@@ -2,6 +2,7 @@
 import mysql.connector
 
 tmp = open('tmp', 'w+') #Temporary File To Write The Stuff
+temp = open('tmp', 'r') #Same, but to read
 
 mydb = mysql.connector.connect( 
   host="192.168.0.101",
@@ -12,26 +13,30 @@ mydb = mysql.connector.connect(
 
 times = int(input("How Many Items? : "))
 for i in range(times): #It'll keep repeating for the amount of items
-  id = input("\nID: ") # ID As In The First Column
-  sql_select_Query = f"select * from paddigurlTest WHERE id = {id}" # This Will Be Sent To The Database
-  cursor = mydb.cursor() # This Is As If You Were Entering It Yourself
-  cursor.execute(sql_select_Query) # Executes
-  records = cursor.fetchall() # Gets All The Outputs
-  for row in records: 
-    print(f"\nName  : {row[1]}")
-    print(f"Price : {row[2]}")
-    tmp.write(f'\n{row[2]}')
+  try:
+    id = input("\nID: ") # ID As In The First Column
+    if id == 'stop':
+      break
+    else:
+      sql_select_Query = f"select * from paddigurlTest WHERE id = {id}" # This Will Be Sent To The Database
+      cursor = mydb.cursor() # This Is As If You Were Entering It Yourself
+      cursor.execute(sql_select_Query) # Executes
+      records = cursor.fetchall() # Gets All The Outputs
+      for row in records: 
+        print(f"\nName  : {row[1]}")
+        print(f"Price : {row[2]}")
+        tmp.write(f'\n{row[2]}')
+  except mysql.connector.Error as rim:
+    print('An Error Occured!\n\n', rim)
 
-total = 0 # Necessary
-price_unchained = tmp.read()
+price_unchained = temp.read()
 for line in price_unchained:
   try:
-    number = int(line)
-    total += number
+    total += int(line)
   except ValueError as e:
     print(f'Error Occured:\n\n{e}')
 
-print(f'Total: {total}')
+print(f'\nTotal: {total}')
 cu = int(input('Cash Given: '))
 bal = int(cu - total)
 if bal == 0:
