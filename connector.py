@@ -20,8 +20,9 @@ for i in range(times): #It'll keep repeating for the amount of items
   for row in records: 
     print(f"\nName  : {row[1]}")
     print(f"Price : {row[2]}")
-    tmp.write(f'\n{row[1]}')
+    tmp.write(f'\n{row[2]}')
 
+total = 0 # Necessary
 price_unchained = tmp.read()
 for line in price_unchained:
   try:
@@ -32,3 +33,8 @@ for line in price_unchained:
 
 print(f'Total: {total}')
 cu = int(input('Cash Given: '))
+bal = int(cu - total)
+if bal == 0:
+  print('\nNo Balance!')
+else:
+  print(f'Balance: {bal}')
