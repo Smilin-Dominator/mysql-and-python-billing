@@ -8,10 +8,13 @@ mydb = mysql.connector.connect(
   database='Miscellaneous'
 ) # The Credz
 
-id = input("ID: ") # ID As In The First Column
-sql_select_Query = f"select * from paddigurlTest WHERE id = {id}" # This Will Be Sent To The Database
-cursor = mydb.cursor()
-cursor.execute(sql_select_Query)
-records = cursor.fetchall()
-for row in records:
-  print(row[1])
+times = int(input("How Many Items? : "))
+for i in range(times): #It'll keep repeating for the amount of items
+  id = input("\nID: ") # ID As In The First Column
+  sql_select_Query = f"select * from paddigurlTest WHERE id = {id}" # This Will Be Sent To The Database
+  cursor = mydb.cursor()
+  cursor.execute(sql_select_Query)
+  records = cursor.fetchall()
+  for row in records: 
+    print(f"\nName  : {row[1]}")
+    print(f"Price : {row[2]}")
