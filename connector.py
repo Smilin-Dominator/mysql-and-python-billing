@@ -1,8 +1,13 @@
 #!/usr/bin/env python3.7.9
 import mysql.connector
+import os
+import logging
 
-tmp = open('tmp', 'w+') #Temporary File To Write The Stuff
-temp = open('tmp', 'r') #Same, but to read
+log_format = '%(asctime)s : %(message)s'
+logcon = logging.basicConfig(filename='log.txt', format=log_format, datefmt='[%Y-%m-%d] [%H:%M:%S]', level=logging.DEBUG)
+
+tmp = open('tmp.txt', 'w') #Temporary File To Write The Amounts
+temp = open('tmp.txt', 'r') # Read
 
 mydb = mysql.connector.connect( 
   host="192.168.0.101",
@@ -12,6 +17,7 @@ mydb = mysql.connector.connect(
 ) # The Credentials For The Database
 
 times = int(input("How Many Items? : "))
+logging.warning(f'Chose {times} Items')
 for i in range(times): #It'll keep repeating for the amount of items
   try:
     id = input("\nID: ") # ID As In The First Column
@@ -26,20 +32,7 @@ for i in range(times): #It'll keep repeating for the amount of items
         print(f"\nName  : {row[1]}")
         print(f"Price : {row[2]}")
         tmp.write(f'\n{row[2]}')
-  except mysql.connector.Error as rim:
+        logging.info(f'Sold Item;\n{records}')
+  except Exception as rim:
     print('An Error Occured!\n\n', rim)
-
-price_unchained = temp.read()
-for line in price_unchained:
-  try:
-    total += int(line)
-  except ValueError as e:
-    print(f'Error Occured:\n\n{e}')
-
-print(f'\nTotal: {total}')
-cu = int(input('Cash Given: '))
-bal = int(cu - total)
-if bal == 0:
-  print('\nNo Balance!')
-else:
-  print(f'Balance: {bal}')
+    logging.error("MySQL Error:\n\n",rim)
