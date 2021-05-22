@@ -1,4 +1,3 @@
-#!/usr/bin/env python3.7.9
 import mysql.connector
 import os
 import logging
@@ -6,14 +5,14 @@ import logging
 log_format = '%(asctime)s : %(message)s'
 logcon = logging.basicConfig(filename='log.txt', format=log_format, datefmt='[%Y-%m-%d] [%H:%M:%S]', level=logging.DEBUG)
 
-tmp = open('tmp.txt', 'w') #Temporary File To Write The Amounts
-temp = open('tmp.txt', 'r') # Read
+tmp = open('tmp.txt', 'w+') #Temporary File To Write The Amounts
 
-mydb = mysql.connector.connect( 
-  host="192.168.0.101",
+mydb = mysql.connector.connect(
+  auth_plugin='mysql_native_password',
+  host="192.168.10.5",
   user="smilin_dominator",
-  password="CaptainPrice@2356",
-  database='Miscellaneous'
+  password="Barney2356",
+  database='miscellaneous'
 ) # The Credentials For The Database
 
 times = int(input("How Many Items? : "))
@@ -31,8 +30,9 @@ for i in range(times): #It'll keep repeating for the amount of items
       for row in records: 
         print(f"\nName  : {row[1]}")
         print(f"Price : {row[2]}")
-        tmp.write(f'\n{row[2]}')
+        tmp.writelines(f'{row[2]}\n')
         logging.info(f'Sold Item;\n{records}')
+      tmp.flush()
   except Exception as rim:
     print('An Error Occured!\n\n', rim)
     logging.error("MySQL Error:\n\n",rim)

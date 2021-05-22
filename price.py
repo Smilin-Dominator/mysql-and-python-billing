@@ -1,25 +1,21 @@
-import connector
-from connector import temp, log_format
+from connector import log_format
 import logging
 
 logging.basicConfig(filename='log.txt', format=log_format, datefmt='[%Y-%m-%d] [%H:%M:%S]', level=logging.DEBUG)
 
+temp = open('tmp.txt', 'r') 
 tot = 0
-price_unchained = temp.readlines()
+price_unchained = (temp.read().splitlines())
+print(price_unchained)
 try:
-    ar = []
-    for line in price_unchained:
-        try:
-            if line.isdigit() == True:
-                ar.append(line)
-        except Exception as ex:
-            logging.error(ex)
-    desired_array = [int(numeric_string) for numeric_string in ar]
-    for i in range(0, len(desired_array)):
-        tot = tot + desired_array[i]
-except Exception as eeee:
-  print(eeee)
-  logging.error(eeee)
+  desired_array = [int(numeric_string) for numeric_string in price_unchained]
+  for i in range(0, len(desired_array)):
+      tot = tot + desired_array[i]
+      print(i)
+  print(tot)
+except Exception as err2:
+  print(err2)
+  logging.error(err2)
 
 print(f'\nTotal:', str(tot))
 logging.info(f'Total: Rs. {tot}')
