@@ -29,12 +29,11 @@ while id != 'Stop':
       for row in records: 
         name = row[1]
         price = row[2]
-        quantity = input("Quantity: ")
+        quantity = int(input("Quantity: "))
         print(f"\nName  : {name}")
         print(f"Price : {price}")
-        print(f"Quantity: {quantity}")
-        tmp.writelines(f'{row[2]}\n')
-        logging.info(f'Sold Item;\n{records}')
+        tmp.writelines(f'{int(price) * quantity}\n')
+        logging.info(f'Sold {quantity} Of Item;\n{records}, totalling Rs. {str(int(price) * quantity)}')
       tmp.flush()
   except Exception as rim:
     print('An Error Occured!\n\n', rim)
