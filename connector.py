@@ -27,19 +27,20 @@ while id != ' ':
         if id == '':
             fileTime = str(time.strftime('%I_%M_%p'))
             fileName = f"[BILL]-{customerName}-{fileTime}.txt"
-            fileOpen = open(fileName, 'w+')
+            filePath = os.path.join('./bills', fileName)
+            fileOpen = open(filePath, 'w+')
             myFormat = "{:<25}{:<15}{:<15}{:<15}"
             print('\n')
             formPrep = myFormat.format('Name', 'Price', 'Quantity', 'Total')
             print(formPrep)
             fileOpen.write(f'Date: {str(time.strftime("%m/%d/%Y"))}')
-            fileOpen.write(f'\nTime: {str(time.strftime("%H.%m %p"))}')
+            fileOpen.write(f'\nTime: {str(time.strftime("%I.%M %p"))}')
             fileOpen.write(f'\nCustomer: {customerName}\n')
-            fileOpen.write(formPrep)
+            fileOpen.write(f'\n{formPrep}')
             for i in range(len(ar)):
                 final = myFormat.format(ar[i][0], ar[i][1], ar[i][2], ar[i][3])
                 print(final)
-                fileOpen.write(f'{final}\n')
+                fileOpen.write(f'\n{final}')
             tot = 0
             price_unchained = []
             for i in range(len(ar)):
@@ -49,8 +50,8 @@ while id != ' ':
                 price_unchained.append(fin)
             for i in range(0, len(price_unchained)):
                 tot = tot + price_unchained[i]
-            print(f'\nTotal:', str(tot))
-            fileOpen.write(f"\nTotal:', {str(tot)}")
+            print(f'\nTotal:, {str(tot)}')
+            fileOpen.write(f'\n\nTotal: {str(tot)}')
             logging.info(f'Total: Rs. {tot}')
 
             cu = int(input('Cash Given: Rs. '))
