@@ -31,7 +31,7 @@ if not check:
 
 else:
     print("Bills DIR Found..Proceeding...\n")
-    key = 2
+key = 2
 while key == 2:
     randomNumGen = random.randint(1, len(messageOfTheSecond)) # RNG, unscripted order
     print(f"Message Of The Second: {messageOfTheSecond[randomNumGen]}")  # pulls from the Dictionary
