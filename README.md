@@ -17,4 +17,7 @@ you know what you're doing, or else, you'll be doomed!</font>
 ### Running
 <font size="9">Run main.py in a directory where you have full permissions. It should automatically make a 
 DIR called 'bills', remember all the soft copies of the bills will be written over there
-. Then enter the IDs, once your done, hit enter when it prompts for the ID again.</font>
+. Then enter the IDs, once your done, hit enter when it prompts for the ID again.<br>
+In case you accidentally put the wrong amount (for the Cash Recieved), the computer calculates the balance before writing it,
+so if it detects that its < 0, it'll loop (without writing the output) until the balance gets an answer >= 0, and only then, will
+it write the amount of cash recieved and the balance.</font>
