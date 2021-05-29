@@ -1,3 +1,6 @@
+# This Program was made by the one and only
+# Devisha Padmaperuma!
+
 import os
 
 key = 2
