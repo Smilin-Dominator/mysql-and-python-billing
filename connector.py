@@ -24,8 +24,8 @@ ar = []  # declared as empty, will get filled in the process
 while id != ' ':
     try:
         id = input("\nID: ")  # ID As In The First Column
-        if id == '': # if you just hit enter
-            fileTime = str(time.strftime('%I_%M_%p'))  # eg: 07_10_PM
+        if id == '':  # if you just hit enter
+            fileTime = str(time.strftime('%I.%M %p'))  # eg: 07.10 PM
             fileName = f"[BILL]-{customerName}-{fileTime}.txt"  # format of the filename
             filePath = os.path.join('./bills', fileName)  # adds it into the bills DIR
             fileOpen = open(filePath, 'w+')  # Opens the bill file for writing
@@ -82,7 +82,7 @@ while id != ' ':
             cursor = mydb.cursor()  # This Is As If You Were Entering It Yourself
             cursor.execute(sql_select_Query)  # Executes
             records = cursor.fetchall()  # Gets All The Outputs
-            if records: # Basically proceeds if its not empty like []
+            if records:  # Basically proceeds if its not empty like []
                 quantity = int(input("Quantity: "))
                 for row in records:
                     name = row[1]  # gets the element from the data

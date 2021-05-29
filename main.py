@@ -25,7 +25,7 @@ while key == 2:
         print('Success!\n')
     else:
         print("Bills DIR Found..Proceeding...\n")
-    os.system('connector.py')  # runs the main python file
+        os.system('connector.py')  # runs the main python file
     key = int(input("Would You Like To Stop, Or Continue? (1/2)\n: "))
     if key == 1:
         quit()
