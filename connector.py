@@ -6,8 +6,6 @@ import os
 log_format = '%(asctime)s : %(message)s'
 logging.basicConfig(filename='log.txt', format=log_format, datefmt='[%Y-%m-%d] [%H:%M:%S]', level=logging.DEBUG)
 
-tmp = open('tmp.txt', 'w+')  # Temporary File To Write The Amounts
-
 mydb = mysql.connector.connect(
     auth_plugin='mysql_native_password',
     host="192.168.10.5",
@@ -27,9 +25,8 @@ while id != ' ':
     try:
         id = input("\nID: ")  # ID As In The First Column
         if id == '':
-            dir = os.getcwd()
-            fileTime = str(time.strftime('%H-%M'))
-            fileName = f"[BILL]_{customerName}_{fileTime}.txt"
+            fileTime = str(time.strftime('%I_%M_%p'))
+            fileName = f"[BILL]-{customerName}-{fileTime}.txt"
             fileOpen = open(fileName, 'w+')
             myFormat = "{:<25}{:<15}{:<15}{:<15}"
             print('\n')
@@ -96,13 +93,10 @@ while id != ' ':
                     tuppence = (name, price, quantity, total)
                     ar.append(tuppence)
                     # and now its done.... (suspense)
-                    tmp.writelines(f'{total}\n')
                     logging.info(
                         f'Sold {quantity} Of Item;\n{records}, bringing the total to Rs. {total}')
             else:
                 print("\nDid You Enter The Right ID?\n")
                 logging.warning(f"Entered Wrong ID: {id}")
-            tmp.flush()
     except Exception as rim:
         logging.error("Error:\n\n", rim)
-tmp.close()
