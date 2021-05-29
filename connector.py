@@ -4,8 +4,7 @@ import time
 import os
 
 log_format = '%(asctime)s : %(message)s'
-logcon = logging.basicConfig(filename='log.txt', format=log_format, datefmt='[%Y-%m-%d] [%H:%M:%S]',
-                             level=logging.DEBUG)
+logging.basicConfig(filename='log.txt', format=log_format, datefmt='[%Y-%m-%d] [%H:%M:%S]', level=logging.DEBUG)
 
 tmp = open('tmp.txt', 'w+')  # Temporary File To Write The Amounts
 
@@ -29,8 +28,10 @@ while id != ' ':
     try:
         id = input("\nID: ")  # ID As In The First Column
         if id == '':
-            fileName = str(time.strftime('%d-%m-%y_%H:%M')) + '.txt'
-            filePath = os.path.join('./bills' + fileName)
+            dir = os.getcwd()
+            fileTime = str(time.strftime('%d--%H:%M'))
+            fileName = fileTime + '.txt'
+            filePath = os.path.join(dir, '\\bills', fileName)
             fileOpen = open(filePath, 'w+')
             myformat = "{:<25}{:<15}{:<15}{:<15}"
             print('\n')
@@ -44,7 +45,8 @@ while id != ' ':
                 final = myformat.format(ar[i][0], ar[i][1], ar[i][2], ar[i][3])
                 print(final)
                 fileOpen.write(final)
-            fileOpen.flush()
+                fileOpen.flush()
+            fileOpen.close()
             break
         else:
             sql_select_Query = f"select * from paddigurlTest WHERE id = {id}"  # This Will Be Sent To The Database
@@ -58,7 +60,7 @@ while id != ' ':
                 print(f"Price : {price}")
                 quantity = int(input("\nQuantity: "))
                 total = int(price) * quantity
-                # Appending to the blank arrays ...
+                # Appending to the blank array ...
                 tuppence = (name, price, quantity, total)
                 ar.append(tuppence)
                 # and now its done.... (suspense)
@@ -67,7 +69,5 @@ while id != ' ':
                     f'Sold {quantity} Of Item;\n{records}, bringing the total to Rs. {total}')
             tmp.flush()
     except Exception as rim:
-        print('An Error Occured!\n\n', rim)
         logging.error("Error:\n\n", rim)
 tmp.close()
-fileOpen.close()
