@@ -44,37 +44,40 @@ while id != ' ':
             tot = 0
             price_unchained = []  # blank array, like the earlier one
             for i in range(len(ar)):
-                price = ar[i][1]  # WOAH 2 []'s ??. These are elements of tuples inside tuples
-                quantity = ar[i][2]
-                fin = int(price) * int(quantity)  # total calculation
+                fin = int(ar[i][3])
                 price_unchained.append(fin)  # appends to the array
             for i in range(0, len(price_unchained)):
                 tot = tot + price_unchained[i]  # paradox alert! this variable is dynamic, it remembers the past state.
-            print(f'\nTotal:, {str(tot)}')
+            print(f'\nTotal: {str(tot)}')
             fileOpen.write(f'\n\nTotal: {str(tot)}')
             logging.info(f'Total: Rs. {tot}')  # Three simultaneous actions here lol
-
-            cu = int(input('Cash Given: Rs. '))
-            logging.info(f'Cash Given: Rs. {cu}')
-            fileOpen.write(f'\nCash Given: Rs. {cu}')
-            bal = int(cu - tot)
-            if bal < 0:
-                print("Negative Value, Something's Off")  # something's **really** off (why doesnt MD work?)
-                logging.info('Negative Balance')
-                fileOpen.write('\nNegative Balance')
-            elif bal == 0:
-                print('\nNo Balance!')
-                logging.info('No Balance')
-                fileOpen.write(f'\nNo Balance!')
-            else:
-                print(f'Balance: Rs. {bal}')
-                logging.info(f'Balance: Rs. {str(bal)}\n')
-                fileOpen.write(f'\nBalance: Rs. {bal}')
+            passOff = False
+            while passOff == False:
+                cu = int(input('Cash Given: Rs. '))
+                bal = int(cu - tot)
+                if bal < 0:  # loops if its a negative number!
+                    print("Negative Value, Something's Off, Retry")  # something's **really** off (why doesnt MD work?)
+                    logging.warning('Negative Balance')
+                    passOff = False
+                elif bal == 0:
+                    logging.info(f'Cash Given: Rs. {cu}')
+                    fileOpen.write(f'\nCash Given: Rs. {cu}')
+                    print('\nNo Balance!')
+                    logging.info('No Balance')
+                    fileOpen.write(f'\nNo Balance!')
+                    break  # passes if its not
+                else:
+                    logging.info(f'Cash Given: Rs. {cu}')
+                    fileOpen.write(f'\nCash Given: Rs. {cu}')
+                    print(f'Balance: Rs. {bal}')
+                    logging.info(f'Balance: Rs. {str(bal)}\n')
+                    fileOpen.write(f'\nBalance: Rs. {bal}')
+                    break
             break
         elif id == 'Kill':  # had to add an emergency kill function :)
             killPass = input("Enter Password: ")
-            if killPass == '627905':  # this is in plaintext, because im converting it to an exe
-                quit()  # simple as that
+            if killPass == '627905':  # alter the code here if you want
+                quit()
             else:
                 print("\n[ Wrong Password ]\n")  # thats the wrong number! (ooohhhh)
         else:
