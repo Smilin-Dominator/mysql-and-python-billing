@@ -98,9 +98,10 @@ while id != ' ':
                     ar.append(tuppence)
                     # and now its done.... (suspense)
                     logging.info(  # have to have a backup:)
-                        f'Sold {quantity} Of Item;\n{records}, bringing the total to Rs. {total}')
+                        f'Sold {quantity} Of Item;\n{records}, bringing the total to Rs. {total}'
+                    )
             else:
                 print("\nDid You Enter The Right ID?")  # congratulations! you're a failure!
                 logging.warning(f"Entered Wrong ID: {id}")
     except Exception as rim:
-        logging.error("Error:\n\n", rim)  # rim alert
+        logging.error(rim)  # rim alert

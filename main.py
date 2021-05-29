@@ -20,7 +20,7 @@ messageOfTheSecond = {  # if you don't recognize this song, stop reading this an
         10: "You Do Not Amaze Me, Ayy, Obama Just Paged Me, Ayy",
         11: "This, That, Grey Poupon, That Evian, That Ted Talk",
         12: "Watch My Soul Speak. You, Let The Meds Talk"
-    }
+}
 
 check = os.path.exists('bills/')
 
@@ -28,9 +28,9 @@ if not check:
     print("Bills DIR not Found, Creating....")
     os.mkdir("bills/")  # Makes the DIR
     print('Success!\n')
-
 else:
     print("Bills DIR Found..Proceeding...\n")
+
 key = 2
 while key == 2:
     randomNumGen = random.randint(1, len(messageOfTheSecond)) # RNG, unscripted order
