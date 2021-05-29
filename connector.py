@@ -53,23 +53,28 @@ while id != ' ':
             print(f'\nTotal:, {str(tot)}')
             fileOpen.write(f'\n\nTotal: {str(tot)}')
             logging.info(f'Total: Rs. {tot}')  # Three simultaneous actions here lol
-
-            cu = int(input('Cash Given: Rs. '))
-            logging.info(f'Cash Given: Rs. {cu}')
-            fileOpen.write(f'\nCash Given: Rs. {cu}')
-            bal = int(cu - tot)
-            if bal < 0:
-                print("Negative Value, Something's Off")  # something's **really** off (why doesnt MD work?)
-                logging.info('Negative Balance')
-                fileOpen.write('\nNegative Balance')
-            elif bal == 0:
-                print('\nNo Balance!')
-                logging.info('No Balance')
-                fileOpen.write(f'\nNo Balance!')
-            else:
-                print(f'Balance: Rs. {bal}')
-                logging.info(f'Balance: Rs. {str(bal)}\n')
-                fileOpen.write(f'\nBalance: Rs. {bal}')
+            passOff = False
+            while passOff == False:
+                cu = int(input('Cash Given: Rs. '))
+                bal = int(cu - tot)
+                if bal < 0:
+                    print("Negative Value, Something's Off, Retry")  # something's **really** off (why doesnt MD work?)
+                    logging.warning('Negative Balance')
+                    passOff = False
+                elif bal == 0:
+                    logging.info(f'Cash Given: Rs. {cu}')
+                    fileOpen.write(f'\nCash Given: Rs. {cu}')
+                    print('\nNo Balance!')
+                    logging.info('No Balance')
+                    fileOpen.write(f'\nNo Balance!')
+                    break
+                else:
+                    logging.info(f'Cash Given: Rs. {cu}')
+                    fileOpen.write(f'\nCash Given: Rs. {cu}')
+                    print(f'Balance: Rs. {bal}')
+                    logging.info(f'Balance: Rs. {str(bal)}\n')
+                    fileOpen.write(f'\nBalance: Rs. {bal}')
+                    break
             break
         elif id == 'Kill':  # had to add an emergency kill function :)
             killPass = input("Enter Password: ")
