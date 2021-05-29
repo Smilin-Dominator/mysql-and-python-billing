@@ -15,17 +15,20 @@ except Exception as err2:
     logging.error(err2)
 
 fileAppend = open(filePath, 'a')
+
 print(f'\nTotal:', str(tot))
 fileAppend.write(f"\nTotal:', {str(tot)}")
 logging.info(f'Total: Rs. {tot}')
+
 cu = int(input('Cash Given: Rs. '))
 logging.info(f'Cash Given: Rs. {cu}')
 fileAppend.write(f'\nCash Given: Rs. {cu}')
+
 try:
     bal = int(cu - tot)
-except Exception as e:
-    print(f"Error: {e}")
+except ValueError as e:
     logging.error(e)
+
 if bal == 0:
     print('\nNo Balance!')
     logging.info('No Balance')
@@ -35,4 +38,3 @@ else:
     logging.info(f'Balance: Rs. {str(bal)}\n')
     fileAppend.write(f'\nBalance: Rs. {bal}')
     fileAppend.flush()
-fileAppend.close()

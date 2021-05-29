@@ -24,7 +24,7 @@ while key == 2:
         print('Success!\n')
     else:
         print("Bills DIR Found..Proceeding...\n")
-    os.system('price.py')
+    os.system('connector.py')
     key = int(input("Would You Like To Stop, Or Continue? (1/2)\n: "))
     if key == 1:
         os.remove('tmp.txt')
