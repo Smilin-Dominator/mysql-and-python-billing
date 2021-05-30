@@ -19,7 +19,8 @@ if not customerName:  # ' ' => blank
     customerName = '(Not Specified)'
 logging.info(f"Sold the following to {customerName}")  # you'll see this often, in case any bills go missing
                                                        # logs are the go-to place
-id = 69  # well, had to declare it as something -\_/-
+global myFormat
+id = 69420666  # well, had to declare it as something -\_/-
 ar = []  # declared as empty, will get filled in the process
 while id != ' ':
     try:
@@ -80,6 +81,26 @@ while id != ' ':
                 quit()
             else:
                 print("\n[ Wrong Password ]\n")  # thats the wrong number! (ooohhhh)
+        elif id == 'del':
+            for i in range(len(ar)):  # reuse
+                final = myFormat.format(ar[i][0], ar[i][1], ar[i][2], ar[i][3])
+                print(final)
+            theLoop = True
+            while theLoop:
+                try:
+                    delKey = input("The (Name) To Be Removed: ")
+                    for i in range(len(ar)):
+                        if ar[i][0] == delKey:
+                            popTime = ar[i]
+                            ar.remove(popTime)
+                            break
+                    print("Success! Press (enter) To See The Updated Version!")
+                    logging.info(f"Successfully Deleted Entry {delKey}")
+                    theLoop = False
+                except Exception as e:
+                    logging.error(e)
+                    print("[ Error Occurred, Please Retry ]")
+                    theLoop = True
         else:
             sql_select_Query = f"select * from paddigurlTest WHERE id = {id}"  # This Will Be Sent To The Database
             cursor = mydb.cursor()  # This Is As If You Were Entering It Yourself
