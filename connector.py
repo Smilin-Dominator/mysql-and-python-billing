@@ -21,7 +21,8 @@ logging.info(f"\nSold the following to {customerName}")  # you'll see this often
                                                          # logs are the go-to place
 
 myFormat = "{:<25}{:<15}{:<15}{:<15}"  # format for the .format() :)
-formPrep = myFormat.format('Name', 'Price', 'Quantity', 'Total')  # headers
+fileHeaderFormat = "{:^70}"
+formPrep = myFormat.format('Name', 'Price (Rs.)', 'Quantity', 'Total (Rs.)')  # headers
 
 idInput = 69420666  # well, had to declare it as something -\_/-
 ar = []  # declared as empty, will get filled in the process
@@ -35,7 +36,10 @@ while idInput != ' ':
             fileOpen = open(filePath, 'w+')  # Opens the bill file for writing
             print('\n')  # just a spacer
             print(formPrep)
-            fileOpen.write(f'Date: {str(time.strftime("%d/%m/%Y"))}')  # eg: 02/05/2021
+            fileOpen.write(f"{fileHeaderFormat.format(70 * '-')}")
+            fileOpen.write(f"\n{fileHeaderFormat.format('Paddy Enterprises (Pvt) Ltd.')}")
+            fileOpen.write(f"\n{fileHeaderFormat.format(70 * '-')}")
+            fileOpen.write(f'\n\nDate: {str(time.strftime("%d/%m/%Y"))}')  # eg: 02/05/2021
             fileOpen.write(f'\nTime: {str(fileTime)}')  # uses the variable set earlier
             fileOpen.write(f'\nCustomer: {customerName}\n')
             fileOpen.write(f'\n{formPrep}')
@@ -50,27 +54,39 @@ while idInput != ' ':
                 price_unchained.append(fin)  # appends to the array
             for i in range(0, len(price_unchained)):
                 tot = tot + price_unchained[i]  # paradox alert! this variable is dynamic, it remembers the past state.
-            print(f'\nTotal: {str(tot)}')
-            fileOpen.write(f'\n\nTotal: {str(tot)}')
-            logging.info(f'Total: Rs. {tot}')  # Three simultaneous actions here lol
+            print(f'\nSubtotal: Rs. {str(tot)}')
+            fileOpen.write(f'\n\nSubtotal: Rs. {str(tot)}')
+            logging.info(f'Subtotal: Rs. {tot}')  # Three simultaneous actions here lol
+            discountInput = int(input("Discount (%): "))
             passOff = False
+            try:
+                discountSum = tot * (100 - discountInput) / 100
+                discountTotal = round(discountSum)
+                print(f"Total: Rs. {discountTotal}")
+                fileOpen.write(f"\nDiscount: Rs. {discountInput}%")
+                fileOpen.write(f"\nTotal: Rs. {discountTotal}")
+                logging.info(f"Discount: {discountInput}%")
+                logging.info(f"Total: {discountTotal}")
+            except Exception as e:
+                logging.error(e)
+                discountTotal = 0  # backup
             while not passOff:
-                cu = int(input('Cash Given: Rs. '))
-                bal = int(cu - tot)
+                cashGiven = int(input('Cash Given: Rs. '))
+                bal = int(cashGiven - discountTotal)
                 if bal < 0:  # loops if its a negative number!
                     print("Negative Value, Something's Off, Retry")  # something's **really** off (why doesnt MD work?)
                     logging.warning('Negative Balance')
                     passOff = False
                 elif bal == 0:
-                    logging.info(f'Cash Given: Rs. {cu}')
-                    fileOpen.write(f'\nCash Given: Rs. {cu}')
+                    logging.info(f'Cash Given: Rs. {cashGiven}')
+                    fileOpen.write(f'\n\nCash Given: Rs. {cashGiven}')
                     print('\nNo Balance!')
                     logging.info('No Balance')
                     fileOpen.write(f'\nNo Balance!')
                     break  # passes if its not
                 elif bal > 0:
-                    logging.info(f'Cash Given: Rs. {cu}')
-                    fileOpen.write(f'\nCash Given: Rs. {cu}')
+                    logging.info(f'Cash Given: Rs. {cashGiven}')
+                    fileOpen.write(f'\nCash Given: Rs. {cashGiven}')
                     print(f'Balance: Rs. {bal}')
                     logging.info(f'Balance: Rs. {str(bal)}\n')
                     fileOpen.write(f'\nBalance: Rs. {bal}')
@@ -83,8 +99,8 @@ while idInput != ' ':
             else:
                 print("\n[ Wrong Password ]\n")  # thats the wrong number! (ooohhhh)
         elif idInput == 'del':
+            print(f"\n{formPrep}")
             for i in range(len(ar)):  # reuse
-                print(f"\n{formPrep}")
                 final = myFormat.format(ar[i][0], ar[i][1], ar[i][2], ar[i][3])
                 print(final)
             theLoop = True
