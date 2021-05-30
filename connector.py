@@ -17,8 +17,8 @@ mydb = mysql.connector.connect(
 customerName = input("Customer: ")  # Optional, if you're in a hurry, just leave blank
 if not customerName:  # ' ' => blank
     customerName = '(Not Specified)'
-logging.info(f"Sold the following to {customerName}")  # you'll see this often, in case any bills go missing
-                                                       # logs are the go-to place
+logging.info(f"\nSold the following to {customerName}")  # you'll see this often, in case any bills go missing
+                                                         # logs are the go-to place
 
 myFormat = "{:<25}{:<15}{:<15}{:<15}"  # format for the .format() :)
 formPrep = myFormat.format('Name', 'Price', 'Quantity', 'Total')  # headers
@@ -54,7 +54,7 @@ while idInput != ' ':
             fileOpen.write(f'\n\nTotal: {str(tot)}')
             logging.info(f'Total: Rs. {tot}')  # Three simultaneous actions here lol
             passOff = False
-            while passOff == False:
+            while not passOff:
                 cu = int(input('Cash Given: Rs. '))
                 bal = int(cu - tot)
                 if bal < 0:  # loops if its a negative number!
@@ -68,14 +68,14 @@ while idInput != ' ':
                     logging.info('No Balance')
                     fileOpen.write(f'\nNo Balance!')
                     break  # passes if its not
-                else:
+                elif bal > 0:
                     logging.info(f'Cash Given: Rs. {cu}')
                     fileOpen.write(f'\nCash Given: Rs. {cu}')
                     print(f'Balance: Rs. {bal}')
                     logging.info(f'Balance: Rs. {str(bal)}\n')
                     fileOpen.write(f'\nBalance: Rs. {bal}')
                     break
-                quit()
+            quit()
         elif idInput == 'Kill':  # had to add an emergency kill function :)
             killPass = input("Enter Password: ")
             if killPass == '627905':  # alter the code here if you want
@@ -90,12 +90,13 @@ while idInput != ' ':
             while theLoop:
                 try:
                     delKey = input("The (Name) To Be Removed: ")
+                    print(f"\n{formPrep}")
                     for i in range(len(ar)):
                         if ar[i][0] == delKey:
                             popTime = ar[i]
                             ar.remove(popTime)
                             break
-                    print("Success! Type  '--' in the ID prompt To See The Updated Version!")
+                    print("\nSuccess! Type  '--' in the ID prompt To See The Updated Version!")
                     logging.info(f"Successfully Deleted Entry {delKey}")
                     theLoop = False
                 except Exception as e:
@@ -134,7 +135,7 @@ while idInput != ' ':
                             checkName = tempList[i][0]
                             checkPrice = tempList[i][1]
                             if checkName == name and checkPrice == price:
-                                print("Duplicate Detected, Updating Current Entry")
+                                print("\nDuplicate Detected, Updating Current Entry")
                                 currentTotal = tempList[i][3]
                                 currentQuantity = tempList[i][2]
                                 newTotal = int(price) * quantity + currentTotal
@@ -143,6 +144,7 @@ while idInput != ' ':
                                     tempList[i][3] = newTotal
                                     tempList[i][2] = newQuantity
                                     print("Success!")
+                                    logging.info(f"Updated: {checkName}, {checkPrice}\nSet Quantity {currentQuantity} => {newQuantity}\nSet Total: {currentTotal} => {newTotal}")
                                     ar = [tuple(entry) for entry in tempList]
                                     break
                                 except Exception as e:
