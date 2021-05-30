@@ -28,8 +28,10 @@ if not check:
     print("Bills DIR not Found, Creating....")
     os.mkdir("bills/")  # Makes the DIR
     print('Success!\n')
+    pass
 else:
     print("Bills DIR Found..Proceeding...\n")
+    pass
 
 key = 2
 while key == 2:

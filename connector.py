@@ -84,13 +84,13 @@ while idInput != ' ':
                 print("\n[ Wrong Password ]\n")  # thats the wrong number! (ooohhhh)
         elif idInput == 'del':
             for i in range(len(ar)):  # reuse
+                print(f"\n{formPrep}")
                 final = myFormat.format(ar[i][0], ar[i][1], ar[i][2], ar[i][3])
                 print(final)
             theLoop = True
             while theLoop:
                 try:
                     delKey = input("The (Name) To Be Removed: ")
-                    print(f"\n{formPrep}")
                     for i in range(len(ar)):
                         if ar[i][0] == delKey:
                             popTime = ar[i]
