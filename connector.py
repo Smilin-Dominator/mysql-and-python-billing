@@ -19,7 +19,7 @@ if not customerName:  # ' ' => blank
     customerName = '(Not Specified)'
 logging.info(f"Sold the following to {customerName}")  # you'll see this often, in case any bills go missing
                                                        # logs are the go-to place
-global myFormat
+global myFormat, formPrep
 id = 69420666  # well, had to declare it as something -\_/-
 ar = []  # declared as empty, will get filled in the process
 while id != ' ':
@@ -94,13 +94,26 @@ while id != ' ':
                             popTime = ar[i]
                             ar.remove(popTime)
                             break
-                    print("Success! Press (enter) To See The Updated Version!")
+                    print("Success! Type  '--' in the ID prompt To See The Updated Version!")
                     logging.info(f"Successfully Deleted Entry {delKey}")
                     theLoop = False
                 except Exception as e:
                     logging.error(e)
                     print("[ Error Occurred, Please Retry ]")
                     theLoop = True
+        elif id == "--":
+            print(f'\n{formPrep}')
+            for i in range(len(ar)):  # reuse
+                final = myFormat.format(ar[i][0], ar[i][1], ar[i][2], ar[i][3])
+                print(final)
+            tot = 0
+            price_unchained = []  # blank array, like the earlier one
+            for i in range(len(ar)):
+                fin = int(ar[i][3])
+                price_unchained.append(fin)  # appends to the array
+            for i in range(0, len(price_unchained)):
+                tot = tot + price_unchained[i]  # paradox alert! this variable is dynamic, it remembers the past state.
+            print(f'\nTotal: {str(tot)}')
         else:
             sql_select_Query = f"select * from paddigurlTest WHERE id = {id}"  # This Will Be Sent To The Database
             cursor = mydb.cursor()  # This Is As If You Were Entering It Yourself
