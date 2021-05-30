@@ -128,13 +128,42 @@ while idInput != ' ':
                     print(f"\nName  : {name}")
                     print(f"Price : {price}")
                     total = int(price) * quantity
-                    # Appending to the blank array ...
-                    tuppence = (name, price, quantity, total)
-                    ar.append(tuppence)
-                    # and now its done.... (suspense)
-                    logging.info(  # have to have a backup:)
-                        f'Sold {quantity} Of Item;\n{records}, bringing the total to Rs. {total}'
-                    )
+                    if len(ar) > 0:
+                        tempList = [list(item) for item in ar]
+                        for i in range(len(tempList)):
+                            checkName = tempList[i][0]
+                            checkPrice = tempList[i][1]
+                            if checkName == name and checkPrice == price:
+                                print("Duplicate Detected, Updating Current Entry")
+                                currentTotal = tempList[i][3]
+                                currentQuantity = tempList[i][2]
+                                newTotal = int(price) * quantity + currentTotal
+                                newQuantity = int(currentQuantity) + quantity
+                                try:
+                                    tempList[i][3] = newTotal
+                                    tempList[i][2] = newQuantity
+                                    print("Success!")
+                                    ar = [tuple(entry) for entry in tempList]
+                                    break
+                                except Exception as e:
+                                    logging.error(e)
+                                    break
+                        else:
+                            # Appending to the blank array ...
+                            tuppence = (name, price, quantity, total)
+                            ar.append(tuppence)
+                            # and now its done.... (suspense)
+                            logging.info(  # have to have a backup:)
+                                f'Sold {quantity} Of Item;\n{records}, bringing the total to Rs. {total}'
+                            )
+                    else:
+                        # Appending to the blank array ...
+                        tuppence = (name, price, quantity, total)
+                        ar.append(tuppence)
+                        # and now its done.... (suspense)
+                        logging.info(  # have to have a backup:)
+                            f'Sold {quantity} Of Item;\n{records}, bringing the total to Rs. {total}'
+                        )
             else:
                 print("\nDid You Enter The Right ID / Command?")  # congratulations! you're a failure!
                 logging.warning(f"Entered Wrong ID: {idInput}")
