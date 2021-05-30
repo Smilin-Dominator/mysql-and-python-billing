@@ -19,20 +19,21 @@ if not customerName:  # ' ' => blank
     customerName = '(Not Specified)'
 logging.info(f"Sold the following to {customerName}")  # you'll see this often, in case any bills go missing
                                                        # logs are the go-to place
-global myFormat, formPrep
-id = 69420666  # well, had to declare it as something -\_/-
+
+myFormat = "{:<25}{:<15}{:<15}{:<15}"  # format for the .format() :)
+formPrep = myFormat.format('Name', 'Price', 'Quantity', 'Total')  # headers
+
+idInput = 69420666  # well, had to declare it as something -\_/-
 ar = []  # declared as empty, will get filled in the process
-while id != ' ':
+while idInput != ' ':
     try:
-        id = input("\nID: ")  # ID As In The First Column
-        if id == '':  # if you just hit enter
+        idInput = input("\nID: ")  # ID As In The First Column
+        if '' == idInput:  # if you just hit enter
             fileTime = str(time.strftime('%I.%M %p'))  # eg: 07.10 PM
             fileName = f"[BILL]-{customerName}-{fileTime}.txt"  # format of the filename
             filePath = os.path.join('./bills', fileName)  # adds it into the bills DIR
             fileOpen = open(filePath, 'w+')  # Opens the bill file for writing
-            myFormat = "{:<25}{:<15}{:<15}{:<15}"  # format for the .format() :)
             print('\n')  # just a spacer
-            formPrep = myFormat.format('Name', 'Price', 'Quantity', 'Total')
             print(formPrep)
             fileOpen.write(f'Date: {str(time.strftime("%d/%m/%Y"))}')  # eg: 02/05/2021
             fileOpen.write(f'\nTime: {str(fileTime)}')  # uses the variable set earlier
@@ -74,14 +75,14 @@ while id != ' ':
                     logging.info(f'Balance: Rs. {str(bal)}\n')
                     fileOpen.write(f'\nBalance: Rs. {bal}')
                     break
-            break
-        elif id == 'Kill':  # had to add an emergency kill function :)
+                quit()
+        elif idInput == 'Kill':  # had to add an emergency kill function :)
             killPass = input("Enter Password: ")
             if killPass == '627905':  # alter the code here if you want
                 quit()
             else:
                 print("\n[ Wrong Password ]\n")  # thats the wrong number! (ooohhhh)
-        elif id == 'del':
+        elif idInput == 'del':
             for i in range(len(ar)):  # reuse
                 final = myFormat.format(ar[i][0], ar[i][1], ar[i][2], ar[i][3])
                 print(final)
@@ -101,7 +102,7 @@ while id != ' ':
                     logging.error(e)
                     print("[ Error Occurred, Please Retry ]")
                     theLoop = True
-        elif id == "--":
+        elif idInput == '--':
             print(f'\n{formPrep}')
             for i in range(len(ar)):  # reuse
                 final = myFormat.format(ar[i][0], ar[i][1], ar[i][2], ar[i][3])
@@ -115,7 +116,7 @@ while id != ' ':
                 tot = tot + price_unchained[i]  # paradox alert! this variable is dynamic, it remembers the past state.
             print(f'\nTotal: {str(tot)}')
         else:
-            sql_select_Query = f"select * from paddigurlTest WHERE id = {id}"  # This Will Be Sent To The Database
+            sql_select_Query = f"select * from paddigurlTest WHERE id = {idInput}"  # This Will Be Sent To The Database
             cursor = mydb.cursor()  # This Is As If You Were Entering It Yourself
             cursor.execute(sql_select_Query)  # Executes
             records = cursor.fetchall()  # Gets All The Outputs
@@ -135,7 +136,7 @@ while id != ' ':
                         f'Sold {quantity} Of Item;\n{records}, bringing the total to Rs. {total}'
                     )
             else:
-                print("\nDid You Enter The Right ID?")  # congratulations! you're a failure!
-                logging.warning(f"Entered Wrong ID: {id}")
+                print("\nDid You Enter The Right ID / Command?")  # congratulations! you're a failure!
+                logging.warning(f"Entered Wrong ID: {idInput}")
     except Exception as rim:
         logging.error(rim)  # rim alert
