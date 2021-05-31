@@ -24,7 +24,9 @@ so if it detects that its < 0, it'll loop (without writing the output) until the
 it write the amount of cash recieved and the balance.<br>
 Also, if you want to view the output without checking out, type '--' into the ID prompt. <br>**Why Did I Add This?** If you press (enter), it creates a bill file,
 so if you check about 1 minute afterwards, it creates a new file, as the name contains the Hour and Minute!<br>
-In case you add the same item more than 1x, the Program will detect it, take the previous entry, add to it and reappend it.</font>
+In case you add the same item more than 1x, the Program will detect it, take the previous entry, add to it and reappend it.
+Accidentally added 275 of the Wrong Item? No probs. type 'del' and enter the Name of the item you want to delete!<br>
+Accidentally added 450 of the Item you wanted? No probs again. type 'update', When prompted, type the name, then type + or -, space and the amount</font>
 
 ### Function List
 - ID Prompt (ID: )
@@ -34,6 +36,7 @@ In case you add the same item more than 1x, the Program will detect it, take the
     - You may enter any of the following to get to the following (#Rhymes)
         - del
         - Kill
+        - update
 - View Display ([shows the bill])
     - To enter this screen, type '--' in the ID prompt
     - **If you only want to see the total, and not checkout yet, please use this instead of (enter)**
@@ -52,3 +55,14 @@ In case you add the same item more than 1x, the Program will detect it, take the
     - To enter this screen, type 'Kill' in the ID Prompt.
     - You'll be prompted to enter the password, the default is '627905', feel free to change it (connector.py)
     - If successful, it'll kill the process, make sure you delete the Bill manually, if you tried to checkout before doing the above.
+- Update Prompt (What Would You Like To Update? (Name): )
+    - To enter this screen, type 'update' in the ID Prompt.
+    - You'll be prompted to enter the name of the Item, (all items are shown above the prompt)
+    - Afterwards, it'll ask you to input the quantity you want to add / substract
+    - You have to enter '+' for addition and '-' for substraction, leave a space and enter the amount you want to add.
+        - **Note: The Space Is Very Important**
+        - Examples:
+            - To add 20:
+                - `+ 20`
+            - Not:
+                - `+20`
