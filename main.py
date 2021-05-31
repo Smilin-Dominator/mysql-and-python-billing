@@ -27,8 +27,8 @@ def main(messageOfTheSecond):
     key = 2
     while key == 2:
         randomNumGen = random.randint(1, len(messageOfTheSecond)) # RNG, unscripted order
-        print(f"Message Of The Second: {messageOfTheSecond[randomNumGen]}")  # pulls from the Dictionary
-        os.system("python connector.py")
+        print(f"Random Line from HUMBLE.: {messageOfTheSecond[randomNumGen]}")  # pulls from the Dictionary
+        os.system('python3 connector.py')
         key = int(input("Would You Like To Stop, Or Continue? (1/2)\n: "))
         if key == 1:
             quit()
