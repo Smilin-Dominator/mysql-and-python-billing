@@ -28,7 +28,7 @@ def main(messageOfTheSecond):
     while key == 2:
         randomNumGen = random.randint(1, len(messageOfTheSecond)) # RNG, unscripted order
         print(f"Message Of The Second: {messageOfTheSecond[randomNumGen]}")  # pulls from the Dictionary
-        os.system("connector.py")
+        os.system("python connector.py")
         key = int(input("Would You Like To Stop, Or Continue? (1/2)\n: "))
         if key == 1:
             quit()
@@ -36,10 +36,5 @@ def main(messageOfTheSecond):
 
 check = os.path.exists('bills/')
 if not check:
-    print("Bills DIR not Found, Creating....")
     os.mkdir("bills/")  # Makes the DIR
-    print('Success!\n')
-    main(messageOfTheSecond)
-else:
-    print("Bills DIR Found..Proceeding...\n")
-    main(messageOfTheSecond)
+main(messageOfTheSecond)
