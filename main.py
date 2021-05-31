@@ -22,22 +22,24 @@ messageOfTheSecond = {  # if you don't recognize this song, stop reading this an
         12: "Watch My Soul Speak. You, Let The Meds Talk"
 }
 
-check = os.path.exists('bills/')
 
+def main(messageOfTheSecond):
+    key = 2
+    while key == 2:
+        randomNumGen = random.randint(1, len(messageOfTheSecond)) # RNG, unscripted order
+        print(f"Message Of The Second: {messageOfTheSecond[randomNumGen]}")  # pulls from the Dictionary
+        os.system("connector.py")
+        key = int(input("Would You Like To Stop, Or Continue? (1/2)\n: "))
+        if key == 1:
+            quit()
+
+
+check = os.path.exists('bills/')
 if not check:
     print("Bills DIR not Found, Creating....")
     os.mkdir("bills/")  # Makes the DIR
     print('Success!\n')
-    pass
+    main(messageOfTheSecond)
 else:
     print("Bills DIR Found..Proceeding...\n")
-    pass
-
-key = 2
-while key == 2:
-    randomNumGen = random.randint(1, len(messageOfTheSecond)) # RNG, unscripted order
-    print(f"Message Of The Second: {messageOfTheSecond[randomNumGen]}")  # pulls from the Dictionary
-    os.system("connector.py")
-    key = int(input("Would You Like To Stop, Or Continue? (1/2)\n: "))
-    if key == 1:
-        quit()
+    main(messageOfTheSecond)
