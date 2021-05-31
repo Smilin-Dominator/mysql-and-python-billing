@@ -107,14 +107,18 @@ while idInput != ' ':
             while theLoop:
                 try:
                     delKey = input("The (Name) To Be Removed: ")
-                    for i in range(len(ar)):
-                        if ar[i][0] == delKey:
-                            popTime = ar[i]
-                            ar.remove(popTime)
-                            break
-                    print("\nSuccess! Type  '--' in the ID prompt To See The Updated Version!")
-                    logging.info(f"Successfully Deleted Entry {delKey}")
-                    theLoop = False
+                    if delKey == 'abort':
+                        print("Aborting...")
+                        break
+                    else:
+                        for i in range(len(ar)):
+                            if ar[i][0] == delKey:
+                                popTime = ar[i]
+                                ar.remove(popTime)
+                                break
+                        print("\nSuccess! Type  '--' in the ID prompt To See The Updated Version!")
+                        logging.info(f"Successfully Deleted Entry {delKey}")
+                        theLoop = False
                 except Exception as e:
                     logging.error(e)
                     print("[ Error Occurred, Please Retry ]")
@@ -132,6 +136,13 @@ while idInput != ' ':
             for i in range(0, len(price_unchained)):
                 tot = tot + price_unchained[i]  # paradox alert! this variable is dynamic, it remembers the past state.
             print(f'\nTotal: {str(tot)}')
+        elif idInput == 'update':
+            print(f'\n{formPrep}')
+            for i in range(len(ar)):  # reuse
+                final = myFormat.format(ar[i][0], ar[i][1], ar[i][2], ar[i][3])
+                print(final)
+            updateValue = input("What Would You Like To Update? (Name): ")
+
         else:
             sql_select_Query = f"select * from paddigurlTest WHERE id = {idInput}"  # This Will Be Sent To The Database
             cursor = mydb.cursor()  # This Is As If You Were Entering It Yourself
