@@ -141,8 +141,38 @@ while idInput != ' ':
             for i in range(len(ar)):  # reuse
                 final = myFormat.format(ar[i][0], ar[i][1], ar[i][2], ar[i][3])
                 print(final)
-            updateValue = input("What Would You Like To Update? (Name): ")
-
+            theLoop = True
+            while theLoop:
+                try:
+                    updateValue = input("What Would You Like To Update? (Name): ")
+                    tempList = [list(tup) for tup in ar]
+                    for i in range(len(tempList)):
+                        up_name = tempList[i][0]
+                        if updateValue == up_name:
+                            update_key = input("Add Or Remove How Much? (+ amount/ - amount): ")
+                            update_key_check = (update_key.split(' '))
+                            upQuan = int(update_key_check[1])
+                            oldQuan = tempList[i][2]
+                            if update_key_check[0] == '+':
+                                newQuan = upQuan + oldQuan
+                                newTot = newQuan * tempList[i][1]
+                                tempList[i][2] = newQuan
+                                tempList[i][3] = newTot
+                                logging.info(f"Updated: {updateValue}, {ar[i][1]}\nSet Quantity {oldQuan} => {newQuan}\nUpdated Total => {newTot}")
+                                ar = [tuple(entry) for entry in tempList]
+                            elif update_key_check[0] == '-':
+                                newQuan = oldQuan - upQuan
+                                newTot = newQuan * tempList[i][1]
+                                tempList[i][2] = newQuan
+                                tempList[i][3] = newTot
+                                logging.info(f"Updated: {updateValue}, {ar[i][1]}\nSet Quantity {oldQuan} => {newQuan}\nUpdated Total => {newTot}")
+                                ar = [tuple(entry) for entry in tempList]
+                            print("Success!")
+                            break
+                    break
+                except Exception as e:
+                    logging.error(e)
+                    theLoop = True
         else:
             sql_select_Query = f"select * from paddigurlTest WHERE id = {idInput}"  # This Will Be Sent To The Database
             cursor = mydb.cursor()  # This Is As If You Were Entering It Yourself
