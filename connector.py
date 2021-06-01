@@ -146,7 +146,7 @@ while idInput != ' ':
                 price_unchained.append(fin)  # appends to the array
             for i in range(0, len(price_unchained)):
                 tot = tot + price_unchained[i]  # paradox alert! this variable is dynamic, it remembers the past state.
-            print(f'\nTotal: {str(tot)}')
+            print(f'\nSubtotal: {str(tot)}')
         elif idInput == 'update':
             print(f'\n{formPrep}')
             for i in range(len(ar)):  # reuse
@@ -205,7 +205,7 @@ while idInput != ' ':
                     print(f"Price : {price}")
                     total = int(price) * quantity
                     if len(ar) > 0:
-                        tempList = [list(item) for item in ar]
+                        tempList = [list(item) for item in ar]  # converts into a list, since you cant change tuples
                         for i in range(len(tempList)):
                             checkName = tempList[i][0]
                             checkPrice = tempList[i][1]

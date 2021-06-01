@@ -25,8 +25,7 @@ messageOfTheSecond = {
     1: "Nobody Pray for Me, It Been That Day For Me, Yeah!",  # actually who are you? Why are you reading this?
     2: "I remember syrup, sandwiches and crime allowances",  # how did you find this document?
     3: "Pull up to your block, and break it, now we playing Tetris",
-    # Are you male, female or NON-BINARY (or HEXADECIMAL?!)
-    4: "AM to the PM, PM to the AM, rock.",  # lol just kidding, had to mention that.
+    4: "AM to the PM, PM to the AM, rock.",
     5: "If I quit your BM, I still ride Mercedes.",
     6: "If I quit the Season, I still be the greatest",  # 5 & 6 are the best lines in the song
     7: "My Left Stroke Just Went Viral",
@@ -47,8 +46,11 @@ if not firstTime:
         print("Initializing First Time Setup..")
         print(f"OS: {system}")
         os.system('bash setup.sh')
+        print("Success.. Run This File Again.")
+        quit()
     elif system == 'win32':
         print("Initializing First Time Setup..")
         print(f"OS: {system}")
         os.system('powershell setup.ps1')
+        quit()
 main(messageOfTheSecond)
