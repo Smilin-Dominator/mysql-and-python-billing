@@ -161,7 +161,13 @@ while idInput != ' ':
                                 logging.info(f"Updated: {updateValue}, {ar[i][1]}\nSet Quantity {oldQuan} => {newQuan}\nUpdated Total => {newTot}")
                                 ar = [tuple(entry) for entry in tempList]
                             elif update_key_check[0] == '-':
-                                newQuan = oldQuan - upQuan
+                                newQuanCheck = oldQuan - upQuan
+                                if newQuanCheck > 0:
+                                    newQuan = newQuanCheck
+                                else:
+                                    print("[ The Value Is Either Negative or 0, And Has Been Set To 1 ]")
+                                    print("[ If Your Intention Was To Delete This, Use The 'del' Command Instead ]")
+                                    newQuan = 1
                                 newTot = newQuan * tempList[i][1]
                                 tempList[i][2] = newQuan
                                 tempList[i][3] = newTot
