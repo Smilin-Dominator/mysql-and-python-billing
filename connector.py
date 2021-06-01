@@ -72,10 +72,13 @@ while idInput != ' ':
                         passOff = True
                     else:
                         print("[ Try Again, The Discount Sum is Negative ]")
+                        logging.warning("Entered Incorrect Discount %")
                         passOff = False
                 else:
                     print("[ Try Again, Its Either 0 or An Integer ]")
+                    logging.warning("Entered Incorrect Discount %")
                     passOff = False
+            passOff = False
             while not passOff:
                 cashGiven = int(input('Cash Given: Rs. '))
                 bal = int(cashGiven - discountTotal)
@@ -173,6 +176,7 @@ while idInput != ' ':
                                 else:
                                     print("[ The Value Is Either Negative or 0, And Has Been Set To 1 ]")
                                     print("[ If Your Intention Was To Delete This, Use The 'del' Command Instead ]")
+                                    logging.warning(f"Set {updateValue}, {ar[i][1]}'s Quantity to 1")
                                     newQuan = 1
                                 newTot = newQuan * tempList[i][1]
                                 tempList[i][2] = newQuan
