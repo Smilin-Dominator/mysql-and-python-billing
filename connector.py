@@ -1,3 +1,5 @@
+#!/usr/bin/env conda run -n mysql-and-python-billing python
+
 import mysql.connector
 import logging
 import time
