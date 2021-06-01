@@ -24,7 +24,7 @@
     ```
   then the installation was successful!
 - Then you're good to go! Just run main.py, it'll check for log.txt, if it's not present, it'll run
-  the shell script related to your OS!
+  the shell script related to your OS! **Do Not Delete Your log.txt, If you want you may clear it, but not delete it.**
 
 ### Condensed
 <font size="6">In the ID Screen, enter an ID, if you want to check

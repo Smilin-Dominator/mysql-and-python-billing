@@ -5,5 +5,5 @@ Write-Host "Activating Conda Environment..."
 conda activate mysql-and-python-billing
 Write-Host "Success!"
 Write-Host "Installing Dependencies..."
-conda install -c -y conda-forge mysql-connector-python
+conda install -y -c conda-forge mysql-connector-python
 Write-Host "Success!"

@@ -5,5 +5,5 @@ echo "Activating Conda Environment..."
 conda activate mysql-and-python-billing
 echo "Success!"
 echo "Installing Dependencies..."
-conda install -c -y conda-forge mysql-connector-python
+conda install -y -c conda-forge mysql-connector-python
 echo "Success!"
