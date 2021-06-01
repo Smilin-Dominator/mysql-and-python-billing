@@ -11,24 +11,40 @@
 >(without any text) and it'll process the data and create an invoice.</font>
 # How To Use It?
 
-<font size="6">Replace the SQL Credentials and Query to your own. If you want to, tweak any setting, just make sure
-you know what you're doing, or else, you'll be doomed!<br>
-Be sure to read the guide below before using the program!</font>
+<font size="6">Condensed:<br>In the ID Screen, enter an ID, if you want to check
+the invoice use '--', if you want to delete an item from the current list type 'del' and
+follow the on-screen prompt, if you want to update the quantity of an item, type
+update, and interact with the prompt. If for whatever reason, you want to kill the process, use
+Kill, and enter the password '627905'. Once you're 100% sure you're done adding the items and everything
+hit (enter) without any other input in the ID Screen to create the bill, you may enter a discount here.</font>
 
-### Detailed Guide
-<font size="6">Run main.py in a directory where you have full permissions. It should automatically make a 
-DIR called 'bills', remember all the soft copies of the bills will be written over there
-. Then enter the IDs, once your done, hit enter when it prompts for the ID again.<br>
-Beware when entering the discount percentage, if you enter anything other than an integer > 0, it'll default to 0.In case you accidentally put the wrong amount (for the Cash Recieved), the computer calculates the balance before writing it,
-so if it detects that its < 0, it'll loop (without writing the output) until the balance gets an answer >= 0, and only then, will
-it write the amount of cash recieved and the balance.<br>
-Also, if you want to view the output without checking out, type '--' into the ID prompt. <br>**Why Did I Add This?** If you press (enter), it creates a bill file,
-so if you check about 1 minute afterwards, it creates a new file, as the name contains the Hour and Minute!<br>
-In case you add the same item more than 1x, the Program will detect it, take the previous entry, add to it and reappend it.
-Accidentally added 275 of the Wrong Item? No probs. type 'del' and enter the Name of the item you want to delete!<br>
-Accidentally added 450 of the Item you wanted? No probs again. type 'update', When prompted, type the name, then type + or -, space and the amount</font>
+### Scenarios and Combatting Them
+<font size="6">Here are some scenarios you are quite likely to encounter, even if you don't you'll know
+how to deal with them.<br>
+##### Problem 1
+Customer walks in, with a large number of items that you can't sit and peacefully count
+since there's 10 Customers waiting behind him.<br>*Earlier: You had to count the amount of items and input it, and then only enter the IDs*<br>
+*Now: Its looped, until you hit 'enter' or type 'Kill', you can keep adding items*
+##### Problem 2
+Customer brings 10 Dolls, and decides to get another bunch instead of the type she just got.
+<br>*Earlier: You had to restart it, losing all your progress*
+<br>*Now: You can use the 'del' function, to delete the type you don't want, and add the new type*
+##### Problem 3
+Customer doesn't wanna spend **too much**, so each time you add something, they want to see
+the bill.
+<br>*Earlier: You'll mess up the whole operation by just viewing and not entering a cash given value.*
+<br>*Now: type '--' to see the Invoice and the total, but not check out, if you want to checkout, press (enter)*
+##### Problem 4
+Customer brings a total of 7 dolls from 2 types (5 Dolls = A, 2 Dolls = B), he wants to transfer
+remove two dolls from Doll A and get 1 more of Doll B.
+<br>*Earlier: I actually didn't think of this back then, but most likely restart*
+<br>*Now: Use the 'update' function. You can remove 2 from DollA and add 2 to Doll B*
+#### Conclusion
+Hope these scenarios helped you! I'll add more along with the new features that I add!
+<br>***Note: for a more detailed explanation of the functions, check the list below!***
+</font>
 
-### Function List
+# Function List
 - ID Prompt (ID: )
     - When it prompts for the ID, you may enter the ID number, and proceed.
     - If you want to view the current total enter '--' instead of an ID when prompted.
