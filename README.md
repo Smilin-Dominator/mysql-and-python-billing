@@ -23,10 +23,8 @@
     base                  *  C:\Users\Devisha\anaconda3
     ```
   then the installation was successful!
-- then type in this, `conda create -n mysql-and-python-billing python=3.7.10`
- - It'll ask you to confirm, and then afterwards use `conda activate mysql-and-python-billing`
- - Then install the packages by entering this command; `conda install -c conda-forge mysql-connector-python`
- - Then you're good to go! Just run main.py!
+- Then you're good to go! Just run main.py, it'll check for log.txt, if it's not present, it'll run
+  the shell script related to your OS!
 
 ### Condensed
 <font size="6">In the ID Screen, enter an ID, if you want to check
