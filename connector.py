@@ -57,19 +57,25 @@ while idInput != ' ':
             print(f'\nSubtotal: Rs. {str(tot)}')
             fileOpen.write(f'\n\nSubtotal: Rs. {str(tot)}')
             logging.info(f'Subtotal: Rs. {tot}')  # Three simultaneous actions here lol
-            discountInput = int(input("Discount (%): "))
             passOff = False
-            try:
-                discountSum = tot * (100 - discountInput) / 100
-                discountTotal = round(discountSum)
-                print(f"Total: Rs. {discountTotal}")
-                fileOpen.write(f"\nDiscount: Rs. {discountInput}%")
-                fileOpen.write(f"\nTotal: Rs. {discountTotal}")
-                logging.info(f"Discount: {discountInput}%")
-                logging.info(f"Total: {discountTotal}")
-            except Exception as e:
-                logging.error(e)
-                discountTotal = 0  # backup
+            while not passOff:
+                discountInput = int(input("Discount (%): "))
+                if discountInput >= 0:
+                    discountSum = tot * (100 - discountInput) / 100
+                    if discountSum >= 0:
+                        discountTotal = round(discountSum)
+                        print(f"Total: Rs. {discountTotal}")
+                        fileOpen.write(f"\nDiscount: {discountInput}%")
+                        fileOpen.write(f"\nTotal: Rs. {discountTotal}")
+                        logging.info(f"Discount: {discountInput}%")
+                        logging.info(f"Total: Rs. {discountTotal}")
+                        passOff = True
+                    else:
+                        print("[ Try Again, The Discount Sum is Negative ]")
+                        passOff = False
+                else:
+                    print("[ Try Again, Its Either 0 or An Integer ]")
+                    passOff = False
             while not passOff:
                 cashGiven = int(input('Cash Given: Rs. '))
                 bal = int(cashGiven - discountTotal)
