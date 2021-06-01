@@ -11,7 +11,25 @@
 >(without any text) and it'll process the data and create an invoice.</font>
 # How To Use It?
 
-<font size="6">Condensed:<br>In the ID Screen, enter an ID, if you want to check
+### Prerequisites
+<font size="6">You should have an 'Anaconda' Environment, with Python 3.7.10<br>Here's how you make one
+- Download the latest version for your OS [here](https://www.anaconda.com/products/individual).
+- After installation open up powershell, type this; `conda env list`
+- If you see something similar to this;
+    ```
+    C:\Users\Devisha> conda env list
+    # conda environments:
+    #
+    base                  *  C:\Users\Devisha\anaconda3
+    ```
+  then the installation was successful!
+- then type in this, `conda create -n mysql-and-python-billing python=3.7.10`
+ - It'll ask you to confirm, and then afterwards use `conda activate mysql-and-python-billing`
+ - Then install the packages by entering this command; `conda install -c conda-forge mysql-connector-python`
+ - Then you're good to go! Just run main.py!
+
+### Condensed
+<font size="6">In the ID Screen, enter an ID, if you want to check
 the invoice use '--', if you want to delete an item from the current list type 'del' and
 follow the on-screen prompt, if you want to update the quantity of an item, type
 update, and interact with the prompt. If for whatever reason, you want to kill the process, use
