@@ -63,14 +63,18 @@ while idInput != ' ':
             while not passOff:
                 discountInput = int(input("Discount (%): "))
                 if discountInput >= 0:
-                    discountSum = tot * (100 - discountInput) / 100
+                    discountAmount = tot * (discountInput / 100)
+                    discountSum = tot - discountAmount
                     if discountSum >= 0:
-                        discountTotal = round(discountSum)
-                        print(f"Total: Rs. {discountTotal}")
+                        discountTotal = round(discountSum, 2)
+                        print(f"Discount Amount: Rs. {round(discountAmount, 2)}")
+                        print(f"Subtotal w/ Discount: Rs. {discountTotal}")
                         fileOpen.write(f"\nDiscount: {discountInput}%")
-                        fileOpen.write(f"\nTotal: Rs. {discountTotal}")
+                        fileOpen.write(f"\nDiscount Amount: Rs. {round(discountAmount, 2)}")
+                        fileOpen.write(f"\nSubtotal w/ Discount: Rs. {discountTotal}")
                         logging.info(f"Discount: {discountInput}%")
-                        logging.info(f"Total: Rs. {discountTotal}")
+                        logging.info(f"Discount Amount: Rs. {round(discountAmount, 2)}")
+                        logging.info(f"Subtotal w/ Discount: Rs. {discountTotal}")
                         passOff = True
                     else:
                         print("[ Try Again, The Discount Sum is Negative ]")
@@ -80,10 +84,18 @@ while idInput != ' ':
                     print("[ Try Again, Its Either 0 or An Integer ]")
                     logging.warning("Entered Incorrect Discount %")
                     passOff = False
+            vatAmount = discountTotal * (15 / 100)
+            finalTotal = discountTotal + vatAmount
+            print(f"Tax: Rs. {vatAmount}")
+            print(f"Grand Total: Rs. {finalTotal}")
+            logging.info(f"Tax: Rs. {vatAmount}")
+            logging.info(f"Grand Total: Rs. {finalTotal}")
+            fileOpen.write(f"\nTax : Rs. {vatAmount}")
+            fileOpen.write(f"\nGrand Total: Rs. {finalTotal}")
             passOff = False
             while not passOff:
                 cashGiven = int(input('Cash Given: Rs. '))
-                bal = int(cashGiven - discountTotal)
+                bal = int(cashGiven - finalTotal)
                 if bal < 0:  # loops if its a negative number!
                     print("Negative Value, Something's Off, Retry")  # something's **really** off (why doesnt MD work?)
                     logging.warning('Negative Balance')
