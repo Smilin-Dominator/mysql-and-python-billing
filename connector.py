@@ -57,19 +57,28 @@ while idInput != ' ':
             print(f'\nSubtotal: Rs. {str(tot)}')
             fileOpen.write(f'\n\nSubtotal: Rs. {str(tot)}')
             logging.info(f'Subtotal: Rs. {tot}')  # Three simultaneous actions here lol
-            discountInput = int(input("Discount (%): "))
             passOff = False
-            try:
-                discountSum = tot * (100 - discountInput) / 100
-                discountTotal = round(discountSum)
-                print(f"Total: Rs. {discountTotal}")
-                fileOpen.write(f"\nDiscount: Rs. {discountInput}%")
-                fileOpen.write(f"\nTotal: Rs. {discountTotal}")
-                logging.info(f"Discount: {discountInput}%")
-                logging.info(f"Total: {discountTotal}")
-            except Exception as e:
-                logging.error(e)
-                discountTotal = 0  # backup
+            while not passOff:
+                discountInput = int(input("Discount (%): "))
+                if discountInput >= 0:
+                    discountSum = tot * (100 - discountInput) / 100
+                    if discountSum >= 0:
+                        discountTotal = round(discountSum)
+                        print(f"Total: Rs. {discountTotal}")
+                        fileOpen.write(f"\nDiscount: {discountInput}%")
+                        fileOpen.write(f"\nTotal: Rs. {discountTotal}")
+                        logging.info(f"Discount: {discountInput}%")
+                        logging.info(f"Total: Rs. {discountTotal}")
+                        passOff = True
+                    else:
+                        print("[ Try Again, The Discount Sum is Negative ]")
+                        logging.warning("Entered Incorrect Discount %")
+                        passOff = False
+                else:
+                    print("[ Try Again, Its Either 0 or An Integer ]")
+                    logging.warning("Entered Incorrect Discount %")
+                    passOff = False
+            passOff = False
             while not passOff:
                 cashGiven = int(input('Cash Given: Rs. '))
                 bal = int(cashGiven - discountTotal)
@@ -161,7 +170,14 @@ while idInput != ' ':
                                 logging.info(f"Updated: {updateValue}, {ar[i][1]}\nSet Quantity {oldQuan} => {newQuan}\nUpdated Total => {newTot}")
                                 ar = [tuple(entry) for entry in tempList]
                             elif update_key_check[0] == '-':
-                                newQuan = oldQuan - upQuan
+                                newQuanCheck = oldQuan - upQuan
+                                if newQuanCheck > 0:
+                                    newQuan = newQuanCheck
+                                else:
+                                    print("[ The Value Is Either Negative or 0, And Has Been Set To 1 ]")
+                                    print("[ If Your Intention Was To Delete This, Use The 'del' Command Instead ]")
+                                    logging.warning(f"Set {updateValue}, {ar[i][1]}'s Quantity to 1")
+                                    newQuan = 1
                                 newTot = newQuan * tempList[i][1]
                                 tempList[i][2] = newQuan
                                 tempList[i][3] = newTot
