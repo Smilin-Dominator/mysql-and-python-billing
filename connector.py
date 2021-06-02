@@ -188,15 +188,22 @@ while idInput != ' ':
                                 if newQuanCheck > 0:
                                     newQuan = newQuanCheck
                                 else:
-                                    print("[ The Value Is Either Negative or 0, And Has Been Set To 1 ]")
+                                    print("[ The Value Is Either Negative or 0, And Will Be Set To 1 ]")
                                     print("[ If Your Intention Was To Delete This, Use The 'del' Command Instead ]")
-                                    logging.warning(f"Set {updateValue}, {ar[i][1]}'s Quantity to 1")
-                                    newQuan = 1
+                                    confirm = input("Proceed? (Y/N): ")
+                                    if confirm == 'Y':
+                                        logging.warning(f"Set {updateValue}, {ar[i][1]}'s Quantity to 1")
+                                        newQuan = 1
+                                    elif confirm == 'N':
+                                        logging.warning(f"Didn't Change {updateValue}, {ar[i][1]}'s Quantity")
+                                        newQuan = oldQuan
                                 newTot = newQuan * tempList[i][1]
                                 tempList[i][2] = newQuan
                                 tempList[i][3] = newTot
                                 logging.info(f"Updated: {updateValue}, {ar[i][1]}\nSet Quantity {oldQuan} => {newQuan}\nUpdated Total => {newTot}")
                                 ar = [tuple(entry) for entry in tempList]
+                            elif update_key_check[0] == 'exit':
+                                break
                             print("Success!")
                             break
                     break
