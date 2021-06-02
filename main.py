@@ -5,6 +5,7 @@
 import os
 import random
 import sys
+import time
 
 print("Welcome! If Something Doesn't Seem Right, Check The Logs!\n")
 
@@ -37,8 +38,15 @@ messageOfTheSecond = {
 }
 
 check = os.path.exists('bills/')
+varTime = time.strftime("%d_of_%B")
+varPath = f'./bills/{varTime}'
+checkmate = os.path.exists(varPath)
 if not check:
     os.mkdir("bills/")  # Makes the DIR
+    print("Making Directory 'bills/'...")
+if not checkmate:
+    os.mkdir(varPath)
+    print(f"Making A Directory For Today..({varPath})\n")
 firstTime = os.path.exists('./log.txt')
 if not firstTime:
     system = sys.platform

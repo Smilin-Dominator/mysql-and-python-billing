@@ -25,6 +25,7 @@ logging.info(f"\nSold the following to {customerName}")  # you'll see this often
 myFormat = "{:<25}{:<15}{:<15}{:<15}"  # format for the .format() :)
 fileHeaderFormat = "{:^70}"
 formPrep = myFormat.format('Name', 'Price (Rs.)', 'Quantity', 'Total (Rs.)')  # headers
+varTime = time.strftime("%d_of_%B")
 
 idInput = 69420666  # well, had to declare it as something -\_/-
 ar = []  # declared as empty, will get filled in the process
@@ -34,7 +35,7 @@ while idInput != ' ':
         if '' == idInput:  # if you just hit enter
             fileTime = str(time.strftime('%I.%M %p'))  # eg: 07.10 PM
             fileName = f"[BILL]-{customerName}-{fileTime}.txt"  # format of the filename
-            filePath = os.path.join('./bills', fileName)  # adds it into the bills DIR
+            filePath = os.path.join(f'./bills/{varTime}', fileName)  # adds it into the bills DIR
             fileOpen = open(filePath, 'w+')  # Opens the bill file for writing
             print('\n')  # just a spacer
             print(formPrep)
