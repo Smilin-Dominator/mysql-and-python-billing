@@ -10,7 +10,7 @@ logging.basicConfig(filename='log.txt', format=log_format, datefmt='[%Y-%m-%d] [
 
 mydb = mysql.connector.connect(
     auth_plugin='mysql_native_password',
-    host="192.168.10.5",
+    host="178.79.168.171",
     user="smilin_dominator",
     password="Barney2356",
     database='miscellaneous'
@@ -68,13 +68,13 @@ while idInput != ' ':
                     if discountSum >= 0:
                         discountTotal = round(discountSum, 2)
                         print(f"Discount Amount: Rs. {round(discountAmount, 2)}")
-                        print(f"Subtotal w/ Discount: Rs. {discountTotal}")
+                        print(f"Subtotal w/ Discount: Rs. {round(discountTotal, 2)}")
                         fileOpen.write(f"\nDiscount: {discountInput}%")
                         fileOpen.write(f"\nDiscount Amount: Rs. {round(discountAmount, 2)}")
-                        fileOpen.write(f"\nSubtotal w/ Discount: Rs. {discountTotal}")
+                        fileOpen.write(f"\nSubtotal w/ Discount: Rs. {round(discountTotal, 2)}")
                         logging.info(f"Discount: {discountInput}%")
                         logging.info(f"Discount Amount: Rs. {round(discountAmount, 2)}")
-                        logging.info(f"Subtotal w/ Discount: Rs. {discountTotal}")
+                        logging.info(f"Subtotal w/ Discount: Rs. {round(discountTotal, 2)}")
                         passOff = True
                     else:
                         print("[ Try Again, The Discount Sum is Negative ]")
