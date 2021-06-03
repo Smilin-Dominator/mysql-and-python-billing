@@ -6,6 +6,7 @@ var_time = time.strftime("%d_of_%B")
 var_path = f'./bills/{var_time}/'
 ls_l = os.listdir(var_path)
 my_format = "{:<25}{:<25}"
+balance_bf_check = os.listdir('./bills/')
 
 main_ar = []
 for bill in ls_l:
