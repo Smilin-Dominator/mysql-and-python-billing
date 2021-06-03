@@ -108,3 +108,5 @@ Hope these scenarios helped you! I'll add more along with the new features that 
     - If you press 3, it'll run  (master-bill.py) and get the total of all bills made today.
         - Don't worry about accidentally running it, it'll always rewrite the file, so run it as many
           times as you want.
+        - It'll automatically generate a sales report (sales-report.txt) With The Grand Totals Of All
+          The days.
