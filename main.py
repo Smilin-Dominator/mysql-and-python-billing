@@ -21,9 +21,8 @@ def main(messageOfTheSecond):
         key = int(input("Would You Like To Stop, Continue or Make The Master Bill? (1/2/3)\n: "))
         if key == 1:
             quit()
-        elif key == 2:
+        elif key == 3:
             os.system("python3 master-bill.py")
-            quit()
 
 
 messageOfTheSecond = {
