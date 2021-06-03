@@ -6,13 +6,11 @@ var_time = time.strftime("%d_of_%B")
 var_path = f'./bills/{var_time}/'
 ls_l = os.listdir(var_path)
 my_format = "{:<25}{:<25}"
-balance_bf_check = os.listdir('./bills/')
+all_dirs_check = os.listdir('./bills/')
 
 main_ar = []
 for bill in ls_l:
-    if bill == 'master-bill.txt':
-        break
-    else:
+    if bill.startswith("[BILL]"):
         temp_path = os.path.join(var_path + bill)
         temp_file = open(temp_path, 'r')
         temp_read = temp_file.read().splitlines()
@@ -23,7 +21,7 @@ for bill in ls_l:
         name_raw = [e for e in temp_read if e.startswith('Customer: ')]
         name_prep = ' '.join(name_raw)
         name_rebuild = name_prep.split(' ')
-        name = name_rebuild[1]
+        name = name_rebuild[1:] 
         append_tup = (name, grand_total)
         main_ar.append(append_tup)
 
@@ -51,3 +49,12 @@ print("\n")
 print(my_format.format("Total For The Day", total))
 master_bill.write("\n\n")
 master_bill.write(my_format.format("Total For The Day", total))
+
+total_ar = []
+sales_report = open("./sales-report.txt", 'w')
+for dir in all_dirs_check:
+    finder = open(os.path.join('./bills' + '/'  + dir + '/' + 'master_bill.txt'), 'r')
+    finderread = finder.read().splitlines()
+    for line in finderread:
+        if line.startswith("Total"):
+            print(f'FindL {line}')
