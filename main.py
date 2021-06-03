@@ -45,13 +45,17 @@ check = os.path.exists('bills/')
 varTime = time.strftime("%d_of_%B")
 varPath = f'./bills/{varTime}'
 checkmate = os.path.exists(varPath)
+checksales = os.path.exists('./sales_reports')
+firstTime = os.path.exists('./log.txt')
 if not check:
     os.mkdir("bills/")  # Makes the DIR
     print("Making Directory 'bills/'...")
 if not checkmate:
     os.mkdir(varPath)
     print(f"Making A Directory For Today..({varPath})\n")
-firstTime = os.path.exists('./log.txt')
+if not checksales:
+    os.mkdir('./sales_reports')
+    print("Making Directory 'sales-reports/'...")
 if not firstTime:
     system = sys.platform
     if system in ['linux', 'darwin']:  # darwin => mac
