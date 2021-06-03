@@ -55,31 +55,38 @@ master_bill.close()
 
 
 total_ar = []
-sales_report = open("./sales-report.txt", 'w+')
-for dir in all_dirs_check:
-    newdir = Path.joinpath(Path.cwd(), 'bills', dir, 'master_bill.txt')
-    finder = open(newdir, 'r')
-    finderread = finder.read().splitlines()
-    for line in finderread:
-        if line.startswith("Total For The Day"):
-            price_get = line.split(' ')
-            tot = float(price_get[11])
-            glink = (dir, tot)
-            total_ar.append(glink)
-            break
-sales_report.write(f"{master_bill_header.format(50 * '-')}")
-sales_report.write(f"\n{master_bill_header.format('Paddy Enterprises (Pvt) Ltd.')}")
-sales_report.write(f"\n{master_bill_header.format(50 * '-')}")
-sales_report.write(f"\n{master_bill_header.format('Sales Report')}")
-sales_report.write(f"\n{master_bill_header.format(50 * '-')}")
-sales_report.write(f'\n\nDate: {str(time.strftime("%d/%m/%Y"))}')
-sales_report.write(f"\nTime: {str(time.strftime('%I.%M %p'))}")
-sales_report.write(f'\n\n{my_format.format("Day", "Total Sales")}')
-grandest_total = 0
-for i in range(len(total_ar)):
-    date_prep = total_ar[i][0].split(f"{Path.joinpath(Path(), 'bills')}")
-    date = date_prep[0].replace("_", " ")
-    price = str(total_ar[i][1])
-    sales_report.write(f'\n{my_format.format(date, f"Rs. {price}")}')
-    grandest_total = grandest_total + total_ar[i][1]
-sales_report.write(f'\n\n{my_format.format("Total Sales", f"Rs: {grandest_total}")}')
+split_week = [all_dirs_check[i:i + 7] for i in range(0, len(all_dirs_check), 7)]
+for i in range(len(split_week)):
+    start = split_week[i][0]
+    end = split_week[i][len(split_week[i]) - 1]
+    sales_file = f"sales-report_from_{start}_to_{end}.txt"
+    sales_report = open(f"./sales_reports/{sales_file}", 'w+')
+    for dir in split_week[i]:
+        newdir = Path.joinpath(Path.cwd(), 'bills', dir, 'master_bill.txt')
+        finder = open(newdir, 'r')
+        finderread = finder.read().splitlines()
+        for line in finderread:
+            if line.startswith("Total For The Day"):
+                price_get = line.split(' ')
+                tot = float(price_get[11])
+                glink = (dir, tot)
+                total_ar.append(glink)
+                break
+    sales_report.write(f"{master_bill_header.format(50 * '-')}")
+    sales_report.write(f"\n{master_bill_header.format('Paddy Enterprises (Pvt) Ltd.')}")
+    sales_report.write(f"\n{master_bill_header.format(50 * '-')}")
+    sales_report.write(f"\n{master_bill_header.format('Weekly Sales Report')}")
+    sales_report.write(f"\n{master_bill_header.format(50 * '-')}")
+    sales_report.write(f'\n\nDate: {str(time.strftime("%d/%m/%Y"))}')
+    sales_report.write(f"\nTime: {str(time.strftime('%I.%M %p'))}")
+    sales_report.write(f'\n\n{my_format.format("Day", "Total Sales")}')
+    grandest_total = 0
+    for i in range(len(total_ar)):
+        date_prep = total_ar[i][0].split(f"{Path.joinpath(Path(), 'bills')}")
+        date = date_prep[0].replace("_", " ")
+        price = str(total_ar[i][1])
+        sales_report.write(f'\n{my_format.format(date, f"Rs. {price}")}')
+        grandest_total = grandest_total + total_ar[i][1]
+    sales_report.write(f'\n\n{my_format.format("Total Sales", f"Rs: {grandest_total}")}')
+    total_ar = []
+

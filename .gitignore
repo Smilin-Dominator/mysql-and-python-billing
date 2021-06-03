@@ -3,3 +3,4 @@ __pycache__
 *.txt
 log.txt
 bills
+sales_reports
