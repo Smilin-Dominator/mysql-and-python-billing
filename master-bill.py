@@ -80,6 +80,6 @@ for i in range(len(total_ar)):
     date_prep = total_ar[i][0].split(f"{Path.joinpath(Path(), 'bills')}")
     date = date_prep[0].replace("_", " ")
     price = str(total_ar[i][1])
-    sales_report.write(f'\n{my_format.format(date, price)}')
+    sales_report.write(f'\n{my_format.format(date, f"Rs. {price}")}')
     grandest_total = grandest_total + total_ar[i][1]
-sales_report.write(f'\n\n{my_format.format("Total Sales", grandest_total)}')
+sales_report.write(f'\n\n{my_format.format("Total Sales", f"Rs: {grandest_total}")}')
