@@ -60,7 +60,7 @@ Hope these scenarios helped you! I'll add more along with the new features that 
 <br>***Note: for a more detailed explanation of the functions, check the list below!***
 </font>
 
-# Function List
+# Function List (connector.py)
 - ID Prompt (ID: )
     - When it prompts for the ID, you may enter the ID number, and proceed.
     - If you want to view the current total enter '--' instead of an ID when prompted.
@@ -98,3 +98,13 @@ Hope these scenarios helped you! I'll add more along with the new features that 
                 - `+ 20`
             - Not:
                 - `+20`
+
+# Function List (main.py)
+- Random Line From HUMBLE:
+    - Just as advertised, it just displays a random line from HUMBLE by Kendrick Lamar
+- Would You Like To Stop, Continue or Make The Master Bill? (1/2/3):
+    - If you press 2, it'll loop back to (connector.py)
+    - If you press 1, the program will stop and write all changes and the bills to the system.
+    - If you press 3, it'll run  (master-bill.py) and get the total of all bills made today.
+        - Don't worry about accidentally running it, it'll always rewrite the file, so run it as many
+          times as you want.
