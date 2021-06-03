@@ -1,3 +1,5 @@
+#!/usr/bin/env conda run -n mysql-and-python-billing python
+
 # This Program was made completely (100%) by the one and only
 # Devisha Padmaperuma!
 # Don't even think of stealing my code!
@@ -16,8 +18,11 @@ def main(messageOfTheSecond):
         randomNumGen = random.randint(1, len(messageOfTheSecond))  # RNG, unscripted order
         print(f"Random Line from HUMBLE.: {messageOfTheSecond[randomNumGen]}")  # pulls from the Dictionary
         os.system('python3 connector.py')
-        key = int(input("Would You Like To Stop, Or Continue? (1/2)\n: "))
+        key = int(input("Would You Like To Stop, Continue or Make The Master Bill? (1/2/3)\n: "))
         if key == 1:
+            quit()
+        elif key == 2:
+            os.system("python3 master-bill.py")
             quit()
 
 
