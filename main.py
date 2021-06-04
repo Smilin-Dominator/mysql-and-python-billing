@@ -3,11 +3,13 @@
 # This Program was made completely (100%) by the one and only
 # Devisha Padmaperuma!
 # Don't even think of stealing my code!
-
+import getpass
 import os
 import random
+import string
 import sys
 import time
+import hashlib
 
 print("Welcome! If Something Doesn't Seem Right, Check The Logs!\n")
 
@@ -47,6 +49,8 @@ varPath = f'./bills/{varTime}'
 checkmate = os.path.exists(varPath)
 checksales = os.path.exists('./sales_reports')
 firstTime = os.path.exists('./log.txt')
+checkPass = os.path.exists('./passwd.txt')
+
 if not check:
     os.mkdir("bills/")  # Makes the DIR
     print("Making Directory 'bills/'...")
@@ -56,6 +60,17 @@ if not checkmate:
 if not checksales:
     os.mkdir('./sales_reports')
     print("Making Directory 'sales-reports/'...")
+if not checkPass:
+    print("No Password Set.. Creating File..")
+    pas_enter = getpass.getpass("Enter Password: ")
+    pas = open('./passwd.txt', 'w+')
+    salt1 = ''.join(random.choices(string.ascii_letters + string.hexdigits, k=95))
+    salt2 = ''.join(random.choices(string.digits + string.octdigits, k=95))
+    pass_write = str(salt1 + pas_enter + salt2)
+    hashpass = hashlib.sha512(pass_write.encode()).hexdigest()
+    pas.write(f'{salt1},{salt2},{hashpass}')
+    print("Success!")
+
 if not firstTime:
     system = sys.platform
     if system in ['linux', 'darwin']:  # darwin => mac
