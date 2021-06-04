@@ -62,7 +62,7 @@ while idInput != ' ':
             logging.info(f'Subtotal: Rs. {tot}')  # Three simultaneous actions here lol
             passOff = False
             while not passOff:
-                discountInput = int(input("Discount (%): "))
+                discountInput = float(input("Discount (%): "))
                 if discountInput >= 0:
                     discountAmount = tot * (discountInput / 100)
                     discountSum = tot - discountAmount

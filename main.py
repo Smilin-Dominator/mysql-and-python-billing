@@ -68,5 +68,6 @@ if not firstTime:
         print("Initializing First Time Setup..")
         print(f"OS: {system}")
         os.system('powershell setup.ps1')
+        print("Success.. Run This File Again.")
         quit()
 main(messageOfTheSecond)
