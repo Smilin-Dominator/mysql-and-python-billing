@@ -3,7 +3,11 @@ import time
 from pathlib import Path
 
 print("Welcome To The Master Bill Creator!\n")
-var_time = time.strftime("%d_of_%B")
+key = input("Today or Update Specific Day?\n\nT for Today\nEnter the Directory Name (Eg: 01_of_June) for Specific Day\n\n: ")
+if key == 'T':
+    var_time = time.strftime("%d_of_%B")
+else:
+    var_time = key
 var_path = f'./bills/{var_time}/'
 ls_l = os.listdir(var_path)
 my_format = "{:<25}{:<25}"
