@@ -1,5 +1,6 @@
 #!/usr/bin/env conda run -n mysql-and-python-billing python
-
+import getpass
+import hashlib
 import mysql.connector
 import logging
 import time
@@ -117,8 +118,15 @@ while idInput != ' ':
                     break
             quit()
         elif idInput == 'Kill':  # had to add an emergency kill function :)
-            killPass = input("Enter Password: ")
-            if killPass == '627905':  # alter the code here if you want
+            killPass = str(getpass.getpass("Enter Password: "))
+            pass_read = open('./passwd.txt', 'r')
+            check_pass_file = pass_read.read().split(',')
+            salt1 = check_pass_file[0]
+            salt2 =  check_pass_file[1]
+            hash_check = check_pass_file[2]
+            pass_check = salt1 + killPass + salt2
+            pass_hash = hashlib.sha512(pass_check.encode()).hexdigest()
+            if hash_check == pass_hash:
                 quit()
             else:
                 print("\n[ Wrong Password ]\n")  # thats the wrong number! (ooohhhh)
