@@ -85,7 +85,9 @@ Hope these scenarios helped you! I'll add more along with the new features that 
     - If successful, it'll say so. Or else, it'll loop until you provide the correct name.
 - Kill Prompt (Enter Password: )
     - To enter this screen, type 'Kill' in the ID Prompt.
-    - You'll be prompted to enter the password, the default is '627905', feel free to change it (connector.py)
+    - You will have to enter the password you set in (main.py). Once you set it, there is no way to reset or recover it. As it's stored
+      as a hash in (passwd.txt), it has 2 salts, on either side of the text.
+    - It covers the input, so it looks like you're not typing anything, but you are.  
     - If successful, it'll kill the process, make sure you delete the Bill manually, if you tried to checkout before doing the above.
 - Update Prompt (What Would You Like To Update? (Name): )
     - To enter this screen, type 'update' in the ID Prompt.
@@ -102,6 +104,10 @@ Hope these scenarios helped you! I'll add more along with the new features that 
 # Function List (main.py)
 - Random Line From HUMBLE:
     - Just as advertised, it just displays a random line from HUMBLE by Kendrick Lamar
+- Enter Password:
+    - If this is your first time setup, or if you deleted passwd.txt, this prompt will appear.
+    - It covers the input, so it looks like you're not typing anything, but you are.
+    - It'll then generate salts and hash it, and store it in (passwd.txt)
 - Would You Like To Stop, Continue or Make The Master Bill? (1/2/3):
     - If you press 2, it'll loop back to (connector.py)
     - If you press 1, the program will stop and write all changes and the bills to the system.
