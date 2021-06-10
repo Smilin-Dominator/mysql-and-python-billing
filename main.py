@@ -20,11 +20,13 @@ def main(messageOfTheSecond):
         randomNumGen = random.randint(1, len(messageOfTheSecond))  # RNG, unscripted order
         print(f"Random Line from HUMBLE.: {messageOfTheSecond[randomNumGen]}")  # pulls from the Dictionary
         os.system('python3 connector.py')
-        key = int(input("Would You Like To Stop, Continue or Make The Master Bill? (1/2/3)\n: "))
+        key = int(input("Would You Like To Stop (1), Continue (2), Make The Master Bill (3) or Run the SQL Client (4)?\n: "))
         if key == 1:
             quit()
         elif key == 3:
             os.system("python3 master-bill.py")
+        elif key == 4:
+            os.system("python3 sql-client.py")
 
 
 messageOfTheSecond = {
