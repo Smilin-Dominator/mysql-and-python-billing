@@ -6,7 +6,7 @@ import logging
 import time
 import os
 
-log_format = '%(asctime)s : %(message)s'  # this basically says that the time and date come first, error next
+log_format = '%(asctime)s (%(filename)s): %(message)s'   # this basically says that the time and date come first, error next
 logging.basicConfig(filename='log.txt', format=log_format, datefmt='[%Y-%m-%d] [%H:%M:%S]', level=logging.DEBUG)
 
 mydb = mysql.connector.connect(
