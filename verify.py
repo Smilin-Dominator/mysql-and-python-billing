@@ -34,6 +34,9 @@ def hash():
             the_new = os.path.join(bill_path, file)
             hash = hash_file(the_new)
             for data in read_the_file:
+                if file.startswith('master_bill'):
+                    print("Skipping Master Bill..")
+                    break
                 if hash in data:
                     print("Skipping Adding Existing Entry....")
                     break

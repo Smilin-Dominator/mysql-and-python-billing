@@ -34,15 +34,19 @@ while badPass:
         logging.warning("Wrong Pass")
         badPass = True
 
-help_string = "\nhelp --> displays this\nshow all --> selects all the dolls\nbye --> exits\nadd --> adds an item\nremove --> removes an item\nchange --> alters an item"
+help_string = "\nhelp --> displays this\nshow all --> selects all the dolls\nbye --> exits\nadd --> adds an " \
+              "item\nremove --> removes an item\nchange --> alters an item\nadd id --> adds item with ID\n custom -->" \
+              "executes your custom query\n"
 
 command_legend = {
     "help": help_string,
     "show all": "SELECT * FROM paddigurlTest",
     "bye": 'quit',
     "add": "INSERT INTO paddigurlTest(name, price) ",
+    "add id": "INSERT INTO paddigurlTest(id, name, price) ",
     "remove": 'DELETE FROM paddigurlTest WHERE id = ',
-    "change": "UPDATE paddigurlTest SET "
+    "change": "UPDATE paddigurlTest SET ",
+    "custom": "Enter Your Command:"
 }
 
 mycursor = mydb.cursor()
@@ -80,11 +84,9 @@ while not exit:
             for i in range(len(get_all)):
                 if get_all[i][0] == id_of_removal:
                     logging.warning(f"Proceeding To Delete Item:\nID: {id_of_removal}\nName: {get_all[i][1]}\nPrice: {get_all[i][2]}")
+                    mycursor.execute(f"INSERT INTO paddigurlRemoved(id, name, price) VALUES({id_of_removal}, '{get_all[i][1]}', {get_all[i][2]})")
             del_string = command_check + f"{id_of_removal};"
             mycursor.execute(del_string)
-            mycursor.execute("SET @count = 0;")
-            mycursor.execute("UPDATE paddigurlTest SET id = @count:= @count + 1;")
-            mycursor.execute("ALTER TABLE paddigurlTest AUTO_INCREMENT = 1;")
             mydb.commit()
             print("Success!")
             logging.info("Successfully Deleted It!")
@@ -102,6 +104,24 @@ while not exit:
             new_str = command_check + f"name = '{name_to_change}', price = {price_to_change} WHERE id = {id_of_change};"
             mycursor.execute(new_str)
             print("Success!")
+        elif command == "add id":
+            id_to_add = int(input("ID: "))
+            name_to_add = input("Name: ")
+            price_to_add = int(input("Price: "))
+            append_add = command_check + f"VALUES({id_to_add}, '{name_to_add}', {price_to_add})"
+            mycursor.execute(append_add)
+            mydb.commit()
+            print(mycursor.rowcount, "record inserted.")
+            logging.info(f"Added Entry;\nID: {id_to_add}\nName: {name_to_add}\nPrice: {price_to_add}")
+        elif command == "custom":
+            print(command_check)
+            execute_order = input(r"")
+            mycursor.execute(execute_order)
+            if 'SELECT' in execute_order:
+                it_vol2 = pd.DataFrame(mycursor.fetchall(), columns=['id', 'name', 'price'])
+                print(it_vol2.to_string(index=False))
+            else:
+                print("Successful!")
     except Exception as e:
         print("\nCorrect Command or Error?")
         logging.error(e)
