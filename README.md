@@ -116,3 +116,23 @@ Hope these scenarios helped you! I'll add more along with the new features that 
           times as you want.
         - It'll automatically generate a weekly sales report (./sales_reports/**) With The Grand Totals Of 7 Days.
           If there's < 7 Days after the initial, It'll have no issue, it'll mention them.
+# Function List (sql-client.py)
+- Master Password: 
+    - Enter the master password you set in (main.py)
+- Smilin_DB>
+    - This is where you enter all the commands.
+    - help
+        - this will print a list of all the commands.
+    - bye
+        - adios (it'll quit and return to main.py)
+    - show all
+        - yeah there's a space in between.
+        - this will print all the entries in the Table.
+    - add
+        - adds an item, prompts for Name and Price (ID asigned automatically)
+    - remove
+        - removes an item from the DB, updates the existing IDs too, so there's no gap.
+    - change
+        - alters an item, prompts you for the ID, once you enter it, it'll display
+          the current Name and Price.
+        - You then get prompted for the new name and price.
