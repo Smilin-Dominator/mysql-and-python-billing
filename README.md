@@ -143,11 +143,17 @@ Hope these scenarios helped you! I'll add more along with the new features that 
     - add
         - adds an item, prompts for Name and Price (ID asigned automatically)
     - remove
-        - removes an item from the DB, updates the existing IDs too, so there's no gap.
+        - removes an item from the DB, there will be a gap. The previous item will be completely removed, and it will be
+          added to another table called paddigurlRemoval, so the ID will always be there.
     - change
         - alters an item, prompts you for the ID, once you enter it, it'll display
           the current Name and Price.
         - You then get prompted for the new name and price.
+    - add id
+        - same as add, but you enter an ID
+    - custom
+      - You execute custom Queries here, it takes your raw input and executes it.
+
 # Function List (verify.py)
 - "Verify or Hash or Quit? (v/h/q): "
   - If you press 'v', it'll use its existing registry of Hashes and verify if the files hashes are the same
