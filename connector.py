@@ -17,6 +17,7 @@ mydb = mysql.connector.connect(
     database='miscellaneous'
 )  # connection time..
 
+BUF_SIZE = 65536
 customerName = input("Customer: ")  # Optional, if you're in a hurry, just leave blank
 if not customerName:  # ' ' => blank
     customerName = '(Not Specified)'
@@ -34,8 +35,9 @@ while idInput != ' ':
     try:
         idInput = input("\nID: ")  # ID As In The First Column
         if '' == idInput:  # if you just hit enter
-            fileTime = str(time.strftime('%I.%M %p'))  # eg: 07.10 PM
-            fileName = f"[BILL]-{customerName}-{fileTime}.txt"  # format of the filename
+            fileTime = str(time.strftime('%I.%M_%p'))  # eg: 07.10 PM
+            customerNameFormat = customerName.replace(' ', '_')
+            fileName = f"[BILL]-{customerNameFormat}-{fileTime}.txt"  # format of the filename
             filePath = os.path.join(f'./bills/{varTime}', fileName)  # adds it into the bills DIR
             fileOpen = open(filePath, 'w+')  # Opens the bill file for writing
             print('\n')  # just a spacer
@@ -44,8 +46,8 @@ while idInput != ' ':
             fileOpen.write(f"\n{fileHeaderFormat.format('Paddy Enterprises (Pvt) Ltd.')}")
             fileOpen.write(f"\n{fileHeaderFormat.format(70 * '-')}")
             fileOpen.write(f'\n\nDate: {str(time.strftime("%d/%m/%Y"))}')  # eg: 02/05/2021
-            fileOpen.write(f'\nTime: {str(fileTime)}')  # uses the variable set earlier
-            fileOpen.write(f'\nCustomer: {customerName}\n')
+            fileOpen.write(f'\nTime: {str(fileTime.replace("_", " "))}')  # uses the variable set earlier
+            fileOpen.write(f'\nCustomer: {customerName.replace("_", " ")}\n')
             fileOpen.write(f'\n{formPrep}')
             for i in range(len(ar)):  # for loop to write the output of each, in the format
                 final = myFormat.format(ar[i][0], ar[i][1], ar[i][2], ar[i][3])
