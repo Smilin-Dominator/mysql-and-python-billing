@@ -129,4 +129,11 @@ Hope these scenarios helped you! I'll add more along with the new features that 
     - show all
         - yeah there's a space in between.
         - this will print all the entries in the Table.
-    - 
+    - add
+        - adds an item, prompts for Name and Price (ID asigned automatically)
+    - remove
+        - removes an item from the DB, updates the existing IDs too, so there's no gap.
+    - change
+        - alters an item, prompts you for the ID, once you enter it, it'll display
+          the current Name and Price.
+        - You then get prompted for the new name and price.
