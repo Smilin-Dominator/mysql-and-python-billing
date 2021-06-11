@@ -3,7 +3,9 @@
 # This Program was made completely (100%) by the one and only
 # Devisha Padmaperuma!
 # Don't even think of stealing my code!
+
 import getpass
+import logging
 import os
 import random
 import string
@@ -13,20 +15,30 @@ import hashlib
 
 print("Welcome! If Something Doesn't Seem Right, Check The Logs!\n")
 
+log_format = '%(asctime)s (%(filename)s): %(message)s'  # this basically says that the time and date come first, error next
+logging.basicConfig(filename='log.txt', format=log_format, datefmt='[%Y-%m-%d] [%H:%M:%S]', level=logging.DEBUG)
+
 
 def main(messageOfTheSecond):
     key = 2
-    while key == 2:
+    while key != '1':
         randomNumGen = random.randint(1, len(messageOfTheSecond))  # RNG, unscripted order
         print(f"Random Line from HUMBLE.: {messageOfTheSecond[randomNumGen]}")  # pulls from the Dictionary
-        os.system('python3 connector.py')
-        key = int(input("Would You Like To Stop (1), Continue (2), Make The Master Bill (3) or Run the SQL Client (4)?\n: "))
-        if key == 1:
-            quit()
-        elif key == 3:
-            os.system("python3 master-bill.py")
-        elif key == 4:
-            os.system("python3 sql-client.py")
+        print("Commands:\n\n1 to Exit\n2 to make another bill\n3 for Master Bill\n4 for the SQL Client\n")
+        date = time.strftime('%c')
+        time_prompt = time.strftime('%I:%M %p')
+        key = input(f"\n[{date}]-[{time_prompt}]\nSmilinPython> ")
+        try:
+            if key == '1':
+                quit()
+            elif key == '2':
+                os.system('python3 connector.py')
+            elif key == '3':
+                os.system("python3 master-bill.py")
+            elif key == '4':
+                os.system("python3 sql-client.py")
+        except Exception as e:
+            logging.error(e)
 
 
 messageOfTheSecond = {
@@ -84,7 +96,7 @@ if not firstTime:
     elif system == 'win32':
         print("Initializing First Time Setup..")
         print(f"OS: {system}")
-        os.system('powershell setup.ps1')
+        os.system('./setup.ps1')
         print("Success.. Run This File Again.")
         quit()
 main(messageOfTheSecond)

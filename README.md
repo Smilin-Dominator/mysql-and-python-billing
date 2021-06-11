@@ -112,7 +112,21 @@ Hope these scenarios helped you! I'll add more along with the new features that 
     - If you press 2, it'll loop back to (connector.py)
     - If you press 1, the program will stop and write all changes and the bills to the system.
     - If you press 3, it'll run  (master-bill.py) and get the total of all bills made today.
+    - If you press 4, it'll take you to (sql-client.py) where you can view and alter entries.
         - Don't worry about accidentally running it, it'll always rewrite the file, so run it as many
           times as you want.
         - It'll automatically generate a weekly sales report (./sales_reports/**) With The Grand Totals Of 7 Days.
           If there's < 7 Days after the initial, It'll have no issue, it'll mention them.
+# Function List (sql-client.py)
+- Master Password: 
+    - Enter the master password you set in (main.py)
+- Smilin_DB>
+    - This is where you enter all the commands.
+    - help
+        - this will print a list of all the commands.
+    - bye
+        - adios (it'll quit and return to main.py)
+    - show all
+        - yeah there's a space in between.
+        - this will print all the entries in the Table.
+    - 

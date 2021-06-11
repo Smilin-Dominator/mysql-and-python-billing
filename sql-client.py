@@ -1,3 +1,5 @@
+#!/usr/bin/env conda run -n mysql-and-python-billing python
+
 import getpass
 import mysql.connector
 import pandas as pd
@@ -45,7 +47,7 @@ command_legend = {
 mycursor = mydb.cursor()
 exit = False
 while not exit:
-    command = input("\nDeviSQL> ")
+    command = input("\nSmilin_DB> ")
     try:
         command_check = command_legend[command]
         if command_check.startswith("\nhelp -->"):
