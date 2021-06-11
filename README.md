@@ -10,7 +10,7 @@
 >of specifying how many items there can be, you keep on adding items, and when you're done, hit enter in the ID input
 >(without any text) and it'll process the data and create an invoice.</font>
 # How To Use It?
-
+*DELETE THIS FILE WHEN YOU'VE READ IT, ANYONE OTHER UNTRUSTED PARTY WHO READS THIS WILL BE A THREAT*
 ### Prerequisites
 <font size="6">You should have an 'Anaconda' Environment, with Python 3.7.10<br>Here's how you make one
 - Download the latest version for your OS [here](https://www.anaconda.com/products/individual).
@@ -32,7 +32,8 @@ the invoice use '--', if you want to delete an item from the current list type '
 follow the on-screen prompt, if you want to update the quantity of an item, type
 update, and interact with the prompt. If for whatever reason, you want to kill the process, use
 Kill, and enter the password '627905'. Once you're 100% sure you're done adding the items and everything
-hit (enter) without any other input in the ID Screen to create the bill, you may enter a discount here.</font>
+hit (enter) without any other input in the ID Screen to create the bill, you may enter a discount here.<br>
+You may then create a master bill when you get to main.py, or you can even edit the SQL table.</font>
 
 ### Scenarios and Combatting Them
 <font size="6">Here are some scenarios you are quite likely to encounter, even if you don't you'll know
@@ -55,6 +56,11 @@ Customer brings a total of 7 dolls from 2 types (5 Dolls = A, 2 Dolls = B), he w
 remove two dolls from Doll A and get 1 more of Doll B.
 <br>*Earlier: I actually didn't think of this back then, but most likely restart*
 <br>*Now: Use the 'update' function. You can remove 2 from DollA and add 2 to Doll B*
+##### Problem 5
+You leave for a well deserved coffee break, totally unaware that some dude just deleted your passwd.txt file.
+<br>*Earlier: He could immediately delete the password file, set the password to something else and do damage and *
+<br>*Now: The password's hash and it's salts are stored in the (log.txt) file, along with an MD5 hash, which proves that
+my program did this. If the MD5 Hashes don't match, your data has been tampered with, by a professional.*
 #### Conclusion
 Hope these scenarios helped you! I'll add more along with the new features that I add!
 <br>***Note: for a more detailed explanation of the functions, check the list below!***
