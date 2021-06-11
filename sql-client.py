@@ -34,14 +34,15 @@ while badPass:
         logging.warning("Wrong Pass")
         badPass = True
 
-help_string = "\nhelp --> displays this\nshow all --> selects all the dolls\nbye --> exits\nadd --> adds an item\nremove --> removes an item\n"
+help_string = "\nhelp --> displays this\nshow all --> selects all the dolls\nbye --> exits\nadd --> adds an item\nremove --> removes an item\nchange --> alters an item"
 
 command_legend = {
     "help": help_string,
     "show all": "SELECT * FROM paddigurlTest",
     "bye": 'quit',
     "add": "INSERT INTO paddigurlTest(name, price) ",
-    "remove": 'DELETE FROM paddigurlTest WHERE id = '
+    "remove": 'DELETE FROM paddigurlTest WHERE id = ',
+    "change": "UPDATE paddigurlTest SET "
 }
 
 mycursor = mydb.cursor()
@@ -76,7 +77,6 @@ while not exit:
             id_of_removal = int(input("\nID: "))
             mycursor.execute(command_legend["show all"])
             get_all = mycursor.fetchall()
-            print(get_all)
             for i in range(len(get_all)):
                 if get_all[i][0] == id_of_removal:
                     logging.warning(f"Proceeding To Delete Item:\nID: {id_of_removal}\nName: {get_all[i][1]}\nPrice: {get_all[i][2]}")
@@ -88,7 +88,21 @@ while not exit:
             mydb.commit()
             print("Success!")
             logging.info("Successfully Deleted It!")
+        elif command == "change":
+            id_of_change = int(input("ID: "))
+            mycursor.execute(command_legend["show all"])
+            get_all = mycursor.fetchall()
+            for i in range(len(get_all)):
+                if get_all[i][0] == id_of_change:
+                    logging.warning(
+                        f"Proceeding To Delete Item:\nID: {id_of_change}\nName: {get_all[i][1]}\nPrice: {get_all[i][2]}")
+                    print(f"\nCurrent Name: {get_all[i][1]}\nCurrent Price: {get_all[i][2]}\n")
+            name_to_change = input("New Name: ")
+            price_to_change = int(input("New Price: "))
+            new_str = command_check + f"name = '{name_to_change}', price = {price_to_change} WHERE id = {id_of_change};"
+            mycursor.execute(new_str)
+            print("Success!")
     except Exception as e:
-        print("\nCorrect Command or Error?\n")
+        print("\nCorrect Command or Error?")
         logging.error(e)
         exit = False
