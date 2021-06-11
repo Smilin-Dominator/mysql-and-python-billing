@@ -58,9 +58,14 @@ remove two dolls from Doll A and get 1 more of Doll B.
 <br>*Now: Use the 'update' function. You can remove 2 from DollA and add 2 to Doll B*
 ##### Problem 5
 You leave for a well deserved coffee break, totally unaware that some dude just deleted your passwd.txt file.
-<br>*Earlier: He could immediately delete the password file, set the password to something else and do damage and *
+<br>*Earlier: He could immediately delete the password file, set the password to something else and do damage*
 <br>*Now: The password's hash and it's salts are stored in the (log.txt) file, along with an MD5 hash, which proves that
 my program did this. If the MD5 Hashes don't match, your data has been tampered with, by a professional.*
+##### Problem 6
+You give your computer to someone, they look at the bills and just alter the values.
+<br>*Earlier: Well, you're screwed*
+<br>*Now: You're still screwed, but unlike earlier, the file verification will tell you if a file is different. So no accidental
+fraud. But if this is on my server, don't worry, I'll make a backup script!*
 #### Conclusion
 Hope these scenarios helped you! I'll add more along with the new features that I add!
 <br>***Note: for a more detailed explanation of the functions, check the list below!***
@@ -143,3 +148,9 @@ Hope these scenarios helped you! I'll add more along with the new features that 
         - alters an item, prompts you for the ID, once you enter it, it'll display
           the current Name and Price.
         - You then get prompted for the new name and price.
+# Function List (verify.py)
+- "Verify or Hash or Quit? (v/h/q): "
+  - If you press 'v', it'll use its existing registry of Hashes and verify if the files hashes are the same
+    - If they are it'll say '<file> Is The Same'
+    - If they aren't it'll say '<file> Has Been Tampered'
+  - If you press 'h', it'll hash all the new bills and store the hashes (skipping existing ones)

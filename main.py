@@ -24,7 +24,7 @@ def main(messageOfTheSecond):
     while key != '1':
         randomNumGen = random.randint(1, len(messageOfTheSecond))  # RNG, unscripted order
         print(f"Random Line from HUMBLE.: {messageOfTheSecond[randomNumGen]}")  # pulls from the Dictionary
-        print("Commands:\n\n1 to Exit\n2 to make another bill\n3 for Master Bill\n4 for the SQL Client\n")
+        print("Commands:\n\n1 to Exit\n2 to make another bill\n3 for Master Bill\n4 for the SQL Client\n5 for The Verifier")
         date = time.strftime('%c')
         time_prompt = time.strftime('%I:%M %p')
         key = input(f"\n[{date}]-[{time_prompt}]\nSmilinPython> ")
@@ -41,6 +41,9 @@ def main(messageOfTheSecond):
             elif key == '4':
                 logging.info("Transferring to (sql-client.py)")
                 os.system("python3 sql-client.py")
+            elif key == '5':
+                logging.info("Transferring to (verify.py)")
+                os.system("python3 verify.py")
         except Exception as e:
             logging.error(e)
 
