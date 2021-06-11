@@ -30,12 +30,16 @@ def main(messageOfTheSecond):
         key = input(f"\n[{date}]-[{time_prompt}]\nSmilinPython> ")
         try:
             if key == '1':
+                logging.info("Exiting Gracefully;")
                 quit()
             elif key == '2':
+                logging.info("Transferring to (connector.py)")
                 os.system('python3 connector.py')
             elif key == '3':
+                logging.info("Transferring to (master-bill.py)")
                 os.system("python3 master-bill.py")
             elif key == '4':
+                logging.info("Transferring to (sql-client.py)")
                 os.system("python3 sql-client.py")
         except Exception as e:
             logging.error(e)
@@ -67,23 +71,57 @@ checkPass = os.path.exists('./passwd.txt')
 
 if not check:
     os.mkdir("bills/")  # Makes the DIR
+    logging.info("Making the Bills Directory")
     print("Making Directory 'bills/'...")
 if not checkmate:
     os.mkdir(varPath)
+    logging.info(f"Making A Directory For Today's Date ({varPath})")
     print(f"Making A Directory For Today..({varPath})\n")
 if not checksales:
     os.mkdir('./sales_reports')
+    logging.info("Making the Sales Report Directory.")
     print("Making Directory 'sales-reports/'...")
 if not checkPass:
-    print("No Password Set.. Creating File..")
-    pas_enter = getpass.getpass("Enter Password: ")
-    pas = open('./passwd.txt', 'w+')
-    salt1 = ''.join(random.choices(string.ascii_letters + string.hexdigits, k=95))
-    salt2 = ''.join(random.choices(string.digits + string.octdigits, k=95))
-    pass_write = str(salt1 + pas_enter + salt2)
-    hashpass = hashlib.sha512(pass_write.encode()).hexdigest()
-    pas.write(f'{salt1},{salt2},{hashpass}')
-    print("Success!")
+    check_log = open('log.txt', 'r')
+    crit = check_log.read().splitlines()
+    critical = []
+    for i in range(len(crit)):
+        try:
+            if "Systemdump--Ignore--These" in crit[i]:
+                signature = crit[i+1]
+                if signature == str(hashlib.md5("McDonalds_Im_Loving_It".encode()).hexdigest()):
+                    salt1 = crit[i+2]
+                    salt2 = crit[i+3]
+                    hash = crit[i+4]
+                    critical_ar = (salt1, salt2, hash)
+                    critical.append(critical_ar)
+                else:
+                    print("Authenticity Not Recognized.. Reset log.txt and passwd.txt, Data Might've been breached")
+                    quit(66)
+        except Exception as e:
+            logging.warning(e)
+    if not critical:
+        print("No Password Set.. Creating File..")
+        pas_enter = getpass.getpass("Enter Password: ")
+        pas = open('./passwd.txt', 'w+')
+        salt1 = ''.join(random.choices(string.ascii_letters + string.hexdigits, k=95))
+        salt2 = ''.join(random.choices(string.digits + string.octdigits, k=95))
+        pass_write = str(salt1 + pas_enter + salt2)
+        hashpass = hashlib.sha512(pass_write.encode()).hexdigest()
+        signature = hashlib.md5("McDonalds_Im_Loving_It".encode()).hexdigest()
+        logging.info(f"Systemdump--Ignore--These\n{signature}\n{salt1}\n{salt2}\n{hashpass}")
+        pas.write(f'{salt1},{salt2},{hashpass}')
+        print("Success!")
+    else:
+        print("Foolish Cow Lad. You really think deleting the 'passwd.txt' file gets rid of the password!"
+              "\nYour level of stupidity is egregious, your lack of braincells causes global warming."
+              "\nYou really think that I, Devisha Padmaperuma would allow a little vulnerability like that"
+              " to exist!")
+        pas = open('./passwd.txt', 'w+')
+        pas.write(f"{critical[0][0]},{critical[0][1]},{critical[0][2]}")
+        print("Successfully Recovered Password!")
+        pas.flush()
+        pas.close()
 
 if not firstTime:
     system = sys.platform
@@ -92,11 +130,10 @@ if not firstTime:
         print(f"OS: {system}")
         os.system('bash setup.sh')
         print("Success.. Run This File Again.")
-        quit()
     elif system == 'win32':
         print("Initializing First Time Setup..")
         print(f"OS: {system}")
         os.system('./setup.ps1')
         print("Success.. Run This File Again.")
-        quit()
+        quit(2)
 main(messageOfTheSecond)
