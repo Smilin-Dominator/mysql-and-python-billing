@@ -9,8 +9,15 @@
 ><font size="6">Added a billing system. So now all progress is logged properly, and saved. Instead
 >of specifying how many items there can be, you keep on adding items, and when you're done, hit enter in the ID input
 >(without any text) and it'll process the data and create an invoice.</font>
+
+(12th June)
+><font size="6">Hello, my silent friend (get the reference?) its been a while. I added many new files, including a master-bill
+> maker, an SQL Client and a File Integrity checker. Added new features like Password Recovery, automatic setup scripts
+> deleting and updating capabilities and making sales reports. Today, I added a new feature I just learned, Classes. So to reduce
+> the repetitive commands, which were copy+pasted everywhere, can now be in a centralized class! It reduces cluttering and makes editing
+> the code easier!</font>
 # How To Use It?
-*DELETE THIS FILE WHEN YOU'VE READ IT, ANYONE OTHER UNTRUSTED PARTY WHO READS THIS WILL BE A THREAT*
+***DELETE THIS FILE WHEN YOU'VE READ IT, ANYONE OTHER UNTRUSTED PARTY WHO READS THIS IS A THREAT***
 ### Prerequisites
 <font size="6">You should have an 'Anaconda' Environment, with Python 3.7.10<br>Here's how you make one
 - Download the latest version for your OS [here](https://www.anaconda.com/products/individual).
