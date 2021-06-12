@@ -67,7 +67,8 @@ remove two dolls from Doll A and get 1 more of Doll B.
 You leave for a well deserved coffee break, totally unaware that some dude just deleted your passwd.txt file.
 <br>*Earlier: He could immediately delete the password file, set the password to something else and do damage*
 <br>*Now: The password's hash and it's salts are stored in the (log.txt) file, along with an MD5 hash, which proves that
-my program did this. If the MD5 Hashes don't match, your data has been tampered with, by a professional.*
+my program did that. If the password file has a different value than the one stored in the (log.txt), it'll rebuild it
+with the correct password.*
 ##### Problem 6
 You give your computer to someone, they look at the bills and just alter the values.
 <br>*Earlier: Well, you're screwed*
@@ -77,7 +78,7 @@ fraud. But if this is on my server, don't worry, I'll make a backup script!*
 File verification is going perfectly fine! Until someone comes along and deletes the hash file and rehashes the files to his version.
 <br>*Earlier: Well, you're screwed, and unaware that you're screwed*
 <br>*Now: All the hashes are stored in a MariaDB database (paddigurlHashes), and if the file is missing, but the hashes
-still exist, it'll rebuild the file.*
+still exist, it'll rebuild the file. If the file's hashes are different, it'll also rebuild the file with the correct hashes.*
 #### Conclusion
 Hope these scenarios helped you! I'll add more along with the new features that I add!
 <br>***Note: for a more detailed explanation of the functions, check the list below!***
