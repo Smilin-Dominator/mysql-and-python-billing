@@ -29,7 +29,7 @@ fileHeaderFormat = "{:^70}" # headers
 varTime = time.strftime("%d_of_%B")
 
 
-class printing_bills(object):
+class printingBills(object):
 
     def __init__(self, ar, myFormat, file):
         self.ar = ar
@@ -76,20 +76,25 @@ while idInput != ' ':
             fileName = f"[BILL]-{customerNameFormat}-{fileTime}.txt"  # format of the filename
             filePath = os.path.join(f'./bills/{varTime}', fileName)  # adds it into the bills DIR
             fileOpen = open(filePath, 'w+')  # Opens the bill file for writing
-            print_the_values = printing_bills(ar, myFormat, 'none')
+
+            print_the_values = printingBills(ar, myFormat, 'none')
             print(print_the_values.print_bill_items())
+
             fileOpen.write(f"{fileHeaderFormat.format(70 * '-')}")
             fileOpen.write(f"\n{fileHeaderFormat.format('Paddy Enterprises (Pvt) Ltd.')}")
             fileOpen.write(f"\n{fileHeaderFormat.format(70 * '-')}")
             fileOpen.write(f'\n\nDate: {str(time.strftime("%d/%m/%Y"))}')  # eg: 02/05/2021
             fileOpen.write(f'\nTime: {str(fileTime.replace("_", " "))}')  # uses the variable set earlier
             fileOpen.write(f'\nCustomer: {customerName.replace("_", " ")}\n')
-            write_the_values = printing_bills(ar, myFormat, fileOpen)
+
+            write_the_values = printingBills(ar, myFormat, fileOpen)
             write_the_values.write_bill_items()
-            var_tot = printing_bills(ar, myFormat, fileOpen).print_total()
-            print(printing_bills(ar, myFormat, 'none').print_total())
+
+            var_tot = printingBills(ar, myFormat, 'var').print_total()
+            print(printingBills(ar, myFormat, 'none').print_total())
             fileOpen.write(f'\n\nSubtotal: Rs. {str(var_tot)}')
             logging.info(f'Subtotal: Rs. {var_tot}')  # Three simultaneous actions here lol
+
             passOff = False
             while not passOff:
                 discountInput = float(input("Discount (%): "))
@@ -151,7 +156,7 @@ while idInput != ' ':
             pass_read = open('./passwd.txt', 'r')
             check_pass_file = pass_read.read().split(',')
             salt1 = check_pass_file[0]
-            salt2 =  check_pass_file[1]
+            salt2 = check_pass_file[1]
             hash_check = check_pass_file[2]
             pass_check = salt1 + killPass + salt2
             pass_hash = hashlib.sha512(pass_check.encode()).hexdigest()
@@ -160,7 +165,7 @@ while idInput != ' ':
             else:
                 print("\n[ Wrong Password ]\n")  # thats the wrong number! (ooohhhh)
         elif idInput == 'del':
-            print_the_values = printing_bills(ar, myFormat, 'none')
+            print_the_values = printingBills(ar, myFormat, 'none')
             print(print_the_values.print_bill_items())
             theLoop = True
             while theLoop:
@@ -183,12 +188,12 @@ while idInput != ' ':
                     print("[ Error Occurred, Please Retry ]")
                     theLoop = True
         elif idInput == '--':
-            print_the_values = printing_bills(ar, myFormat, 'none')
+            print_the_values = printingBills(ar, myFormat, 'none')
             print(print_the_values.print_bill_items())
-            var_tot = printing_bills(ar, myFormat, 'var').print_total()
-            print(printing_bills(ar, myFormat, 'none').print_total())
+            var_tot = printingBills(ar, myFormat, 'var').print_total()
+            print(printingBills(ar, myFormat, 'none').print_total())
         elif idInput == 'update':
-            print_the_values = printing_bills(ar, myFormat, 'none')
+            print_the_values = printingBills(ar, myFormat, 'none')
             print(print_the_values.print_bill_items())
             theLoop = True
             while theLoop:
@@ -288,6 +293,6 @@ while idInput != ' ':
                         )
             else:
                 print("\nDid You Enter The Right ID / Command?")  # congratulations! you're a failure!
-                logging.warning(f"Entered Wrong ID: {idInput}")
+                logging.warning(f"Entered Wrong ID / CMD: {idInput}")
     except Exception as rim:
         logging.error(rim)  # rim alert
