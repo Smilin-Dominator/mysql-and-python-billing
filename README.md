@@ -73,6 +73,11 @@ You give your computer to someone, they look at the bills and just alter the val
 <br>*Earlier: Well, you're screwed*
 <br>*Now: You're still screwed, but unlike earlier, the file verification will tell you if a file is different. So no accidental
 fraud. But if this is on my server, don't worry, I'll make a backup script!*
+##### Problem 7
+File verification is going perfectly fine! Until someone comes along and deletes the hash file and rehashes the files to his version.
+<br>*Earlier: Well, you're screwed, and unaware that you're screwed*
+<br>*Now: All the hashes are stored in a MariaDB database (paddigurlHashes), and if the file is missing, but the hashes
+still exist, it'll rebuild the file.*
 #### Conclusion
 Hope these scenarios helped you! I'll add more along with the new features that I add!
 <br>***Note: for a more detailed explanation of the functions, check the list below!***
