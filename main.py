@@ -12,12 +12,21 @@ import string
 import sys
 import time
 import hashlib
+import mysql.connector
 
 print("Welcome! If Something Doesn't Seem Right, Check The Logs!\n")
 
 log_format = '%(asctime)s (%(filename)s): %(message)s'  # this basically says that the time and date come first, error next
 logging.basicConfig(filename='log.txt', format=log_format, datefmt='[%Y-%m-%d] [%H:%M:%S]', level=logging.DEBUG)
 
+mydb = mysql.connector.connect(
+    auth_plugin='mysql_native_password',
+    host="178.79.168.171",
+    user="smilin_dominator",
+    password="Barney2356",
+    database='miscellaneous'
+)
+mycursor = mydb.cursor()
 
 def main(messageOfTheSecond):
     key = 2
@@ -71,6 +80,7 @@ checkmate = os.path.exists(varPath)
 checksales = os.path.exists('./sales_reports')
 firstTime = os.path.exists('./log.txt')
 checkPass = os.path.exists('./passwd.txt')
+checkHash = os.path.exists('./hashes.txt')
 
 if not check:
     os.mkdir("bills/")  # Makes the DIR
@@ -125,6 +135,26 @@ if not checkPass:
         print("Successfully Recovered Password!")
         pas.flush()
         pas.close()
+
+if not checkHash:
+    print("No Hash File Found...")
+    mycursor.execute("SELECT filepath, hash FROM paddigurlHashes;")
+    scrape = mycursor.fetchall()
+    if not scrape:
+        print("No Attempt Of Espionage...")
+        print("Proceeding To Make File....")
+        write_hi = open('hashes.txt', 'w')
+        write_hi.write('\n')
+        write_hi.close()
+    else:
+        print("Act Of Espionage Detected..")
+        print("Remaking The File...")
+        write_hi = open('hashes.txt', 'a')
+        for i in range(len(scrape)):
+            write_hi.write(f"\n{scrape[i][0]},{scrape[i][1]}")
+        print("Thought you could pull a fast one, Fool?\nNo Way.")
+        write_hi.flush()
+        write_hi.close()
 
 if not firstTime:
     system = sys.platform

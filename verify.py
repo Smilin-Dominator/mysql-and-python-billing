@@ -2,6 +2,7 @@
 import hashlib
 import logging
 import os
+import mysql.connector
 
 log_format = '%(asctime)s (%(filename)s): %(message)s'  # this basically says that the time and date come first, error next
 logging.basicConfig(filename='log.txt', format=log_format, datefmt='[%Y-%m-%d] [%H:%M:%S]', level=logging.DEBUG)
@@ -9,6 +10,14 @@ logging.basicConfig(filename='log.txt', format=log_format, datefmt='[%Y-%m-%d] [
 print("Welcome To The Verifier!\n\n'Nobody Will Tamper With Your Data!' \n- People Before Their Data Got Tampered\n")
 print("This Will Verify The Hashes Of Your Bills, Not The Master Bills And Sales Reports, as they're Dynamic")
 
+mydb = mysql.connector.connect(
+    auth_plugin='mysql_native_password',
+    host="178.79.168.171",
+    user="smilin_dominator",
+    password="Barney2356",
+    database='miscellaneous'
+)
+mycursor = mydb.cursor()
 
 def hash_file(filepath):
     sha256 = hashlib.sha256()
@@ -28,10 +37,10 @@ def hash():
     multiverse = os.listdir('bills')
     read_the_file = read_hash.read().splitlines()
     for dir in multiverse:
-        bill_path = os.path.join('./bills', dir)
+        bill_path = os.path.join('./bills/', dir)
         ls_l = os.listdir(bill_path)
         for file in ls_l:
-            the_new = os.path.join(bill_path, file)
+            the_new = os.path.join(bill_path + '/' + file)
             hash = hash_file(the_new)
             for data in read_the_file:
                 if file.startswith('master_bill'):
@@ -42,8 +51,10 @@ def hash():
                     break
             else:
                 hashwrite.write(f"\n{the_new},{hash}")
+                mycursor.execute(f"INSERT INTO paddigurlHashes(filepath, hash) VALUES('{the_new}', '{hash}')")
                 print(f"Hashed {file} .. {hash}")
-                logging.info(f"Hashed {file} .. {hash}")
+                logging.info(f"Hashed .. {file} .. {hash}")
+        mydb.commit()
 
 # -------Verify------------#
 def verify():
