@@ -25,9 +25,45 @@ logging.info(f"\nSold the following to {customerName}")  # you'll see this often
                                                          # logs are the go-to place
 
 myFormat = "{:<25}{:<15}{:<15}{:<15}"  # format for the .format() :)
-fileHeaderFormat = "{:^70}"
-formPrep = myFormat.format('Name', 'Price (Rs.)', 'Quantity', 'Total (Rs.)')  # headers
+fileHeaderFormat = "{:^70}" # headers
 varTime = time.strftime("%d_of_%B")
+
+
+class printing_bills(object):
+
+    def __init__(self, ar, myFormat, file):
+        self.ar = ar
+        self.form = myFormat
+        self.formPrep = self.form.format('Name', 'Price (Rs.)', 'Quantity', 'Total (Rs.)')
+        self.file = file
+
+    def print_bill_items(self):
+        print(f'\n{self.formPrep}')
+        for i in range(len(self.ar)):
+            final = self.form.format(ar[i][0], ar[i][1], ar[i][2], ar[i][3])
+            print(final)
+        return ''
+
+    def write_bill_items(self):
+        self.file.write(f'\n{self.formPrep}')
+        for i in range(len(self.ar)):
+            final = self.form.format(ar[i][0], ar[i][1], ar[i][2], ar[i][3])
+            self.file.write(f'\n{final}')
+        return ''
+
+    def print_total(self):
+        tot = 0
+        price_unchained = []  # blank array, like the earlier one
+        for i in range(len(ar)):
+            fin = int(ar[i][3])
+            price_unchained.append(fin)  # appends to the array
+        for i in range(0, len(price_unchained)):
+            tot = tot + price_unchained[i]  # paradox alert! this variable is dynamic, it remembers the past state.
+        if self.file == 'none':
+            return f"Subtotal: Rs. {tot}"
+        else:
+            return tot
+
 
 idInput = 69420666  # well, had to declare it as something -\_/-
 ar = []  # declared as empty, will get filled in the process
@@ -40,35 +76,26 @@ while idInput != ' ':
             fileName = f"[BILL]-{customerNameFormat}-{fileTime}.txt"  # format of the filename
             filePath = os.path.join(f'./bills/{varTime}', fileName)  # adds it into the bills DIR
             fileOpen = open(filePath, 'w+')  # Opens the bill file for writing
-            print('\n')  # just a spacer
-            print(formPrep)
+            print_the_values = printing_bills(ar, myFormat, 'none')
+            print(print_the_values.print_bill_items())
             fileOpen.write(f"{fileHeaderFormat.format(70 * '-')}")
             fileOpen.write(f"\n{fileHeaderFormat.format('Paddy Enterprises (Pvt) Ltd.')}")
             fileOpen.write(f"\n{fileHeaderFormat.format(70 * '-')}")
             fileOpen.write(f'\n\nDate: {str(time.strftime("%d/%m/%Y"))}')  # eg: 02/05/2021
             fileOpen.write(f'\nTime: {str(fileTime.replace("_", " "))}')  # uses the variable set earlier
             fileOpen.write(f'\nCustomer: {customerName.replace("_", " ")}\n')
-            fileOpen.write(f'\n{formPrep}')
-            for i in range(len(ar)):  # for loop to write the output of each, in the format
-                final = myFormat.format(ar[i][0], ar[i][1], ar[i][2], ar[i][3])
-                print(final)
-                fileOpen.write(f'\n{final}')  # mirrors the print output to the file
-            tot = 0
-            price_unchained = []  # blank array, like the earlier one
-            for i in range(len(ar)):
-                fin = int(ar[i][3])
-                price_unchained.append(fin)  # appends to the array
-            for i in range(0, len(price_unchained)):
-                tot = tot + price_unchained[i]  # paradox alert! this variable is dynamic, it remembers the past state.
-            print(f'\nSubtotal: Rs. {str(tot)}')
-            fileOpen.write(f'\n\nSubtotal: Rs. {str(tot)}')
-            logging.info(f'Subtotal: Rs. {tot}')  # Three simultaneous actions here lol
+            write_the_values = printing_bills(ar, myFormat, fileOpen)
+            write_the_values.write_bill_items()
+            var_tot = printing_bills(ar, myFormat, fileOpen).print_total()
+            print(printing_bills(ar, myFormat, 'none').print_total())
+            fileOpen.write(f'\n\nSubtotal: Rs. {str(var_tot)}')
+            logging.info(f'Subtotal: Rs. {var_tot}')  # Three simultaneous actions here lol
             passOff = False
             while not passOff:
                 discountInput = float(input("Discount (%): "))
                 if discountInput >= 0:
-                    discountAmount = tot * (discountInput / 100)
-                    discountSum = tot - discountAmount
+                    discountAmount = var_tot * (discountInput / 100)
+                    discountSum = var_tot - discountAmount
                     if discountSum >= 0:
                         discountTotal = round(discountSum, 2)
                         print(f"Discount Amount: Rs. {round(discountAmount, 2)}")
@@ -133,10 +160,8 @@ while idInput != ' ':
             else:
                 print("\n[ Wrong Password ]\n")  # thats the wrong number! (ooohhhh)
         elif idInput == 'del':
-            print(f"\n{formPrep}")
-            for i in range(len(ar)):  # reuse
-                final = myFormat.format(ar[i][0], ar[i][1], ar[i][2], ar[i][3])
-                print(final)
+            print_the_values = printing_bills(ar, myFormat, 'none')
+            print(print_the_values.print_bill_items())
             theLoop = True
             while theLoop:
                 try:
@@ -158,23 +183,13 @@ while idInput != ' ':
                     print("[ Error Occurred, Please Retry ]")
                     theLoop = True
         elif idInput == '--':
-            print(f'\n{formPrep}')
-            for i in range(len(ar)):  # reuse
-                final = myFormat.format(ar[i][0], ar[i][1], ar[i][2], ar[i][3])
-                print(final)
-            tot = 0
-            price_unchained = []  # blank array, like the earlier one
-            for i in range(len(ar)):
-                fin = int(ar[i][3])
-                price_unchained.append(fin)  # appends to the array
-            for i in range(0, len(price_unchained)):
-                tot = tot + price_unchained[i]  # paradox alert! this variable is dynamic, it remembers the past state.
-            print(f'\nSubtotal: {str(tot)}')
+            print_the_values = printing_bills(ar, myFormat, 'none')
+            print(print_the_values.print_bill_items())
+            var_tot = printing_bills(ar, myFormat, 'var').print_total()
+            print(printing_bills(ar, myFormat, 'none').print_total())
         elif idInput == 'update':
-            print(f'\n{formPrep}')
-            for i in range(len(ar)):  # reuse
-                final = myFormat.format(ar[i][0], ar[i][1], ar[i][2], ar[i][3])
-                print(final)
+            print_the_values = printing_bills(ar, myFormat, 'none')
+            print(print_the_values.print_bill_items())
             theLoop = True
             while theLoop:
                 try:
