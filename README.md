@@ -72,8 +72,10 @@ with the correct password.*
 ##### Problem 6
 You give your computer to someone, they look at the bills and just alter the values.
 <br>*Earlier: Well, you're screwed*
-<br>*Now: You're still screwed, but unlike earlier, the file verification will tell you if a file is different. So no accidental
+<br>*A Little Bit Later: You're still screwed, but unlike earlier, the file verification will tell you if a file is different. So no accidental
 fraud. But if this is on my server, don't worry, I'll make a backup script!*
+<br>*Now: along with the hashes, the file's content is also stored in the database (its official, im crazy), so if the verifier flags the file as
+altered or deleted, it'll rebuild it.*
 ##### Problem 7
 File verification is going perfectly fine! Until someone comes along and deletes the hash file and rehashes the files to his version.
 <br>*Earlier: Well, you're screwed, and unaware that you're screwed*
