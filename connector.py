@@ -64,6 +64,14 @@ class printingBills(object):
         else:
             return tot
 
+def appending_to_ar(name, price, quantity, total):
+    tuppence = (name, price, quantity, total)
+    # and now its done.... (suspense)
+    logging.info(  # have to have a backup:)
+        f'Sold {quantity} Of Item;\n{records}, bringing the total to Rs. {total}'
+    )
+    return tuppence
+
 
 idInput = 69420666  # well, had to declare it as something -\_/-
 ar = []  # declared as empty, will get filled in the process
@@ -276,21 +284,9 @@ while idInput != ' ':
                                     logging.error(e)
                                     break
                         else:
-                            # Appending to the blank array ...
-                            tuppence = (name, price, quantity, total)
-                            ar.append(tuppence)
-                            # and now its done.... (suspense)
-                            logging.info(  # have to have a backup:)
-                                f'Sold {quantity} Of Item;\n{records}, bringing the total to Rs. {total}'
-                            )
+                            ar.append(appending_to_ar(name, price, quantity, total))
                     else:
-                        # Appending to the blank array ...
-                        tuppence = (name, price, quantity, total)
-                        ar.append(tuppence)
-                        # and now its done.... (suspense)
-                        logging.info(  # have to have a backup:)
-                            f'Sold {quantity} Of Item;\n{records}, bringing the total to Rs. {total}'
-                        )
+                        ar.append(appending_to_ar(name, price, quantity, total))
             else:
                 print("\nDid You Enter The Right ID / Command?")  # congratulations! you're a failure!
                 logging.warning(f"Entered Wrong ID / CMD: {idInput}")
