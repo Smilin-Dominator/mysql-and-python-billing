@@ -46,7 +46,7 @@ def hash():
             the_new = os.path.join(bill_path + '/' + file)
             hash = hash_file(the_new)
             for data in read_the_file:
-                if file.startswith('master_bill'):
+                if the_new.endswith('master_bill.txt'):
                     print("Skipping Master Bill..")
                     break
                 if hash in data:
@@ -63,6 +63,7 @@ def hash():
 def verify():
     read_hash = open("hashes.txt", 'r')
     read = read_hash.read().splitlines()
+    read.remove('')
     col = []
     for i in range(len(read)):
         zee = read[i].split(',')
