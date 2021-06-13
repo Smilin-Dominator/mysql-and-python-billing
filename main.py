@@ -88,8 +88,8 @@ def main(messageOfTheSecond):
     key = 2
     while key != '1':
         randomNumGen = random.randint(1, len(messageOfTheSecond))  # RNG, unscripted order
-        print(f"Random Line from HUMBLE.: {messageOfTheSecond[randomNumGen]}")  # pulls from the Dictionary
-        print("Commands:\n\n1 to Exit\n2 to make another bill\n3 for Master Bill\n4 for the SQL Client\n5 for The Verifier")
+        print(f"\nRandom Line from HUMBLE.: {messageOfTheSecond[randomNumGen]}")  # pulls from the Dictionary
+        print("Commands:\n\n1 - Exit\n2 - Make A Bill\n3 - Create Master Bill & Sales Reports\n4 - SQL Client\n5 - Verifier")
         date = time.strftime('%c')
         time_prompt = time.strftime('%I:%M %p')
         key = input(f"\n[{date}]-[{time_prompt}]\nSmilinPython> ")

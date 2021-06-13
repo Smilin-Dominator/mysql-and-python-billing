@@ -158,6 +158,7 @@ while idInput != ' ':
                     logging.info(f'Balance: Rs. {str(bal)}\n')
                     fileOpen.write(f'\nBalance: Rs. {bal}')
                     break
+            input("\n(enter) to proceed...")
             quit()
         elif idInput == 'Kill':  # had to add an emergency kill function :)
             killPass = str(getpass.getpass("Enter Password: "))
