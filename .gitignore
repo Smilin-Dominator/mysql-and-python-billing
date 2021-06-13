@@ -3,4 +3,5 @@ __pycache__
 *.txt
 log.txt
 bills
-sales_reports
+sales_reports.idea/dbnavigator.xml
+.idea/dbnavigator.xml

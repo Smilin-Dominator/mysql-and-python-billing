@@ -21,13 +21,16 @@ mycursor = mydb.cursor()
 
 def hash_file(filepath):
     sha256 = hashlib.sha256()
-    with open(filepath, 'r') as red:
-        while True:
-            check = red.read(65536)
-            if not check:
-                break
-            sha256.update(check.encode())
-        return sha256.hexdigest()
+    if os.path.exists(filepath):
+        with open(filepath, 'r') as red:
+            while True:
+                check = red.read(65536)
+                if not check:
+                    break
+                sha256.update(check.encode())
+            return sha256.hexdigest()
+    else:
+        return False
 
 
 # ---------Hash------------#
@@ -51,7 +54,7 @@ def hash():
                     break
             else:
                 hashwrite.write(f"\n{the_new},{hash}")
-                mycursor.execute(f"INSERT INTO paddigurlHashes(filepath, hash) VALUES('{the_new}', '{hash}')")
+                mycursor.execute(f"INSERT INTO paddigurlHashes(filepath, hash, filecontents) VALUES('{the_new}', '{hash}', '{open(the_new, 'r').read()}')")
                 print(f"Hashed {file} .. {hash}")
                 logging.info(f"Hashed .. {file} .. {hash}")
         mydb.commit()
@@ -65,12 +68,32 @@ def verify():
         zee = read[i].split(',')
         try:
             hashest = hash_file(zee[0])
-            if str(hashest) == str(zee[1]):
-                print(f"{zee[0]} Is The Same")
-                logging.info(f"{zee[0]} Is The Same")
+            if hashest:
+                if str(hashest) == str(zee[1]):
+                    print(f"{zee[0]} Is The Same")
+                    logging.info(f"{zee[0]} Is The Same")
+                else:
+                    print(f"{zee[0]} Has Been Tampered")
+                    logging.critical(f"{zee[0]} Has Been Tampered")
+                    print("\t\tRecovering Data...")
+                    mycursor.execute(f"SELECT filecontents FROM paddigurlHashes WHERE `hash` = '{str(zee[1])}';")
+                    attempted_recovery = mycursor.fetchall()
+                    recovered = ''.join(attempted_recovery[0])
+                    recover_write = open(zee[0], 'w')
+                    recover_write.write(recovered)
+                    recover_write.flush()
+                    recover_write.close()
+                    print("\t\tSuccess...")
             else:
-                print(f"{zee[0]} Has Been Tampered")
-                logging.critical(f"{zee[0]} Has Been Tampered")
+                print(f"\t\tFile {zee[0]} Has Been Deleted....")
+                mycursor.execute(f"SELECT filecontents FROM paddigurlHashes WHERE `hash` = '{str(zee[1])}';")
+                attempted_recovery = mycursor.fetchall()
+                recovered = ''.join(attempted_recovery[0])
+                recover_write = open(zee[0], 'w')
+                recover_write.write(recovered)
+                recover_write.flush()
+                recover_write.close()
+                print("\t\tAttempting Recovery....\n\t\tSuccess...")
         except Exception as e:
             logging.error(e)
 
