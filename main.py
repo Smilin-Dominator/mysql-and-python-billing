@@ -28,6 +28,62 @@ mydb = mysql.connector.connect(
 )
 mycursor = mydb.cursor()
 
+
+class integrityCheck(object):
+
+    def __init__(self, check_log, hash_array, password_array):
+        self.check_the_pass = check_log
+        self.scraped_content = hash_array
+        self.password_array = password_array
+
+    def pass_check(self):
+        read_the_pass = open(self.check_the_pass, 'r')
+        crit = read_the_pass.read().splitlines()
+        critical = []
+        for i in range(len(crit)):
+            try:
+                if "Systemdump--Ignore--These" in crit[i]:
+                    signature = crit[i + 1]
+                    if signature == str(hashlib.md5("McDonalds_Im_Loving_It".encode()).hexdigest()):
+                        salt1 = crit[i + 2]
+                        salt2 = crit[i + 3]
+                        hashed_pw = crit[i + 4]
+                        critical_ar = (salt1, salt2, hashed_pw)
+                        critical.append(critical_ar)
+                    else:
+                        print("Authenticity Not Recognized.. Reset log.txt and passwd.txt, Data Might've been breached")
+                        quit(66)
+            except Exception as e:
+                logging.warning(e)
+        return critical
+
+    def pass_write(self):
+        print("Password File Tampered, Restoring...")
+        logging.critical("Password File Tampered, Restoring...")
+        pas = open('./passwd.txt', 'w+')
+        pas.write(f"{self.password_array[0][0]},{self.password_array[0][1]},{self.password_array[0][2]}")
+        pas.flush()
+        pas.close()
+        logging.info("Successfully Recovered Password!")
+        return "Successfully Recovered Password!"
+
+    def hash_check(self):
+        mycursor.execute("SELECT filepath, hash FROM paddigurlHashes;")
+        grape = mycursor.fetchall()
+        return grape
+
+    def hash_write(self):
+        print("Hashes Have Been Tampered With, Restoring Previous Hashes...")
+        logging.critical("Hashes Have Been Tampered With, Restoring Previous Hashes...")
+        write_hash = open("hashes.txt", 'w')
+        for i in range(len(self.scraped_content)):
+            write_hash.write(f"\n{self.scraped_content[i][0]},{self.scraped_content[i][1]}")
+        write_hash.flush()
+        write_hash.close()
+        logging.info("Successfully Recovered The Hashes!")
+        return "Successfully Recovered The Hashes!\n"
+
+
 def main(messageOfTheSecond):
     key = 2
     while key != '1':
@@ -96,24 +152,7 @@ if not checksales:
     print("Making Directory 'sales-reports/'...")
 
 if not checkPass:
-    check_log = open('log.txt', 'r')
-    crit = check_log.read().splitlines()
-    critical = []
-    for i in range(len(crit)):
-        try:
-            if "Systemdump--Ignore--These" in crit[i]:
-                signature = crit[i+1]
-                if signature == str(hashlib.md5("McDonalds_Im_Loving_It".encode()).hexdigest()):
-                    salt1 = crit[i+2]
-                    salt2 = crit[i+3]
-                    hash = crit[i+4]
-                    critical_ar = (salt1, salt2, hash)
-                    critical.append(critical_ar)
-                else:
-                    print("Authenticity Not Recognized.. Reset log.txt and passwd.txt, Data Might've been breached")
-                    quit(66)
-        except Exception as e:
-            logging.warning(e)
+    critical = integrityCheck('./log.txt', 'none', 'none').pass_check()
     if not critical:
         print("No Password Set.. Creating File..")
         pas_enter = getpass.getpass("Enter Password: ")
@@ -127,52 +166,21 @@ if not checkPass:
         pas.write(f'{salt1},{salt2},{hashpass}')
         print("Success!")
     else:
-        print("Foolish Cow Lad. You really think deleting the 'passwd.txt' file gets rid of the password!"
-              "\nYour level of stupidity is egregious, your lack of braincells causes global warming."
-              "\nYou really think that I, Devisha Padmaperuma would allow a little vulnerability like that"
-              " to exist!")
-        pas = open('./passwd.txt', 'w+')
-        pas.write(f"{critical[0][0]},{critical[0][1]},{critical[0][2]}")
-        print("Successfully Recovered Password!")
-        pas.flush()
-        pas.close()
+        print(integrityCheck('none', 'none', critical).pass_write())
 
 if checkPass:
-    check_log = open('log.txt', 'r')
-    crit = check_log.read().splitlines()
-    critical = []
-    for i in range(len(crit)):
-        try:
-            if "Systemdump--Ignore--These" in crit[i]:
-                signature = crit[i+1]
-                if signature == str(hashlib.md5("McDonalds_Im_Loving_It".encode()).hexdigest()):
-                    salt1 = crit[i+2]
-                    salt2 = crit[i+3]
-                    hash = crit[i+4]
-                    critical_ar = (salt1, salt2, hash)
-                    critical.append(critical_ar)
-                else:
-                    print("Authenticity Not Recognized.. Reset log.txt and passwd.txt, Data Might've been breached")
-                    quit(66)
-        except Exception as e:
-            logging.warning(e)
+    critical = integrityCheck('./log.txt', 'none', 'none').pass_check()
     read_pass = open('passwd.txt', 'r')
     read_pass_re = read_pass.read()
     read_pass_tup = tuple(read_pass_re.split(','))
     if read_pass_tup == (critical[0][0], critical[0][1], critical[0][2]):
-        print("Password Check Successful.. Proceeding..\n")
+        print("Password Check Successful.. Proceeding..")
     else:
-        print("Password File Tampered, Restoring...")
-        pas = open('./passwd.txt', 'w+')
-        pas.write(f"{critical[0][0]},{critical[0][1]},{critical[0][2]}")
-        print("Successfully Recovered Password!")
-        pas.flush()
-        pas.close()
+        print(integrityCheck('none', 'none', critical).pass_write())
 
 if not checkHash:
     print("No Hash File Found...")
-    mycursor.execute("SELECT filepath, hash FROM paddigurlHashes;")
-    scrape = mycursor.fetchall()
+    scrape = integrityCheck('none', 'none', 'none').hash_check()
     if not scrape:
         print("No Attempt Of Espionage...")
         print("Proceeding To Make File....")
@@ -180,18 +188,10 @@ if not checkHash:
         write_hi.write('\n')
         write_hi.close()
     else:
-        print("Act Of Espionage Detected..")
-        print("Remaking The File...")
-        write_hi = open('hashes.txt', 'w')
-        for i in range(len(scrape)):
-            write_hi.write(f"\n{scrape[i][0]},{scrape[i][1]}")
-        print("Thought you could pull a fast one, Fool?\nNo Way.")
-        write_hi.flush()
-        write_hi.close()
+        print(integrityCheck('none', scrape, 'none').hash_write())
 
 if checkHash:
-    mycursor.execute("SELECT filepath, hash FROM paddigurlHashes;")
-    scrape = mycursor.fetchall()
+    scrape = integrityCheck('none', 'none', 'none').hash_check()
     scrape_file = open('hashes.txt', 'r')
     scrape2 = scrape_file.read().splitlines()
     hash_check_ar = []
@@ -202,14 +202,9 @@ if checkHash:
             split = tuple(scrape2[i].split(','))
             hash_check_ar.append(split)
     if hash_check_ar == scrape:
-        print("Hashes Match.. Proceeding...")
+        print("Hashes Match.. Proceeding...\n")
     else:
-        print("Hashes Have Been Tampered With, Restoring Previous Hashes...")
-        write_hash = open("hashes.txt", 'w')
-        for i in range(len(scrape)):
-            write_hash.write(f"\n{scrape[i][0]},{scrape[i][1]}")
-        print("Successfuly Restored...")
-
+        print(integrityCheck('none', scrape, 'none').hash_write())
 
 
 if not firstTime:
@@ -225,4 +220,5 @@ if not firstTime:
         os.system('./setup.ps1')
         print("Success.. Run This File Again.")
         quit(2)
+
 main(messageOfTheSecond)
