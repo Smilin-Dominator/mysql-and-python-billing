@@ -247,7 +247,8 @@ while idInput != ' ':
                     logging.error(e)
                     theLoop = True
         else:
-            sql_select_Query = f"select * from paddigurlTest WHERE id = {idInput}"  # This Will Be Sent To The Database
+            proceed = int(idInput)
+            sql_select_Query = f"select * from paddigurlTest WHERE id = {proceed}"  # This Will Be Sent To The Database
             cursor = mydb.cursor()  # This Is As If You Were Entering It Yourself
             cursor.execute(sql_select_Query)  # Executes
             records = cursor.fetchall()  # Gets All The Outputs
