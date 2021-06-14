@@ -90,6 +90,10 @@ def verify():
                     print("\t\tSuccess...")
             else:
                 print(f"File {zee[0]} Has Been Deleted....")
+                dir_check = zee[0].split("[BILL]")
+                if not os.path.exists(dir_check[0]):
+                    print("\t\tEntire Directory Deleted... Restoring")
+                    os.mkdir(dir_check[0])
                 logging.critical(f"File {zee[0]} Has Been Deleted")
                 mycursor.execute(f"SELECT filecontents FROM paddigurlHashes WHERE `hash` = '{str(zee[1])}';")
                 attempted_recovery = mycursor.fetchall()
