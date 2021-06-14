@@ -1,5 +1,3 @@
-#!/usr/bin/env conda run -n mysql-and-python-billing python
-
 # This Program was made completely (100%) by the one and only
 # Devisha Padmaperuma!
 # Don't even think of stealing my code!

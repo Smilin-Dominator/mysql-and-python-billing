@@ -1,4 +1,3 @@
-#!/usr/bin/env conda run -n mysql-and-python-billing python
 import hashlib
 import logging
 import os

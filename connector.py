@@ -1,4 +1,3 @@
-#!/usr/bin/env conda run -n mysql-and-python-billing python
 import getpass
 import hashlib
 import mysql.connector

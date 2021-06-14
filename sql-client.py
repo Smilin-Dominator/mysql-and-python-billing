@@ -1,5 +1,3 @@
-#!/usr/bin/env conda run -n mysql-and-python-billing python
-
 import getpass
 import mysql.connector
 import pandas as pd
