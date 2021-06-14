@@ -64,6 +64,7 @@ class printingBills(object):
         else:
             return tot
 
+
 def appending_to_ar(name, price, quantity, total):
     tuppence = (name, price, quantity, total)
     # and now its done.... (suspense)

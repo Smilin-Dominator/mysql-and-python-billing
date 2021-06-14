@@ -19,6 +19,7 @@ mydb = mysql.connector.connect(
 )
 mycursor = mydb.cursor()
 
+
 def hash_file(filepath):
     sha256 = hashlib.sha256()
     if os.path.exists(filepath):
@@ -54,10 +55,12 @@ def hash():
                     break
             else:
                 hashwrite.write(f"\n{the_new},{hash}")
-                mycursor.execute(f"INSERT INTO paddigurlHashes(filepath, hash, filecontents) VALUES('{the_new}', '{hash}', '{open(the_new, 'r').read()}')")
+                mycursor.execute(
+                    f"INSERT INTO paddigurlHashes(filepath, hash, filecontents) VALUES('{the_new}', '{hash}', '{open(the_new, 'r').read()}')")
                 print(f"Hashed {file} .. {hash}")
                 logging.info(f"Hashed .. {file} .. {hash}")
         mydb.commit()
+
 
 # -------Verify------------#
 def verify():
@@ -100,6 +103,7 @@ def verify():
         except Exception as e:
             logging.error(e)
 
+
 def main():
     key = input("Verify or Hash or Quit? (v/h/q): ")
     if key == 'v':
@@ -108,5 +112,6 @@ def main():
         hash()
     elif key == 'q':
         quit()
+
 
 main()
