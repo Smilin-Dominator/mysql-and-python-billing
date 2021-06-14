@@ -1,7 +1,5 @@
-echo "Setting Up Conda Environment..."
-conda create -y -n mysql-and-python-billing python=3.9.5
-echo "Success!"
-echo "Installing Dependencies..."
-conda install -y -c conda-forge -n mysql-and-python-billing mysql-connector-python pandas
+echo "Installing Dependencies.."
+pip3 install mysql-connector-python pandas
 echo "Success!"
 touch log.txt
+echo "Successful.. Restart (main.py)..."
