@@ -174,8 +174,7 @@ while idInput != ' ':
             else:
                 print("\n[ Wrong Password ]\n")  # thats the wrong number! (ooohhhh)
         elif idInput == 'del':
-            print_the_values = printingBills(ar, myFormat, 'none')
-            print(print_the_values.print_bill_items())
+            print(printingBills(ar, myFormat, 'none').print_bill_items())
             theLoop = True
             while theLoop:
                 try:
@@ -197,13 +196,10 @@ while idInput != ' ':
                     print("[ Error Occurred, Please Retry ]")
                     theLoop = True
         elif idInput == '--':
-            print_the_values = printingBills(ar, myFormat, 'none')
-            print(print_the_values.print_bill_items())
-            var_tot = printingBills(ar, myFormat, 'var').print_total()
+            print(printingBills(ar, myFormat, 'none').print_bill_items())
             print(printingBills(ar, myFormat, 'none').print_total())
         elif idInput == 'update':
-            print_the_values = printingBills(ar, myFormat, 'none')
-            print(print_the_values.print_bill_items())
+            print(printingBills(ar, myFormat, 'none').print_bill_items())
             theLoop = True
             while theLoop:
                 try:
