@@ -5,7 +5,7 @@ import logging
 import time
 import os
 
-log_format = '%(asctime)s (%(filename)s): %(message)s'   # this basically says that the time and date come first, error next
+log_format = '%(asctime)s (%(filename)s): %(message)s'  # this basically says that the time and date come first, error next
 logging.basicConfig(filename='log.txt', format=log_format, datefmt='[%Y-%m-%d] [%H:%M:%S]', level=logging.DEBUG)
 
 mydb = mysql.connector.connect(
@@ -21,10 +21,10 @@ customerName = input("Customer: ")  # Optional, if you're in a hurry, just leave
 if not customerName:  # ' ' => blank
     customerName = '(Not Specified)'
 logging.info(f"\nSold the following to {customerName}")  # you'll see this often, in case any bills go missing
-                                                         # logs are the go-to place
+# logs are the go-to place
 
 myFormat = "{:<25}{:<15}{:<15}{:<15}"  # format for the .format() :)
-fileHeaderFormat = "{:^70}" # headers
+fileHeaderFormat = "{:^70}"  # headers
 varTime = time.strftime("%d_of_%B")
 
 
@@ -84,7 +84,7 @@ def update_list(ar):
                         tempList[i][2] = newQuan
                         tempList[i][3] = newTot
                         logging.info(
-                            f"Updated: {updateValue}, {ar[i][1]}\nSet Quantity {oldQuan} => {newQuan}\nUpdated Total => {newTot}")
+                            f"Updated: {updateValue}, {ar[i][1]}\nSet Quantity {oldQuan} => {newQuan}\nUpdated Total {tempList[i][3]} => {newTot}")
                         ar = [tuple(entry) for entry in tempList]
                     elif update_key_check[0] == '-':
                         newQuanCheck = oldQuan - upQuan
@@ -97,7 +97,7 @@ def update_list(ar):
                             if confirm == 'Y':
                                 logging.warning(f"Set {updateValue}, {ar[i][1]}'s Quantity to 1")
                                 newQuan = 1
-                            elif confirm == 'N':
+                            else:
                                 logging.warning(f"Didn't Change {updateValue}, {ar[i][1]}'s Quantity")
                                 newQuan = oldQuan
                         newTot = newQuan * tempList[i][1]
@@ -239,6 +239,41 @@ def bill_write(ar):
     quit()
 
 
+def duplicate_check(ar, records):
+    quantity = int(input("Quantity: "))
+    for row in records:
+        name = row[1]  # gets the element from the data
+        price = row[2]  # and its in a fixed format, which is what matters
+        print(f"\nName  : {name}")
+        print(f"Price : {price}")
+        total = int(price) * quantity
+        if len(ar) > 0:
+            tempList = [list(item) for item in ar]  # converts into a list, since you cant change tuples
+            for i in range(len(tempList)):
+                checkName = tempList[i][0]
+                checkPrice = tempList[i][1]
+                if checkName == name and checkPrice == price:
+                    print("\nDuplicate Detected, Updating Current Entry")
+                    currentTotal = tempList[i][3]
+                    currentQuantity = tempList[i][2]
+                    newTotal = int(price) * quantity + currentTotal
+                    newQuantity = int(currentQuantity) + quantity
+                    try:
+                        tempList[i][3] = newTotal
+                        tempList[i][2] = newQuantity
+                        print("Success!")
+                        logging.info(
+                            f"Updated: {checkName}, {checkPrice}\nSet Quantity {currentQuantity} => {newQuantity}\nSet Total: {currentTotal} => {newTotal}")
+                        ar = [tuple(entry) for entry in tempList]
+                        return ar
+                    except Exception as e:
+                        logging.error(e)
+            else:
+                return [name, price, quantity, total]
+        else:
+            return [name, price, quantity, total]
+
+
 def appending_to_ar(name, price, quantity, total):
     tuppence = (name, price, quantity, total)
     # and now its done.... (suspense)
@@ -272,42 +307,16 @@ def main():
                 cursor.execute(sql_select_Query)  # Executes
                 records = cursor.fetchall()  # Gets All The Outputs
                 if records:  # Basically proceeds if its not empty like []
-                    quantity = int(input("Quantity: "))
-                    for row in records:
-                        name = row[1]  # gets the element from the data
-                        price = row[2]  # and its in a fixed format, which is what matters
-                        print(f"\nName  : {name}")
-                        print(f"Price : {price}")
-                        total = int(price) * quantity
-                        if len(ar) > 0:
-                            tempList = [list(item) for item in ar]  # converts into a list, since you cant change tuples
-                            for i in range(len(tempList)):
-                                checkName = tempList[i][0]
-                                checkPrice = tempList[i][1]
-                                if checkName == name and checkPrice == price:
-                                    print("\nDuplicate Detected, Updating Current Entry")
-                                    currentTotal = tempList[i][3]
-                                    currentQuantity = tempList[i][2]
-                                    newTotal = int(price) * quantity + currentTotal
-                                    newQuantity = int(currentQuantity) + quantity
-                                    try:
-                                        tempList[i][3] = newTotal
-                                        tempList[i][2] = newQuantity
-                                        print("Success!")
-                                        logging.info(f"Updated: {checkName}, {checkPrice}\nSet Quantity {currentQuantity} => {newQuantity}\nSet Total: {currentTotal} => {newTotal}")
-                                        ar = [tuple(entry) for entry in tempList]
-                                        break
-                                    except Exception as e:
-                                        logging.error(e)
-                                        break
-                            else:
-                                ar.append(appending_to_ar(name, price, quantity, total))
-                        else:
-                            ar.append(appending_to_ar(name, price, quantity, total))
+                    dup = duplicate_check(ar, records)
+                    if len(dup) == len(ar) and len(dup) != len(records):
+                        ar = dup
+                    else:
+                        ar.append(appending_to_ar(dup[0], dup[1], dup[2], dup[3]))
                 else:
                     print("\nDid You Enter The Right ID / Command?")  # congratulations! you're a failure!
                     logging.warning(f"Entered Wrong ID / CMD: {idInput}")
         except Exception as rim:
             logging.error(rim)  # rim alert
+
 
 main()
