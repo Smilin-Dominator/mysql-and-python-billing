@@ -58,10 +58,7 @@ class printingBills(object):
             price_unchained.append(fin)  # appends to the array
         for i in range(0, len(price_unchained)):
             tot = tot + price_unchained[i]  # paradox alert! this variable is dynamic, it remembers the past state.
-        if self.file == 'none':
-            return f"Subtotal: Rs. {tot}"
-        else:
-            return tot
+        return tot
 
 
 def update_list(ar):
@@ -176,7 +173,7 @@ def bill_write(ar):
     write_the_values.write_bill_items()
 
     var_tot = printingBills(ar, myFormat, 'var').print_total()
-    print(printingBills(ar, myFormat, 'none').print_total())
+    print("Subtotal: Rs.", var_tot)
     fileOpen.write(f'\n\nSubtotal: Rs. {str(var_tot)}')
     logging.info(f'Subtotal: Rs. {var_tot}')  # Three simultaneous actions here lol
 
@@ -297,7 +294,7 @@ def main():
                 ar = delete_from_list(ar)
             elif idInput == '--':
                 print(printingBills(ar, myFormat, 'none').print_bill_items())
-                print(printingBills(ar, myFormat, 'none').print_total())
+                print(f"Subtotal: {printingBills(ar, myFormat, 'none').print_total()}")
             elif idInput == 'update':
                 ar = update_list(ar)
             else:
