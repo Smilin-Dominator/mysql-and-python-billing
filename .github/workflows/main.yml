@@ -1,6 +1,10 @@
-name: Pylint
+name: Syntax Error Check
 
-on: [push]
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
 
 jobs:
   build:
