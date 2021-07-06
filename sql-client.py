@@ -3,7 +3,7 @@ import mysql.connector
 import pandas as pd
 import logging
 import hashlib
-import rsa
+import sys
 
 log_format = '%(asctime)s (%(filename)s): %(message)s'  # this basically says that the time and date come first, error next
 logging.basicConfig(filename='log.txt', format=log_format, datefmt='[%Y-%m-%d] [%H:%M:%S]', level=logging.DEBUG)
@@ -19,11 +19,7 @@ while badPass:
     pass_check = salt1 + passwd + salt2
     pass_hash = hashlib.sha512(pass_check.encode()).hexdigest()
     if pass_hash == hash_check:
-        with open("./credentials/mysql.txt", 'rb') as fillet:
-            privKey = rsa.PrivateKey.load_pkcs1(open("./credentials/private.pem", 'rb').read())
-            a = fillet.read()
-            b = rsa.decrypt(a, privKey).decode('utf-8')
-            credz = b.split(',')
+        credz = sys.argv[1].split(',')
         print("Success!")
         mydb = mysql.connector.connect(
             auth_plugin='mysql_native_password',

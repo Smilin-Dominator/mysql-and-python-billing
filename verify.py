@@ -2,7 +2,7 @@ import hashlib
 import logging
 import os
 import mysql.connector
-import rsa
+import sys
 
 log_format = '%(asctime)s (%(filename)s): %(message)s'  # this basically says that the time and date come first, error next
 logging.basicConfig(filename='log.txt', format=log_format, datefmt='[%Y-%m-%d] [%H:%M:%S]', level=logging.DEBUG)
@@ -10,11 +10,7 @@ logging.basicConfig(filename='log.txt', format=log_format, datefmt='[%Y-%m-%d] [
 print("Welcome To The Verifier!\n\n'Nobody Will Tamper With Your Data!' \n- People Before Their Data Got Tampered\n")
 print("This Will Verify The Hashes Of Your Bills, Not The Master Bills And Sales Reports, as they're Dynamic")
 
-with open("./credentials/mysql.txt", 'rb') as fillet:
-    privKey = rsa.PrivateKey.load_pkcs1(open("./credentials/private.pem", 'rb').read())
-    a = fillet.read()
-    b = rsa.decrypt(a, privKey).decode('utf-8')
-    credz = b.split(',')
+credz = sys.argv[1].split(',')
 mydb = mysql.connector.connect(
     auth_plugin='mysql_native_password',
     host=credz[0],

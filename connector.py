@@ -4,16 +4,12 @@ import mysql.connector
 import logging
 import time
 import os
-import rsa
+import sys
 
 log_format = '%(asctime)s (%(filename)s): %(message)s'  # this basically says that the time and date come first, error next
 logging.basicConfig(filename='log.txt', format=log_format, datefmt='[%Y-%m-%d] [%H:%M:%S]', level=logging.DEBUG)
 
-with open("./credentials/mysql.txt", 'rb') as fillet:
-    privKey = rsa.PrivateKey.load_pkcs1(open("./credentials/private.pem", 'rb').read())
-    a = fillet.read()
-    b = rsa.decrypt(a, privKey).decode('utf-8')
-    credz = b.split(',')
+credz = sys.argv[1].split(',')
 mydb = mysql.connector.connect(
     auth_plugin='mysql_native_password',
     host=credz[0],

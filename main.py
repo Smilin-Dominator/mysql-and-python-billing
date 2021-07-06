@@ -49,7 +49,7 @@ def startup():
     )
     #mycursor = mydb.cursor()
     #init5(mycursor)
-    main(messageOfTheSecond)
+    main(messageOfTheSecond, credz)
 
 
 class integrityCheck(object):
@@ -108,7 +108,7 @@ class integrityCheck(object):
         return "Successfully Recovered The Hashes!\n"
 
 
-def main(messageOfTheSecond):
+def main(messageOfTheSecond, credz):
     key = 2
     while key != '1':
         randomNumGen = random.randint(1, len(messageOfTheSecond))  # RNG, unscripted order
@@ -118,22 +118,23 @@ def main(messageOfTheSecond):
         date = time.strftime('%c')
         time_prompt = time.strftime('%I:%M %p')
         key = input(f"\n[{date}]-[{time_prompt}]\nSmilinPython> ")
+        ncredz = ' '.join(credz).replace(' ', ',')
         try:
             if key == '1':
                 logging.info("Exiting Gracefully;")
                 quit()
             elif key == '2':
                 logging.info("Transferring to (connector.py)")
-                os.system('python3 connector.py')
+                os.system(f'python3 connector.py {ncredz}')
             elif key == '3':
                 logging.info("Transferring to (master-bill.py)")
                 os.system("python3 master-bill.py")
             elif key == '4':
                 logging.info("Transferring to (sql-client.py)")
-                os.system("python3 sql-client.py")
+                os.system(f"python3 sql-client.py {ncredz}")
             elif key == '5':
                 logging.info("Transferring to (verify.py)")
-                os.system("python3 verify.py")
+                os.system(f"python3 verify.py {ncredz}")
         except Exception as e:
             logging.error(e)
 
