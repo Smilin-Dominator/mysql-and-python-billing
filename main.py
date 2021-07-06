@@ -13,11 +13,10 @@ import hashlib
 import mysql.connector
 from shred.shredders import FileShredder
 import rsa
+import base64
 
 
 def startup():
-
-    credz = init1()
 
     messageOfTheSecond = {
         # if you don't recognize this song, stop reading this and listen <https://open.spotify.com/track/7KXjTSCq5nL1LoYtL7XAwS?si=9f86d9e08cac4cd2>
@@ -37,7 +36,7 @@ def startup():
 
     log_format = '%(asctime)s (%(filename)s): %(message)s'  # this basically says that the time and date come first, error next
     logging.basicConfig(filename='log.txt', format=log_format, datefmt='[%Y-%m-%d] [%H:%M:%S]', level=logging.DEBUG)
-
+    credz = init1(logging)
     mydb = mysql.connector.connect(
         auth_plugin='mysql_native_password',
         host=credz[0],
@@ -45,6 +44,7 @@ def startup():
         password=credz[2],
         database=credz[3]
     )
+
     mycursor = mydb.cursor()
     if len(credz) == 5:
         if credz[4] == 'y':
@@ -169,11 +169,39 @@ def main(messageOfTheSecond, credz):
             logging.error(e)
 
 
-def init1():
+def init1(logging):
     check = os.path.exists('./credentials')
+    keycheck1 = os.path.exists('./credentials/private.pem')
+    keycheck2 = os.path.exists('./credentials/public.pem')
     if not check:
         os.mkdir('./credentials')
-        print('[*] Made Directory Credentials..')
+        print('[*] Made Directory "./Credentials"..')
+    if not keycheck1 or (not keycheck2):
+        with open('log.txt', 'r') as truth:
+            a = truth.read().splitlines()
+            for line in a:
+                if 'Binary_Data' in line:
+                    print("[*] Found Existing Public Key..")
+                    print("[*] Recovering..")
+                    b = line.split('Binary_Data:')
+                    pubkey = open('./credentials/public.pem', 'w+')
+                    out = ''.join(b[1]).replace("b'", "").replace("'", "")
+                    dec = base64.b64decode(out).decode()
+                    pubkey.write(dec)
+                    print("[*] Successfully Recovered Public Key!")
+                    pubkey.close()
+                elif "Binary-Data" in line:
+                    print("[*] Found Existing Private Key..")
+                    print("[*] Recovering...")
+                    b = line.split('Binary-Data:')
+                    privkey = open('./credentials/private.pem', 'w+')
+                    out = ''.join(b[1]).replace("b'", "").replace("'", "")
+                    dec = base64.b64decode(out).decode()
+                    privkey.write(dec)
+                    print("[*] Successfully Recovered Private Key!")
+                    privkey.close()
+            else:
+                print("[*] No Attempt Of Fraud, Continuing..")
     check_for_file = os.path.exists('./credentials/mysql.txt')
     if not check_for_file:
         host = input("Host: ")
@@ -184,11 +212,17 @@ def init1():
         pubKey, privKey = rsa.newkeys(1096)
         print("[*] Writing Public Key..")
         with open('./credentials/public.pem', 'w') as pop:
-            pop.write(pubKey.save_pkcs1().decode('utf-8'))
+            pubStr = pubKey.save_pkcs1()
+            pop.write(pubStr.decode('utf-8'))
+            encoded = base64.b64encode(pubStr)
+            logging.info(f"Binary_Data:{encoded}")
             pop.close()
         print("[*] Writing Private Key..")
         with open('./credentials/private.pem', 'w') as pop:
-            pop.write(privKey.save_pkcs1().decode('utf-8'))
+            privStr = privKey.save_pkcs1()
+            pop.write(privStr.decode('utf-8'))
+            encoded = base64.b64encode(privStr)
+            logging.info(f"Binary-Data:{encoded}")
             pop.close()
         logging.info("Wrote RSA Keys")
         print("[*] Success.. Final Touches...")
