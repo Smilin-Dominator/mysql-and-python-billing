@@ -17,6 +17,8 @@ import rsa
 
 def startup():
 
+    credz = init1()
+
     messageOfTheSecond = {
         # if you don't recognize this song, stop reading this and listen <https://open.spotify.com/track/7KXjTSCq5nL1LoYtL7XAwS?si=9f86d9e08cac4cd2>
         1: "Nobody Pray for Me, It Been That Day For Me, Yeah!",  # actually who are you? Why are you reading this?
@@ -40,13 +42,13 @@ def startup():
 
     mydb = mysql.connector.connect(
         auth_plugin='mysql_native_password',
-        host="remotemysql.com",
-        user="ki474LQWR4",
-        password="owlXZM9I3W",
-        database='ki474LQWR4'
+        host=credz[0],
+        user=credz[1],
+        password=credz[2],
+        database=credz[3]
     )
-    mycursor = mydb.cursor()
-    init5(mycursor)
+    #mycursor = mydb.cursor()
+    #init5(mycursor)
     main(messageOfTheSecond)
 
 
@@ -137,7 +139,44 @@ def main(messageOfTheSecond):
 
 
 def init1():
-    
+    check = os.path.exists('./credentials')
+    if not check:
+        os.mkdir('./credentials')
+        print('[*] Made Directory Credentials..')
+    check_for_file = os.path.exists('./credentials/mysql.txt')
+    if not check_for_file:
+        host = input("Host: ")
+        user = input("Username: ")
+        password = input("Password: ")
+        db = input("Database: ")
+        print("[*] Generating Keys....")
+        pubKey, privKey = rsa.newkeys(1096)
+        print("[*] Writing Public Key..")
+        with open('./credentials/public.pem', 'w') as pop:
+            pop.write(pubKey.save_pkcs1().decode('utf-8'))
+            pop.close()
+        print("[*] Writing Private Key..")
+        with open('./credentials/private.pem', 'w') as pop:
+            pop.write(privKey.save_pkcs1().decode('utf-8'))
+            pop.close()
+        logging.info("Wrote RSA Keys")
+        print("[*] Success.. Final Touches...")
+        st = f"{host},{user},{password},{db}".encode()
+        logging.info(st)
+        with open('./credentials/mysql.txt', 'wb+') as mcdonalds:
+            var = rsa.encrypt(st, pubKey)
+            mcdonalds.write(var)
+        print("[*] Successfully Wrote The Changes To The File..")
+        return [host, user, password, db]
+    else:
+        with open("./credentials/mysql.txt", 'rb') as fillet:
+            privKey = rsa.PrivateKey.load_pkcs1(open("./credentials/private.pem", 'rb').read())
+            a = fillet.read()
+            b = rsa.decrypt(a, privKey).decode('utf-8')
+            return b.split(',')
+
+
+
 
 
 def init5(mycursor):
@@ -185,7 +224,7 @@ def init5(mycursor):
         print("Making Directory 'sales-reports/'...")
 
     if not checkPass:
-        critical = integrityCheck('./log.txt', 'none', 'none').pass_check()
+        critical = integrityCheck('./log.txt', 'none', 'none', mycursor).pass_check()
         if not critical:
             print("No Password Set.. Creating File..")
             pas_enter = getpass.getpass("Enter Password: ")
@@ -199,21 +238,21 @@ def init5(mycursor):
             pas.write(f'{salt1},{salt2},{hashpass}')
             print("Success!")
         else:
-            print(integrityCheck('none', 'none', critical).pass_write())
+            print(integrityCheck('none', 'none', critical, mycursor).pass_write())
 
     if checkPass:
-        critical = integrityCheck('./log.txt', 'none', 'none').pass_check()
+        critical = integrityCheck('./log.txt', 'none', 'none', mycursor).pass_check()
         read_pass = open('./credentials/passwd.txt', 'r')
         read_pass_re = read_pass.read()
         read_pass_tup = tuple(read_pass_re.split(','))
         if read_pass_tup == (critical[0][0], critical[0][1], critical[0][2]):
             print("Password Check Successful.. Proceeding..")
         else:
-            print(integrityCheck('none', 'none', critical).pass_write())
+            print(integrityCheck('none', 'none', critical, mycursor).pass_write())
 
     if not checkHash:
         print("No Hash File Found...")
-        scrape = integrityCheck('none', 'none', 'none').hash_check()
+        scrape = integrityCheck('none', 'none', 'none', mycursor).hash_check()
         if not scrape:
             print("No Attempt Of Espionage...")
             print("Proceeding To Make File....")
@@ -221,10 +260,10 @@ def init5(mycursor):
             write_hi.write('\n')
             write_hi.close()
         else:
-            print(integrityCheck('none', scrape, 'none').hash_write())
+            print(integrityCheck('none', scrape, 'none', mycursor).hash_write())
 
     if checkHash:
-        scrape = integrityCheck('none', 'none', 'none').hash_check()
+        scrape = integrityCheck('none', 'none', 'none', mycursor).hash_check()
         scrape_file = open('./credentials/hashes.txt', 'r')
         scrape2 = scrape_file.read().splitlines()
         hash_check_ar = []
@@ -237,7 +276,7 @@ def init5(mycursor):
         if hash_check_ar == scrape:
             print("Hashes Match.. Proceeding...\n")
         else:
-            print(integrityCheck('none', scrape, 'none').hash_write())
+            print(integrityCheck('none', scrape, 'none', mycursor).hash_write())
 
 
 startup()
