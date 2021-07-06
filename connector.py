@@ -4,17 +4,19 @@ import mysql.connector
 import logging
 import time
 import os
+import sys
 
 log_format = '%(asctime)s (%(filename)s): %(message)s'  # this basically says that the time and date come first, error next
 logging.basicConfig(filename='log.txt', format=log_format, datefmt='[%Y-%m-%d] [%H:%M:%S]', level=logging.DEBUG)
 
+credz = sys.argv[1].split(',')
 mydb = mysql.connector.connect(
     auth_plugin='mysql_native_password',
-    host="178.79.168.171",
-    user="smilin_dominator",
-    password="Barney2356",
-    database='miscellaneous'
-)  # connection time..
+    host=credz[0],
+    user=credz[1],
+    password=credz[2],
+    database=credz[3]
+)
 
 BUF_SIZE = 65536
 customerName = input("Customer: ")  # Optional, if you're in a hurry, just leave blank

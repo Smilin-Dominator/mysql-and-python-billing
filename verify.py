@@ -2,6 +2,7 @@ import hashlib
 import logging
 import os
 import mysql.connector
+import sys
 
 log_format = '%(asctime)s (%(filename)s): %(message)s'  # this basically says that the time and date come first, error next
 logging.basicConfig(filename='log.txt', format=log_format, datefmt='[%Y-%m-%d] [%H:%M:%S]', level=logging.DEBUG)
@@ -9,12 +10,13 @@ logging.basicConfig(filename='log.txt', format=log_format, datefmt='[%Y-%m-%d] [
 print("Welcome To The Verifier!\n\n'Nobody Will Tamper With Your Data!' \n- People Before Their Data Got Tampered\n")
 print("This Will Verify The Hashes Of Your Bills, Not The Master Bills And Sales Reports, as they're Dynamic")
 
+credz = sys.argv[1].split(',')
 mydb = mysql.connector.connect(
     auth_plugin='mysql_native_password',
-    host="178.79.168.171",
-    user="smilin_dominator",
-    password="Barney2356",
-    database='miscellaneous'
+    host=credz[0],
+    user=credz[1],
+    password=credz[2],
+    database=credz[3]
 )
 mycursor = mydb.cursor()
 
