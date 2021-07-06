@@ -74,12 +74,12 @@ def verify():
             hashest = hash_file(zee[0])
             if hashest:
                 if str(hashest) == str(zee[1]):
-                    print(f"File {zee[0]} Is Safe")
+                    print(f"[*] File {zee[0]} Is Safe")
                     logging.info(f"{zee[0]} Is Safe")
                 else:
-                    print(f"File {zee[0]} Has Been Tampered")
+                    print(f"[*] File {zee[0]} Has Been Tampered")
                     logging.critical(f"File {zee[0]} Has Been Tampered")
-                    print("\t\tRecovering Data...")
+                    print("[*] Recovering Data...")
                     mycursor.execute(f"SELECT filecontents FROM paddigurlHashes WHERE `hash` = '{str(zee[1])}';")
                     attempted_recovery = mycursor.fetchall()
                     recovered = ''.join(attempted_recovery[0])
@@ -88,12 +88,12 @@ def verify():
                     recover_write.flush()
                     recover_write.close()
                     logging.info("Successful Recovery...")
-                    print("\t\tSuccess...")
+                    print("[*] Success...")
             else:
-                print(f"File {zee[0]} Has Been Deleted....")
+                print(f"[*] File {zee[0]} Has Been Deleted....")
                 dir_check = zee[0].split("[BILL]")
                 if not os.path.exists(dir_check[0]):
-                    print("\t\tEntire Directory Deleted... Restoring")
+                    print("[*] Entire Directory Deleted... Restoring")
                     os.mkdir(dir_check[0])
                 logging.critical(f"File {zee[0]} Has Been Deleted")
                 mycursor.execute(f"SELECT filecontents FROM paddigurlHashes WHERE `hash` = '{str(zee[1])}';")
@@ -104,7 +104,7 @@ def verify():
                 recover_write.flush()
                 recover_write.close()
                 logging.info("Successful Recovery...")
-                print("\t\tAttempting Recovery....\n\t\tSuccess...")
+                print("[*] Attempting Recovery....\n[*] Success...")
         except Exception as e:
             logging.error(e)
 

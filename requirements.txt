@@ -2,3 +2,4 @@ mysql~=0.0.2
 mysql-connector-python~=8.0.25
 pandas~=1.2.4
 shred~=0.1.0
+rsa~=4.7.2
