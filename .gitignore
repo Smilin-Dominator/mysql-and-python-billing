@@ -5,3 +5,4 @@ log.txt
 bills
 sales_reports.idea/dbnavigator.xml
 .idea/
+!requirements.txt
