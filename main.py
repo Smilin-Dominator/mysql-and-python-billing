@@ -35,8 +35,6 @@ def startup():
         12: "Watch My Soul Speak. You, Let The Meds Talk"
     }
 
-    print("Welcome! If Something Doesn't Seem Right, Check The Logs!\n")
-
     log_format = '%(asctime)s (%(filename)s): %(message)s'  # this basically says that the time and date come first, error next
     logging.basicConfig(filename='log.txt', format=log_format, datefmt='[%Y-%m-%d] [%H:%M:%S]', level=logging.DEBUG)
 
@@ -48,6 +46,38 @@ def startup():
         database=credz[3]
     )
     mycursor = mydb.cursor()
+    if len(credz) == 5:
+        if credz[4] == 'y':
+            print("[*] Creating Tables")
+            print("[*] Creating 'paddigurlTest'")
+            mycursor.execute("""
+                CREATE TABLE paddigurlTest (
+                    id INT AUTO_INCREMENT PRIMARY KEY,
+                    name VARCHAR(256),
+                    price INT
+                )
+            """)
+            print("[*] Creating 'paddigurlRemoved'")
+            mycursor.execute("""
+                CREATE TABLE paddigurlRemoved (
+                    id INT AUTO_INCREMENT PRIMARY KEY,
+                    name VARCHAR(256),
+                    price INT
+                )
+                        """)
+            print("[*] Creating 'paddigurlHashes'")
+            mycursor.execute("""
+                CREATE TABLE paddigurlHashes (
+                    id INT AUTO_INCREMENT PRIMARY KEY,
+                    filepath TEXT,
+                    hash MEDIUMTEXT,
+                    filecontents LONGTEXT
+                )
+                        """)
+            mydb.commit()
+            print("[*] Success!")
+
+    print("Welcome! If Something Doesn't Seem Right, Check The Logs!\n")
     init5(mycursor)
     main(messageOfTheSecond, credz)
 
@@ -99,7 +129,7 @@ class integrityCheck(object):
     def hash_write(self):
         print("[*] Hashes Have Been Tampered With, Restoring Previous Hashes...")
         logging.critical("Hashes Have Been Tampered With, Restoring Previous Hashes...")
-        write_hash = open("hashes.txt", 'w')
+        write_hash = open("./credentials/hashes.txt", 'w')
         for i in range(len(self.scraped_content)):
             write_hash.write(f"\n{self.scraped_content[i][0]},{self.scraped_content[i][1]}")
         write_hash.flush()
@@ -168,7 +198,8 @@ def init1():
             var = rsa.encrypt(st, pubKey)
             mcdonalds.write(var)
         print("[*] Successfully Wrote The Changes To The File..")
-        return [host, user, password, db]
+        conf = input("[*] Create Tables? (y/n): ")
+        return [host, user, password, db, conf]
     else:
         with open("./credentials/mysql.txt", 'rb') as fillet:
             privKey = rsa.PrivateKey.load_pkcs1(open("./credentials/private.pem", 'rb').read())
