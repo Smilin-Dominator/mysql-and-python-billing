@@ -11,20 +11,26 @@ import sys
 import time
 import hashlib
 import mysql.connector
+from shred.shredders import FileShredder
+import rsa
 
-print("Welcome! If Something Doesn't Seem Right, Check The Logs!\n")
 
-log_format = '%(asctime)s (%(filename)s): %(message)s'  # this basically says that the time and date come first, error next
-logging.basicConfig(filename='log.txt', format=log_format, datefmt='[%Y-%m-%d] [%H:%M:%S]', level=logging.DEBUG)
+def startup():
+    global mycursor
+    print("Welcome! If Something Doesn't Seem Right, Check The Logs!\n")
 
-mydb = mysql.connector.connect(
-    auth_plugin='mysql_native_password',
-    host="178.79.168.171",
-    user="smilin_dominator",
-    password="Barney2356",
-    database='miscellaneous'
-)
-mycursor = mydb.cursor()
+    log_format = '%(asctime)s (%(filename)s): %(message)s'  # this basically says that the time and date come first, error next
+    logging.basicConfig(filename='log.txt', format=log_format, datefmt='[%Y-%m-%d] [%H:%M:%S]', level=logging.DEBUG)
+
+    mydb = mysql.connector.connect(
+        auth_plugin='mysql_native_password',
+        host="remotemysql.com",
+        user="ki474LQWR4",
+        password="owlXZM9I3W",
+        database='ki474LQWR4'
+    )
+    mycursor = mydb.cursor()
+    main(messageOfTheSecond)
 
 
 class integrityCheck(object):
@@ -87,7 +93,8 @@ def main(messageOfTheSecond):
     while key != '1':
         randomNumGen = random.randint(1, len(messageOfTheSecond))  # RNG, unscripted order
         print(f"\nRandom Line from HUMBLE.: {messageOfTheSecond[randomNumGen]}")  # pulls from the Dictionary
-        print("Commands:\n\n1 - Exit\n2 - Make A Bill\n3 - Create Master Bill & Sales Reports\n4 - SQL Client\n5 - Verifier")
+        print(
+            "Commands:\n\n1 - Exit\n2 - Make A Bill\n3 - Create Master Bill & Sales Reports\n4 - SQL Client\n5 - Verifier")
         date = time.strftime('%c')
         time_prompt = time.strftime('%I:%M %p')
         key = input(f"\n[{date}]-[{time_prompt}]\nSmilinPython> ")
@@ -135,6 +142,27 @@ checksales = os.path.exists('./sales_reports')
 firstTime = os.path.exists('./log.txt')
 checkPass = os.path.exists('./passwd.txt')
 checkHash = os.path.exists('./hashes.txt')
+
+if not firstTime:
+    shredder = FileShredder()
+    system = sys.platform
+    if system in ['linux', 'darwin']:  # darwin => mac
+        print("Initializing First Time Setup..")
+        input("[ Read The README.md File, Once Done, Hit Enter, It'll Be Shredded ]")
+        shredder.destroy('README.md', rew=500)
+        shredder.remove('README.md')
+        print(f"OS: {system}")
+        os.system('bash setup.sh')
+        print("Success.. Run This File Again.")
+    elif system == 'win32':
+        print("Initializing First Time Setup..")
+        input("[ Read The README.md File, Once Done, Hit Enter, It'll Be Shredded ]")
+        shredder.destroy('README.md', rew=500)
+        shredder.remove('README.md')
+        print(f"OS: {system}")
+        os.system('./setup.ps1')
+        print("Success.. Run This File Again.")
+        quit(2)
 
 if not check:
     os.mkdir("bills/")  # Makes the DIR
@@ -205,18 +233,4 @@ if checkHash:
         print(integrityCheck('none', scrape, 'none').hash_write())
 
 
-if not firstTime:
-    system = sys.platform
-    if system in ['linux', 'darwin']:  # darwin => mac
-        print("Initializing First Time Setup..")
-        print(f"OS: {system}")
-        os.system('bash setup.sh')
-        print("Success.. Run This File Again.")
-    elif system == 'win32':
-        print("Initializing First Time Setup..")
-        print(f"OS: {system}")
-        os.system('./setup.ps1')
-        print("Success.. Run This File Again.")
-        quit(2)
-
-main(messageOfTheSecond)
+startup()
