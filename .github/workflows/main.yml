@@ -27,14 +27,3 @@ jobs:
         # stop the build if there are Python syntax errors or undefined names
         flake8 . --count --select=E9,F63,F7,F82 --show-source --statistics
         # exit-zero treats all errors as warnings. The GitHub editor is 127 chars wide
-        flake8 . --count --exit-zero --max-complexity=10 --max-line-length=127 --statistics
-    - name: Testing 'main.py' with PyTest
-      run: pytest --suppress-no-test-exit-code main.py
-    - name: Testing 'sql-client.py' with PyTest
-      run: pytest --suppress-no-test-exit-code sql-client.py
-    - name: Testing 'verify.py' with PyTest
-      run: pytest --suppress-no-test-exit-code verify.py
-    - name: Testing 'connector.py' with PyTest
-      run: pytest --suppress-no-test-exit-code connector.py
-    - name: Testing 'master-bill.py' with PyTest
-      run: pytest --suppress-no-test-exit-code master-bill.py
