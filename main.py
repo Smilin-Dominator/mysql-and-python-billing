@@ -76,6 +76,9 @@ def startup():
                         """)
             mydb.commit()
             print("[*] Success!")
+            os.system('cls')
+    else:
+        os.system('cls')
 
     print("Welcome! If Something Doesn't Seem Right, Check The Logs!\n")
     init5(mycursor)
@@ -204,6 +207,7 @@ def init1(logging):
                 print("[*] No Attempt Of Fraud, Continuing..")
     check_for_file = os.path.exists('./credentials/mysql.txt')
     if not check_for_file:
+        print("[*] No MySQL Configuration File Detected, Enter The Details Below.")
         host = input("Host: ")
         user = input("Username: ")
         password = input("Password: ")
