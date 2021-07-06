@@ -47,8 +47,8 @@ def startup():
         password=credz[2],
         database=credz[3]
     )
-    #mycursor = mydb.cursor()
-    #init5(mycursor)
+    mycursor = mydb.cursor()
+    init5(mycursor)
     main(messageOfTheSecond, credz)
 
 
@@ -75,21 +75,21 @@ class integrityCheck(object):
                         critical_ar = (salt1, salt2, hashed_pw)
                         critical.append(critical_ar)
                     else:
-                        print("Authenticity Not Recognized.. Reset log.txt and passwd.txt, Data Might've been breached")
+                        print("[*] Authenticity Not Recognized.. Reset log.txt and passwd.txt, Data Might've been breached")
                         quit(66)
             except Exception as e:
                 logging.warning(e)
         return critical
 
     def pass_write(self):
-        print("Password File Tampered, Restoring...")
+        print("[*] Password File Tampered, Restoring...")
         logging.critical("Password File Tampered, Restoring...")
         pas = open('./credentials/passwd.txt', 'w+')
         pas.write(f"{self.password_array[0][0]},{self.password_array[0][1]},{self.password_array[0][2]}")
         pas.flush()
         pas.close()
         logging.info("Successfully Recovered Password!")
-        return "Successfully Recovered Password!"
+        return "[*] Successfully Recovered Password!"
 
     def hash_check(self):
         self.mycursor.execute("SELECT filepath, hash FROM paddigurlHashes;")
@@ -97,7 +97,7 @@ class integrityCheck(object):
         return grape
 
     def hash_write(self):
-        print("Hashes Have Been Tampered With, Restoring Previous Hashes...")
+        print("[*] Hashes Have Been Tampered With, Restoring Previous Hashes...")
         logging.critical("Hashes Have Been Tampered With, Restoring Previous Hashes...")
         write_hash = open("hashes.txt", 'w')
         for i in range(len(self.scraped_content)):
@@ -105,7 +105,7 @@ class integrityCheck(object):
         write_hash.flush()
         write_hash.close()
         logging.info("Successfully Recovered The Hashes!")
-        return "Successfully Recovered The Hashes!\n"
+        return "[*] Successfully Recovered The Hashes!\n"
 
 
 def main(messageOfTheSecond, credz):
@@ -177,9 +177,6 @@ def init1():
             return b.split(',')
 
 
-
-
-
 def init5(mycursor):
     check = os.path.exists('bills/')
     varTime = time.strftime("%d_of_%B")
@@ -194,41 +191,43 @@ def init5(mycursor):
         shredder = FileShredder()
         system = sys.platform
         if system in ['linux', 'darwin']:  # darwin => mac
-            print("Initializing First Time Setup..")
+            print("[*] Initializing First Time Setup..")
             input("[ Read The README.md File, Once Done, Hit Enter, It'll Be Shredded ]")
             shredder.destroy('README.md', rew=500)
             shredder.remove('README.md')
-            print(f"OS: {system}")
+            print("[*] Successfully Shredded README.md")
+            print(f"[*] OS: {system}")
             os.system('bash setup.sh')
-            print("Success.. Run This File Again.")
+            print("[*] Success.. Run This File Again.")
         elif system == 'win32':
-            print("Initializing First Time Setup..")
+            print("[*] Initializing First Time Setup..")
             input("[ Read The README.md File, Once Done, Hit Enter, It'll Be Shredded ]")
             shredder.destroy('README.md', rew=500)
             shredder.remove('README.md')
-            print(f"OS: {system}")
+            print("[*] Successfully Shredded README.md")
+            print(f"[*] OS: {system}")
             os.system('./setup.ps1')
-            print("Success.. Run This File Again.")
+            print("[*] Success.. Run This File Again.")
             quit(2)
 
     if not check:
         os.mkdir("bills/")  # Makes the DIR
         logging.info("Making the Bills Directory")
-        print("Making Directory 'bills/'...")
+        print("[*] Making Directory 'bills/'...")
     if not checkmate:
         os.mkdir(varPath)
         logging.info(f"Making A Directory For Today's Date ({varPath})")
-        print(f"Making A Directory For Today..({varPath})\n")
+        print(f"[*] Making A Directory For Today..({varPath})\n")
     if not checksales:
         os.mkdir('./sales_reports')
         logging.info("Making the Sales Report Directory.")
-        print("Making Directory 'sales-reports/'...")
+        print("[*] Making Directory 'sales-reports/'...")
 
     if not checkPass:
         critical = integrityCheck('./log.txt', 'none', 'none', mycursor).pass_check()
         if not critical:
-            print("No Password Set.. Creating File..")
-            pas_enter = getpass.getpass("Enter Password: ")
+            print("[*] No Password Set.. Creating File..")
+            pas_enter = getpass.getpass("[*] Enter Password: ")
             pas = open('./credentials/passwd.txt', 'w+')
             salt1 = ''.join(random.choices(string.ascii_letters + string.hexdigits, k=95))
             salt2 = ''.join(random.choices(string.digits + string.octdigits, k=95))
@@ -237,7 +236,7 @@ def init5(mycursor):
             signature = hashlib.md5("McDonalds_Im_Loving_It".encode()).hexdigest()
             logging.info(f"Systemdump--Ignore--These\n{signature}\n{salt1}\n{salt2}\n{hashpass}")
             pas.write(f'{salt1},{salt2},{hashpass}')
-            print("Success!")
+            print("[*] Success!")
         else:
             print(integrityCheck('none', 'none', critical, mycursor).pass_write())
 
@@ -247,16 +246,16 @@ def init5(mycursor):
         read_pass_re = read_pass.read()
         read_pass_tup = tuple(read_pass_re.split(','))
         if read_pass_tup == (critical[0][0], critical[0][1], critical[0][2]):
-            print("Password Check Successful.. Proceeding..")
+            print("[*] Password Check Successful.. Proceeding..")
         else:
             print(integrityCheck('none', 'none', critical, mycursor).pass_write())
 
     if not checkHash:
-        print("No Hash File Found...")
+        print("[*] No Hash File Found...")
         scrape = integrityCheck('none', 'none', 'none', mycursor).hash_check()
         if not scrape:
-            print("No Attempt Of Espionage...")
-            print("Proceeding To Make File....")
+            print("[*] No Attempt Of Espionage...")
+            print("[*] Proceeding To Make File....")
             write_hi = open('./credentials/hashes.txt', 'w')
             write_hi.write('\n')
             write_hi.close()
@@ -275,7 +274,7 @@ def init5(mycursor):
                 split = tuple(scrape2[i].split(','))
                 hash_check_ar.append(split)
         if hash_check_ar == scrape:
-            print("Hashes Match.. Proceeding...\n")
+            print("[*] Hashes Match.. Proceeding...\n")
         else:
             print(integrityCheck('none', scrape, 'none', mycursor).hash_write())
 
