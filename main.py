@@ -34,10 +34,15 @@ def startup():
         11: "This, That, Grey Poupon, That Evian, That Ted Talk",
         12: "Watch My Soul Speak. You, Let The Meds Talk"
     }
+    # First Boot - Checks For Log.txt
+    init0()
 
     log_format = '%(asctime)s (%(filename)s): %(message)s'  # this basically says that the time and date come first, error next
     logging.basicConfig(filename='log.txt', format=log_format, datefmt='[%Y-%m-%d] [%H:%M:%S]', level=logging.DEBUG)
+
+    # Second Phase - Checks For SQL Credentials
     credz = init1(logging)
+
     mydb = mysql.connector.connect(
         auth_plugin='mysql_native_password',
         host=credz[0],
@@ -82,8 +87,14 @@ def startup():
         os.system('cls')
 
     print("Welcome! If Something Doesn't Seem Right, Check The Logs!\n")
+
+    # Third Phase - Checks For Updates
     init3()
+
+    # Fourth Phase - Checks Integrity Of Credentials
     init5(mycursor)
+
+    # Final Phase - Main Program
     main(messageOfTheSecond, credz)
 
 
@@ -172,6 +183,32 @@ def main(messageOfTheSecond, credz):
                 os.system(f"python3 verify.py {ncredz}")
         except Exception as e:
             logging.error(e)
+
+
+def init0():
+    firstTime = os.path.exists('./log.txt')
+    if not firstTime:
+        shredder = FileShredder()
+        system = sys.platform
+        if system in ['linux', 'darwin']:  # darwin => mac
+            print("[*] Initializing First Time Setup..")
+            input("[ Read The README.md File, Once Done, Hit Enter, It'll Be Shredded ]")
+            shredder.destroy('README.md', rew=500)
+            shredder.remove('README.md')
+            print("[*] Successfully Shredded README.md")
+            print(f"[*] OS: {system}")
+            os.system('bash setup.sh')
+            print("[*] Success.. Run This File Again.")
+        elif system == 'win32':
+            print("[*] Initializing First Time Setup..")
+            input("[ Read The README.md File, Once Done, Hit Enter, It'll Be Shredded ]")
+            shredder.destroy('README.md', rew=500)
+            shredder.remove('README.md')
+            print("[*] Successfully Shredded README.md")
+            print(f"[*] OS: {system}")
+            os.system('./setup.ps1')
+            print("[*] Success.. Run This File Again.")
+            quit(2)
 
 
 def init1(logging):
@@ -266,32 +303,8 @@ def init5(mycursor):
     varPath = f'./bills/{varTime}'
     checkmate = os.path.exists(varPath)
     checksales = os.path.exists('./sales_reports')
-    firstTime = os.path.exists('./log.txt')
     checkPass = os.path.exists('./credentials/passwd.txt')
     checkHash = os.path.exists('./credentials/hashes.txt')
-
-    if not firstTime:
-        shredder = FileShredder()
-        system = sys.platform
-        if system in ['linux', 'darwin']:  # darwin => mac
-            print("[*] Initializing First Time Setup..")
-            input("[ Read The README.md File, Once Done, Hit Enter, It'll Be Shredded ]")
-            shredder.destroy('README.md', rew=500)
-            shredder.remove('README.md')
-            print("[*] Successfully Shredded README.md")
-            print(f"[*] OS: {system}")
-            os.system('bash setup.sh')
-            print("[*] Success.. Run This File Again.")
-        elif system == 'win32':
-            print("[*] Initializing First Time Setup..")
-            input("[ Read The README.md File, Once Done, Hit Enter, It'll Be Shredded ]")
-            shredder.destroy('README.md', rew=500)
-            shredder.remove('README.md')
-            print("[*] Successfully Shredded README.md")
-            print(f"[*] OS: {system}")
-            os.system('./setup.ps1')
-            print("[*] Success.. Run This File Again.")
-            quit(2)
 
     if not check:
         os.mkdir("bills/")  # Makes the DIR
