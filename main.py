@@ -187,6 +187,10 @@ def main(messageOfTheSecond, credz):
 
 def init0():
     firstTime = os.path.exists('./log.txt')
+    check = os.path.exists('./credentials')
+    if not check:
+        os.mkdir('./credentials')
+        print('[*] Made Directory "./Credentials"..')
     if not firstTime:
         shredder = FileShredder()
         system = sys.platform
@@ -196,6 +200,13 @@ def init0():
             shredder.destroy('README.md', rew=500)
             shredder.remove('README.md')
             print("[*] Successfully Shredded README.md")
+            up = input("[*] Check For Updates On Startup? (y/n): ")
+            options = open('./credentials/options.txt', 'w+')
+            if up == 'y':
+                options.write("check_for_updates=True")
+            else:
+                options.write("check_for_updates=False")
+            print("[*] Initializing Environment Setup..")
             print(f"[*] OS: {system}")
             os.system('bash setup.sh')
             print("[*] Success.. Run This File Again.")
@@ -205,19 +216,21 @@ def init0():
             shredder.destroy('README.md', rew=500)
             shredder.remove('README.md')
             print("[*] Successfully Shredded README.md")
+            up = input("[*] Check For Updates On Startup? (y/n): ")
+            options = open('./credentials/options.txt', 'w+')
+            if up == 'y':
+                options.write("check_for_updates=True")
+            else:
+                options.write("check_for_updates=False")
+            print("[*] Initializing Environment Setup..")
             print(f"[*] OS: {system}")
-            os.system('./setup.ps1')
-            print("[*] Success.. Run This File Again.")
+            os.system('powershell ./setup.ps1')
             quit(2)
 
 
 def init1(logging):
-    check = os.path.exists('./credentials')
     keycheck1 = os.path.exists('./credentials/private.pem')
     keycheck2 = os.path.exists('./credentials/public.pem')
-    if not check:
-        os.mkdir('./credentials')
-        print('[*] Made Directory "./Credentials"..')
     if not keycheck1 or (not keycheck2):
         with open('log.txt', 'r') as truth:
             a = truth.read().splitlines()
@@ -270,7 +283,6 @@ def init1(logging):
         logging.info("Wrote RSA Keys")
         print("[*] Success.. Final Touches...")
         st = f"{host},{user},{password},{db}".encode()
-        logging.info(st)
         with open('./credentials/mysql.txt', 'wb+') as mcdonalds:
             var = rsa.encrypt(st, pubKey)
             mcdonalds.write(var)
@@ -286,15 +298,27 @@ def init1(logging):
 
 
 def init3():
-    subprocess.run('git fetch')
-    raw = subprocess.check_output('git status')
-    check = raw.decode().splitlines()
-    if check[1] == "Your branch is up to date with 'origin/main'.":
-        print("[*] No Update Found, Continuing...")
-    else:
-        print("[*] Update Found... Updating...\n")
-        print(subprocess.check_output('git pull origin main').decode())
-        print("\n[*] Success!")
+    if not os.path.exists('./credentials/options.txt'):
+        options = open('./credentials/options.txt', 'w')
+        print("[*] Options File Doesn't Exist.")
+        up = input("[*] Check For Updates On Startup? (y/n): ")
+        if up == 'y':
+            options.write("check_for_updates=True")
+        else:
+            options.write("check_for_updates=False")
+        options.close()
+    with open('./credentials/options.txt', 'r') as pop:
+        if pop.read().splitlines()[0] == 'check_for_updates=True':
+            subprocess.run('git fetch', stdout=subprocess.DEVNULL)
+            raw = subprocess.check_output('git status')
+            check = raw.decode().splitlines()
+            if check[1] == "Your branch is up to date with 'origin/main'.":
+                print("[*] No Update Found, Continuing...")
+            else:
+                print("[*] Update Found... Updating...\n")
+                print(subprocess.check_output('git pull origin main').decode())
+                print("\n[*] Success!")
+        pop.close()
 
 
 def init5(mycursor):

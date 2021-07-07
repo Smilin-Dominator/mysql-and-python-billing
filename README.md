@@ -26,9 +26,7 @@
 # How To Use It?
 ***DELETE THIS FILE WHEN YOU'VE READ IT, ANYONE OTHER UNTRUSTED PARTY WHO READS THIS IS A THREAT***
 ### Prerequisites
-<font size="6">
-
-- Download [Python 3.9.4](https://www.python.org/downloads/release/python-394/) and install it.
+- <font size="6">Download [Python 3.9.4](https://www.python.org/downloads/release/python-394/) and install it.
 
 - Then you're good to go! Just go to the directory where you downloaded it (via Powershell) and type
   `python main.py`, it'll check for log.txt, if it's not present, it'll run
@@ -177,3 +175,8 @@ Hope these scenarios helped you! I'll add more along with the new features that 
     - If they are it'll say '<file> Is The Same'
     - If they aren't it'll say '<file> Has Been Tampered'
   - If you press 'h', it'll hash all the new bills and store the hashes (skipping existing ones)
+
+# Configuration Options (./credentials/options.txt)
+- check_for_updates
+  - Set `check_for_updates=True` if you want the program to check for updates, and auto-update, each time you run (main.py)
+  - Set `check_for_updates=False` if you want the program to ignore the updates, so you can manually `git pull origin` whenever.
