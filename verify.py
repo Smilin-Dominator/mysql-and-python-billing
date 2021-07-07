@@ -37,8 +37,8 @@ def hash_file(filepath):
 
 # ---------Hash------------#
 def hash():
-    hashwrite = open('./hashes.txt', 'a')
-    read_hash = open("hashes.txt", 'r')
+    hashwrite = open('./credentials/hashes.txt', 'a')
+    read_hash = open("./credentials/hashes.txt", 'r')
     multiverse = os.listdir('bills')
     read_the_file = read_hash.read().splitlines()
     for dir in multiverse:
@@ -65,7 +65,7 @@ def hash():
 
 # -------Verify------------#
 def verify():
-    read_hash = open("hashes.txt", 'r')
+    read_hash = open("./credentials/hashes.txt", 'r')
     read = read_hash.read().splitlines()
     read.remove('')
     for i in range(len(read)):

@@ -225,7 +225,6 @@ def init0():
             print("[*] Initializing Environment Setup..")
             print(f"[*] OS: {system}")
             os.system('powershell ./setup.ps1')
-            print("[*] Success.. Run This File Again.")
             quit(2)
 
 
@@ -284,7 +283,6 @@ def init1(logging):
         logging.info("Wrote RSA Keys")
         print("[*] Success.. Final Touches...")
         st = f"{host},{user},{password},{db}".encode()
-        logging.info(st)
         with open('./credentials/mysql.txt', 'wb+') as mcdonalds:
             var = rsa.encrypt(st, pubKey)
             mcdonalds.write(var)
