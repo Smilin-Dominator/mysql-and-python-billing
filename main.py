@@ -249,13 +249,15 @@ def init1(logging):
 
 
 def init3():
+    subprocess.run('git fetch')
     raw = subprocess.check_output('git status')
     check = raw.decode().splitlines()
     if check[1] == "Your branch is up to date with 'origin/main'.":
         print("[*] No Update Found, Continuing...")
     else:
         print("[*] Update Found... Updating...")
-        print(subprocess.check_output('git pull origin main'))
+        print(subprocess.check_output('git pull origin main').decode())
+        print("[*] Success!")
 
 
 def init5(mycursor):
