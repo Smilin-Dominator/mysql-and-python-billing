@@ -14,6 +14,7 @@ import mysql.connector
 from shred.shredders import FileShredder
 import rsa
 import base64
+import subprocess
 
 
 def startup():
@@ -81,6 +82,7 @@ def startup():
         os.system('cls')
 
     print("Welcome! If Something Doesn't Seem Right, Check The Logs!\n")
+    init3()
     init5(mycursor)
     main(messageOfTheSecond, credz)
 
@@ -244,6 +246,16 @@ def init1(logging):
             a = fillet.read()
             b = rsa.decrypt(a, privKey).decode('utf-8')
             return b.split(',')
+
+
+def init3():
+    raw = subprocess.check_output('git status')
+    check = raw.decode().splitlines()
+    if check[1] == "Your branch is up to date with 'origin/main'.":
+        print("[*] No Update Found, Continuing...")
+    else:
+        print("[*] Update Found... Updating...")
+        print(subprocess.check_output('git pull origin main'))
 
 
 def init5(mycursor):
