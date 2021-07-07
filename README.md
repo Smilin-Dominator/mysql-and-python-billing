@@ -16,31 +16,32 @@
 > deleting and updating capabilities and making sales reports. Today, I added a new feature I just learned, Classes. So to reduce
 > the repetitive commands, which were copy+pasted everywhere, can now be in a centralized class! It reduces cluttering and makes editing
 > the code easier!</font>
+
+(7th July)
+><font size="6">The credentials are now entered on your first setup, and stored in a file (Encrypted of Course)
+> and each time you run Main.py its Decrypted, instead of making the rest of the files (connector, verify) also decrypt it 
+> main.py sends the credentials as a CL Argument. And the RSA Key is now stored in the logs, so whenever its deleted
+>  you can recover it. And I added different phases to main.py, Init0 which checks your log file, Init1 which looks for
+>  your SQL Credentials, Init3 which checks for code updates and Init5 which checks the integrity of all the files in ./credentials</font>
 # How To Use It?
 ***DELETE THIS FILE WHEN YOU'VE READ IT, ANYONE OTHER UNTRUSTED PARTY WHO READS THIS IS A THREAT***
 ### Prerequisites
-<font size="6">You should have an 'Anaconda' Environment, with Python 3.7.10<br>Here's how you make one
-- Download the latest version for your OS [here](https://www.anaconda.com/products/individual).
-- After installation open up powershell, type this; `conda env list`
-- If you see something similar to this;
-    ```
-    C:\Users\Devisha> conda env list
-    # conda environments:
-    #
-    base                  *  C:\Users\Devisha\anaconda3
-    ```
-  then the installation was successful!
-- Then you're good to go! Just run main.py, it'll check for log.txt, if it's not present, it'll run
-  the shell script related to your OS! **Do Not Delete Your log.txt, If you want you may clear it, but not delete it.**
+<font size="6">
+
+- Download [Python 3.9.4](https://www.python.org/downloads/release/python-394/) and install it.
+
+- Then you're good to go! Just go to the directory where you downloaded it (via Powershell) and type
+  `python main.py`, it'll check for log.txt, if it's not present, it'll run
+  the shell script related to your OS! **Do Not Delete Your log.txt, If you want you may clear it, but not delete it.**</font>
 
 ### Condensed
 <font size="6">In the ID Screen, enter an ID, if you want to check
 the invoice use '--', if you want to delete an item from the current list type 'del' and
 follow the on-screen prompt, if you want to update the quantity of an item, type
 update, and interact with the prompt. If for whatever reason, you want to kill the process, use
-Kill, and enter the password '627905'. Once you're 100% sure you're done adding the items and everything
-hit (enter) without any other input in the ID Screen to create the bill, you may enter a discount here.<br>
-You may then create a master bill when you get to main.py, or you can even edit the SQL table.</font>
+Kill, and enter the password you set. Once you're 100% sure you're done adding the items and everything
+hit (enter) without any other input in the ID Screen to create the bill, you may enter a discount here.
+More on the rest in the following sections.</font>
 
 ### Scenarios and Combatting Them
 <font size="6">Here are some scenarios you are quite likely to encounter, even if you don't you'll know
@@ -131,18 +132,19 @@ Hope these scenarios helped you! I'll add more along with the new features that 
 - Random Line From HUMBLE:
     - Just as advertised, it just displays a random line from HUMBLE by Kendrick Lamar
 - Enter Password:
-    - If this is your first time setup, or if you deleted passwd.txt, this prompt will appear.
+    - If this is your first time setup, or if you deleted ./credentials/passwd.txt, this prompt will appear.
     - It covers the input, so it looks like you're not typing anything, but you are.
     - It'll then generate salts and hash it, and store it in (passwd.txt)
-- Would You Like To Stop, Continue or Make The Master Bill? (1/2/3):
+- The Main Prompt:
     - If you press 2, it'll loop back to (connector.py)
     - If you press 1, the program will stop and write all changes and the bills to the system.
     - If you press 3, it'll run  (master-bill.py) and get the total of all bills made today.
-    - If you press 4, it'll take you to (sql-client.py) where you can view and alter entries.
         - Don't worry about accidentally running it, it'll always rewrite the file, so run it as many
           times as you want.
         - It'll automatically generate a weekly sales report (./sales_reports/**) With The Grand Totals Of 7 Days.
           If there's < 7 Days after the initial, It'll have no issue, it'll mention them.
+    - If you press 4, it'll take you to (sql-client.py) where you can view and alter entries.
+    - If you press 5, it'll take you to (verify.py) where you can verify your bills.
 # Function List (sql-client.py)
 - Master Password: 
     - Enter the master password you set in (main.py)

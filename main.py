@@ -292,9 +292,9 @@ def init3():
     if check[1] == "Your branch is up to date with 'origin/main'.":
         print("[*] No Update Found, Continuing...")
     else:
-        print("[*] Update Found... Updating...")
+        print("[*] Update Found... Updating...\n")
         print(subprocess.check_output('git pull origin main').decode())
-        print("[*] Success!")
+        print("\n[*] Success!")
 
 
 def init5(mycursor):
