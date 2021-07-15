@@ -104,7 +104,7 @@ def startup():
     except FileNotFoundError as e:
         logging.warning(e)
         print("[!] Config File Not Found!\n[*] Generating...")
-        
+
 
     # Final Phase - Main Program
     main(messageOfTheSecond, credz)
@@ -201,6 +201,20 @@ def main(messageOfTheSecond, credz):
             logging.error(e)
 
 
+def conifguration_file():
+    up = input("[*] Check For Updates On Startup? (y/n): ")
+    options = open('./credentials/options.txt', 'w+')
+    if up == 'y':
+        options.write("check_for_updates=True")
+    else:
+        options.write("check_for_updates=False")
+    incheck = input("[*] Check Password Integrity On Startup? (y/n): ")
+    if incheck == 'y':
+        options.write("check_file_integrity=True")
+    else:
+        options.write("check_file_integrity=False")
+
+
 def init0():
     f = os.listdir()
     for i in range(len(f)):
@@ -223,12 +237,7 @@ def init0():
             shredder.destroy('README.md', rew=500)
             shredder.remove('README.md')
             print("[*] Successfully Shredded README.md")
-            up = input("[*] Check For Updates On Startup? (y/n): ")
-            options = open('./credentials/options.txt', 'w+')
-            if up == 'y':
-                options.write("check_for_updates=True")
-            else:
-                options.write("check_for_updates=False")
+            conifguration_file()
             print("[*] Initializing Environment Setup..")
             print(f"[*] OS: {system}")
             if f:
@@ -243,12 +252,7 @@ def init0():
             shredder.destroy('README.md', rew=500)
             shredder.remove('README.md')
             print("[*] Successfully Shredded README.md")
-            up = input("[*] Check For Updates On Startup? (y/n): ")
-            options = open('./credentials/options.txt', 'w+')
-            if up == 'y':
-                options.write("check_for_updates=True")
-            else:
-                options.write("check_for_updates=False")
+            conifguration_file()
             print("[*] Initializing Environment Setup..")
             print(f"[*] OS: {system}")
             if f:
