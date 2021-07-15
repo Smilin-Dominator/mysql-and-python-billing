@@ -181,7 +181,7 @@ def main(messageOfTheSecond, credz):
         randomNumGen = random.randint(1, len(messageOfTheSecond))  # RNG, unscripted order
         print(f"\nRandom Line from HUMBLE.: {messageOfTheSecond[randomNumGen]}")  # pulls from the Dictionary
         print(
-            "Commands:\n\n1 - Exit\n2 - Make A Bill\n3 - Create Master Bill & Sales Reports\n4 - SQL Client\n5 - Verifier")
+            "Commands:\n\n1 - Exit\n2 - Make A Bill\n3 - Create Master Bill & Sales Reports\n4 - SQL Client\n5 - Verifier\n6 - Configure Options")
         date = time.strftime('%c')
         time_prompt = time.strftime('%I:%M %p')
         key = input(f"\n[{date}]-[{time_prompt}]\nSmilinPython> ")
@@ -206,6 +206,8 @@ def main(messageOfTheSecond, credz):
                 logging.info("Transferring to (verify.py)")
                 import verify
                 verify.init(ncredz)
+            elif key == '6':
+                conifguration_file()
         except Exception as e:
             logging.error(e)
 
@@ -251,6 +253,7 @@ def init0():
             print(f"[*] OS: {system}")
             if f:
                 os.system("touch log.txt")
+                print("[*] Configuration Successful! Please Restart main.exe")
             else:
                 os.system('bash setup.sh')
             print("[*] Success.. Run This File Again.")
@@ -265,9 +268,9 @@ def init0():
             print(f"[*] OS: {system}")
             if f:
                 os.system('powershell.exe New-Item -Name "log.txt" -ItemType "file"')
+                print("[*] Configuration Successful! Please Restart main.exe")
             else:
                 os.system('powershell ./setup.ps1') 
-        print("[*] Configuration Successful! Please Restart main.exe")
         sys.exit(0)
 
 
@@ -375,7 +378,7 @@ def init5(mycursor, conf):
         logging.info("Making the Sales Report Directory.")
         print("[*] Making Directory 'sales-reports/'...")
 
-    if not checkPass and conf == True:
+    if not checkPass:
         critical = integrityCheck('./log.txt', 'none', 'none', mycursor).pass_check()
         if not critical:
             print("[*] No Password Set.. Creating File..")
@@ -402,7 +405,7 @@ def init5(mycursor, conf):
         else:
             print(integrityCheck('none', 'none', critical, mycursor).pass_write())
 
-    if not checkHash and conf == True:
+    if not checkHash:
         print("[*] No Hash File Found...")
         scrape = integrityCheck('none', 'none', 'none', mycursor).hash_check()
         if not scrape:
