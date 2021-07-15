@@ -43,14 +43,18 @@ def startup():
     # Second Phase - Checks For SQL Credentials
     credz = init1(logging)
 
-    mydb = mysql.connector.connect(
-        auth_plugin='mysql_native_password',
-        host=credz[0],
-        user=credz[1],
-        port=credz[2],
-        password=credz[3],
-        database=credz[4]
-    )
+    try:
+        mydb = mysql.connector.connect(
+            auth_plugin='mysql_native_password',
+            host=credz[0],
+            user=credz[1],
+            port=credz[2],
+            password=credz[3],
+            database=credz[4]
+        )
+    except mysql.connector.Error as e:
+        logging.error(e)
+        sys.exit(5)
 
     mycursor = mydb.cursor()
     if len(credz) == 6:
@@ -100,10 +104,15 @@ def startup():
         if config[1] == 'check_file_integrity=True':
 
             # Fourth Phase - Checks Integrity Of Credentials
-            init5(mycursor)
+            init5(mycursor, True)
+
+        else:
+            init5(mycursor, False)
+
     except FileNotFoundError as e:
         logging.warning(e)
         print("[!] Config File Not Found!\n[*] Generating...")
+        conifguration_file()
 
 
     # Final Phase - Main Program
@@ -210,9 +219,9 @@ def conifguration_file():
         options.write("check_for_updates=False")
     incheck = input("[*] Check Password Integrity On Startup? (y/n): ")
     if incheck == 'y':
-        options.write("check_file_integrity=True")
+        options.write("\ncheck_file_integrity=True")
     else:
-        options.write("check_file_integrity=False")
+        options.write("\ncheck_file_integrity=False")
 
 
 def init0():
@@ -242,7 +251,6 @@ def init0():
             print(f"[*] OS: {system}")
             if f:
                 os.system("touch log.txt")
-                print("[*] Configuration Successful! Please Restart main.exe")
             else:
                 os.system('bash setup.sh')
             print("[*] Success.. Run This File Again.")
@@ -257,10 +265,10 @@ def init0():
             print(f"[*] OS: {system}")
             if f:
                 os.system('powershell.exe New-Item -Name "log.txt" -ItemType "file"')
-                print("[*] Configuration Successful! Please Restart main.exe")
             else:
-                os.system('powershell ./setup.ps1')
-            sys.exit(2)
+                os.system('powershell ./setup.ps1') 
+        print("[*] Configuration Successful! Please Restart main.exe")
+        sys.exit(0)
 
 
 def init1(logging):
@@ -345,7 +353,7 @@ def init3():
         print("\n[*] Success!")
 
 
-def init5(mycursor):
+def init5(mycursor, conf):
     check = os.path.exists('bills/')
     varTime = time.strftime("%d_of_%B")
     varPath = f'./bills/{varTime}'
@@ -367,7 +375,7 @@ def init5(mycursor):
         logging.info("Making the Sales Report Directory.")
         print("[*] Making Directory 'sales-reports/'...")
 
-    if not checkPass:
+    if not checkPass and conf == True:
         critical = integrityCheck('./log.txt', 'none', 'none', mycursor).pass_check()
         if not critical:
             print("[*] No Password Set.. Creating File..")
@@ -384,7 +392,7 @@ def init5(mycursor):
         else:
             print(integrityCheck('none', 'none', critical, mycursor).pass_write())
 
-    if checkPass:
+    if checkPass and conf == True:
         critical = integrityCheck('./log.txt', 'none', 'none', mycursor).pass_check()
         read_pass = open('./credentials/passwd.txt', 'r')
         read_pass_re = read_pass.read()
@@ -394,7 +402,7 @@ def init5(mycursor):
         else:
             print(integrityCheck('none', 'none', critical, mycursor).pass_write())
 
-    if not checkHash:
+    if not checkHash and conf == True:
         print("[*] No Hash File Found...")
         scrape = integrityCheck('none', 'none', 'none', mycursor).hash_check()
         if not scrape:
@@ -406,7 +414,7 @@ def init5(mycursor):
         else:
             print(integrityCheck('none', scrape, 'none', mycursor).hash_write())
 
-    if checkHash:
+    if checkHash and conf == True:
         scrape = integrityCheck('none', 'none', 'none', mycursor).hash_check()
         scrape_file = open('./credentials/hashes.txt', 'r')
         scrape2 = scrape_file.read().splitlines()
