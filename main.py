@@ -123,7 +123,7 @@ class integrityCheck(object):
                         critical.append(critical_ar)
                     else:
                         print("[*] Authenticity Not Recognized.. Reset log.txt and passwd.txt, Data Might've been breached")
-                        quit(66)
+                        sys.exit(66)
             except Exception as e:
                 logging.warning(e)
         return critical
@@ -169,7 +169,7 @@ def main(messageOfTheSecond, credz):
         try:
             if key == '1':
                 logging.info("Exiting Gracefully;")
-                quit()
+                sys.exit()
             elif key == '2':
                 logging.info("Transferring to (connector.py)")
                 import connector
@@ -245,7 +245,7 @@ def init0():
                 print("[*] Configuration Successful! Please Restart main.exe")
             else:
                 os.system('powershell ./setup.ps1')
-            quit(2)
+            sys.exit(2)
 
 
 def init1(logging):
