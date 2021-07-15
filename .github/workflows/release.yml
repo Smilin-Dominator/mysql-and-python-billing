@@ -7,9 +7,9 @@ on:
 jobs:
 
   createrelease:
+  
     name: Create Release
     runs-on: [ubuntu-latest]
-    needs: syntax_check
     steps:
     - name: Create Release
       id: create_release
