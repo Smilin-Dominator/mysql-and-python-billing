@@ -43,14 +43,18 @@ def startup():
     # Second Phase - Checks For SQL Credentials
     credz = init1(logging)
 
-    mydb = mysql.connector.connect(
-        auth_plugin='mysql_native_password',
-        host=credz[0],
-        user=credz[1],
-        port=credz[2],
-        password=credz[3],
-        database=credz[4]
-    )
+    try:
+        mydb = mysql.connector.connect(
+            auth_plugin='mysql_native_password',
+            host=credz[0],
+            user=credz[1],
+            port=credz[2],
+            password=credz[3],
+            database=credz[4]
+        )
+    except mysql.connector.Error as e:
+        logging.error(e)
+        sys.exit(5)
 
     mycursor = mydb.cursor()
     if len(credz) == 6:
@@ -90,10 +94,26 @@ def startup():
     print("Welcome! If Something Doesn't Seem Right, Check The Logs!\n")
 
     # Third Phase - Checks For Updates
-    init3()
+    try:
+        config = open('./credentials/options.txt', 'r').read().splitlines()
+        if config[0] == 'check_for_updates=True':
 
-    # Fourth Phase - Checks Integrity Of Credentials
-    init5(mycursor)
+            # Third Phase - Checks For Updates
+            init3()
+
+        if config[1] == 'check_file_integrity=True':
+
+            # Fourth Phase - Checks Integrity Of Credentials
+            init5(mycursor, True)
+
+        else:
+            init5(mycursor, False)
+
+    except FileNotFoundError as e:
+        logging.warning(e)
+        print("[!] Config File Not Found!\n[*] Generating...")
+        conifguration_file()
+
 
     # Final Phase - Main Program
     main(messageOfTheSecond, credz)
@@ -161,7 +181,7 @@ def main(messageOfTheSecond, credz):
         randomNumGen = random.randint(1, len(messageOfTheSecond))  # RNG, unscripted order
         print(f"\nRandom Line from HUMBLE.: {messageOfTheSecond[randomNumGen]}")  # pulls from the Dictionary
         print(
-            "Commands:\n\n1 - Exit\n2 - Make A Bill\n3 - Create Master Bill & Sales Reports\n4 - SQL Client\n5 - Verifier")
+            "Commands:\n\n1 - Exit\n2 - Make A Bill\n3 - Create Master Bill & Sales Reports\n4 - SQL Client\n5 - Verifier\n6 - Configure Options")
         date = time.strftime('%c')
         time_prompt = time.strftime('%I:%M %p')
         key = input(f"\n[{date}]-[{time_prompt}]\nSmilinPython> ")
@@ -186,8 +206,24 @@ def main(messageOfTheSecond, credz):
                 logging.info("Transferring to (verify.py)")
                 import verify
                 verify.init(ncredz)
+            elif key == '6':
+                conifguration_file()
         except Exception as e:
             logging.error(e)
+
+
+def conifguration_file():
+    up = input("[*] Check For Updates On Startup? (y/n): ")
+    options = open('./credentials/options.txt', 'w+')
+    if up == 'y':
+        options.write("check_for_updates=True")
+    else:
+        options.write("check_for_updates=False")
+    incheck = input("[*] Check Password Integrity On Startup? (y/n): ")
+    if incheck == 'y':
+        options.write("\ncheck_file_integrity=True")
+    else:
+        options.write("\ncheck_file_integrity=False")
 
 
 def init0():
@@ -212,12 +248,7 @@ def init0():
             shredder.destroy('README.md', rew=500)
             shredder.remove('README.md')
             print("[*] Successfully Shredded README.md")
-            up = input("[*] Check For Updates On Startup? (y/n): ")
-            options = open('./credentials/options.txt', 'w+')
-            if up == 'y':
-                options.write("check_for_updates=True")
-            else:
-                options.write("check_for_updates=False")
+            conifguration_file()
             print("[*] Initializing Environment Setup..")
             print(f"[*] OS: {system}")
             if f:
@@ -232,20 +263,15 @@ def init0():
             shredder.destroy('README.md', rew=500)
             shredder.remove('README.md')
             print("[*] Successfully Shredded README.md")
-            up = input("[*] Check For Updates On Startup? (y/n): ")
-            options = open('./credentials/options.txt', 'w+')
-            if up == 'y':
-                options.write("check_for_updates=True")
-            else:
-                options.write("check_for_updates=False")
+            conifguration_file()
             print("[*] Initializing Environment Setup..")
             print(f"[*] OS: {system}")
             if f:
                 os.system('powershell.exe New-Item -Name "log.txt" -ItemType "file"')
                 print("[*] Configuration Successful! Please Restart main.exe")
             else:
-                os.system('powershell ./setup.ps1')
-            sys.exit(2)
+                os.system('powershell ./setup.ps1') 
+        sys.exit(0)
 
 
 def init1(logging):
@@ -319,30 +345,18 @@ def init1(logging):
 
 
 def init3():
-    if not os.path.exists('./credentials/options.txt'):
-        options = open('./credentials/options.txt', 'w')
-        print("[*] Options File Doesn't Exist.")
-        up = input("[*] Check For Updates On Startup? (y/n): ")
-        if up == 'y':
-            options.write("check_for_updates=True")
-        else:
-            options.write("check_for_updates=False")
-        options.close()
-    with open('./credentials/options.txt', 'r') as pop:
-        if pop.read().splitlines()[0] == 'check_for_updates=True':
-            subprocess.run('git fetch', stdout=subprocess.DEVNULL)
-            raw = subprocess.check_output('git status')
-            check = raw.decode().splitlines()
-            if check[1] == "Your branch is up to date with 'origin/main'." or check[1].startswith("Your branch is ahead of 'origin/main'"):
-                print("[*] No Update Found, Continuing...")
-            else:
-                print("[*] Update Found... Updating...\n")
-                print(subprocess.check_output('git pull origin main').decode())
-                print("\n[*] Success!")
-        pop.close()
+    subprocess.run('git fetch', stdout=subprocess.DEVNULL)
+    raw = subprocess.check_output('git status')
+    check = raw.decode().splitlines()
+    if check[1] == "Your branch is up to date with 'origin/main'." or check[1].startswith("Your branch is ahead of 'origin/main'"):
+        print("[*] No Update Found, Continuing...")
+    else:
+        print("[*] Update Found... Updating...\n")
+        print(subprocess.check_output('git pull origin main').decode())
+        print("\n[*] Success!")
 
 
-def init5(mycursor):
+def init5(mycursor, conf):
     check = os.path.exists('bills/')
     varTime = time.strftime("%d_of_%B")
     varPath = f'./bills/{varTime}'
@@ -381,7 +395,7 @@ def init5(mycursor):
         else:
             print(integrityCheck('none', 'none', critical, mycursor).pass_write())
 
-    if checkPass:
+    if checkPass and conf == True:
         critical = integrityCheck('./log.txt', 'none', 'none', mycursor).pass_check()
         read_pass = open('./credentials/passwd.txt', 'r')
         read_pass_re = read_pass.read()
@@ -403,7 +417,7 @@ def init5(mycursor):
         else:
             print(integrityCheck('none', scrape, 'none', mycursor).hash_write())
 
-    if checkHash:
+    if checkHash and conf == True:
         scrape = integrityCheck('none', 'none', 'none', mycursor).hash_check()
         scrape_file = open('./credentials/hashes.txt', 'r')
         scrape2 = scrape_file.read().splitlines()

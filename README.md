@@ -142,6 +142,7 @@ Hope these scenarios helped you! I'll add more along with the new features that 
           If there's < 7 Days after the initial, It'll have no issue, it'll mention them.
     - If you press 4, it'll take you to (sql-client.py) where you can view and alter entries.
     - If you press 5, it'll take you to (verify.py) where you can verify your bills.
+    - If you press 6, it'll allow you to edit your config file.
 # Function List (sql-client.py)
 - Master Password: 
     - Enter the master password you set in (main.py)
@@ -179,3 +180,7 @@ Hope these scenarios helped you! I'll add more along with the new features that 
 - check_for_updates
   - Set `check_for_updates=True` if you want the program to check for updates, and auto-update, each time you run (main.py)
   - Set `check_for_updates=False` if you want the program to ignore the updates, so you can manually `git pull origin` whenever.
+- check_file_integrity
+    - Set `check_file_integrity=True` if you want the program to check if the password and hash file have been tampered with **while they're not deleted**.
+    - Set `check_file_integrity=False` if you don't want the program to check if the password and hash files have been tampered with while they're not deleted.
+    > Regardless Of What You Choose, If One Of The Two Aforementioned Files Are Absent, It'll Detect It And Recover.
