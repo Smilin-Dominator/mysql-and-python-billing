@@ -72,7 +72,7 @@ def main():
             elif command == 'bye':
                 print("See Ya!\n")
                 logging.info("Exited Gracefully;")
-                quit(80085)
+                break
             elif command == 'show all':
                 mycursor.execute(command_check)
                 scrape = mycursor.fetchall()

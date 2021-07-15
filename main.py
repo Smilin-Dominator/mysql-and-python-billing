@@ -174,18 +174,18 @@ def main(messageOfTheSecond, credz):
                 logging.info("Transferring to (connector.py)")
                 import connector
                 connector.init(ncredz)
-                key = key
             elif key == '3':
                 logging.info("Transferring to (master-bill.py)")
-                os.system("python3 master-bill.py")
+                import master_bill
+                master_bill.main()
             elif key == '4':
                 logging.info("Transferring to (sql-client.py)")
                 import sql_client
                 sql_client.init(ncredz)
-                key = key
             elif key == '5':
                 logging.info("Transferring to (verify.py)")
-                os.system(f"python3 verify.py {ncredz}")
+                import verify
+                verify.init(ncredz)
         except Exception as e:
             logging.error(e)
 
