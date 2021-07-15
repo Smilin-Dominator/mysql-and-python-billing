@@ -4,3 +4,4 @@ pandas~=1.2.4
 shred~=0.1.0
 rsa~=4.7.2
 pyinstaller~=4.2
+flake8
