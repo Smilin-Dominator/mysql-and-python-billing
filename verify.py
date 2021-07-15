@@ -7,7 +7,6 @@ log_format = '%(asctime)s (%(filename)s): %(message)s'  # this basically says th
 logging.basicConfig(filename='log.txt', format=log_format, datefmt='[%Y-%m-%d] [%H:%M:%S]', level=logging.DEBUG)
 
 def init(raw):
-    print('s')
     global mydb, mycursor
     credz = raw.split(',')
     mydb = mysql.connector.connect(

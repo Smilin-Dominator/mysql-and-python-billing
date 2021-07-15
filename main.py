@@ -191,7 +191,13 @@ def main(messageOfTheSecond, credz):
 
 
 def init0():
-    f = ''.join(os.listdir())
+    f = os.listdir()
+    for i in range(len(f)):
+        if f[i].endswith('.exe'):
+            f = True
+            break
+    else:
+        f = False
     firstTime = os.path.exists('./log.txt')
     check = os.path.exists('./credentials')
     if not check:
@@ -214,7 +220,7 @@ def init0():
                 options.write("check_for_updates=False")
             print("[*] Initializing Environment Setup..")
             print(f"[*] OS: {system}")
-            if f.endswith('.exe'):
+            if f:
                 os.system("touch log.txt")
                 print("[*] Configuration Successful! Please Restart main.exe")
             else:
@@ -234,8 +240,8 @@ def init0():
                 options.write("check_for_updates=False")
             print("[*] Initializing Environment Setup..")
             print(f"[*] OS: {system}")
-            if f.endswith('.exe'):
-                os.system('New-Item -Name "log.txt" -ItemType "file"')
+            if f:
+                os.system('powershell.exe New-Item -Name "log.txt" -ItemType "file"')
                 print("[*] Configuration Successful! Please Restart main.exe")
             else:
                 os.system('powershell ./setup.ps1')
