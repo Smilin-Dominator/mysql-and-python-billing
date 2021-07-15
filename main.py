@@ -173,13 +173,16 @@ def main(messageOfTheSecond, credz):
             elif key == '2':
                 logging.info("Transferring to (connector.py)")
                 import connector
-                connector.main()
+                connector.init(ncredz)
+                key = key
             elif key == '3':
                 logging.info("Transferring to (master-bill.py)")
                 os.system("python3 master-bill.py")
             elif key == '4':
                 logging.info("Transferring to (sql-client.py)")
-                os.system(f"python3 sql-client.py {ncredz}")
+                import sql_client
+                sql_client.init(ncredz)
+                key = key
             elif key == '5':
                 logging.info("Transferring to (verify.py)")
                 os.system(f"python3 verify.py {ncredz}")
@@ -315,7 +318,7 @@ def init3():
             subprocess.run('git fetch', stdout=subprocess.DEVNULL)
             raw = subprocess.check_output('git status')
             check = raw.decode().splitlines()
-            if check[1] == "Your branch is up to date with 'origin/main'.":
+            if check[1] == "Your branch is up to date with 'origin/main'." or check[1].startswith("Your branch is ahead of 'origin/main'"):
                 print("[*] No Update Found, Continuing...")
             else:
                 print("[*] Update Found... Updating...\n")

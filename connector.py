@@ -4,29 +4,31 @@ import mysql.connector
 import logging
 import time
 import os
-import sys
 
 log_format = '%(asctime)s (%(filename)s): %(message)s'  # this basically says that the time and date come first, error next
 logging.basicConfig(filename='log.txt', format=log_format, datefmt='[%Y-%m-%d] [%H:%M:%S]', level=logging.DEBUG)
 
-credz = sys.argv[1].split(',')
-mydb = mysql.connector.connect(
-    auth_plugin='mysql_native_password',
-    host=credz[0],
-    user=credz[1],
-    port=credz[2],
-    password=credz[3],
-    database=credz[4]
-)
+def init(raw):
+    global mydb
+    credz = raw.split(',')
+    mydb = mysql.connector.connect(
+        auth_plugin='mysql_native_password',
+        host=credz[0],
+        user=credz[1],
+        port=credz[2],
+        password=credz[3],
+        database=credz[4]
+    )
+    main()
 
 BUF_SIZE = 65536
 
 def startup():
-    global customerName
     customerName = input("Customer: ")  # Optional, if you're in a hurry, just leave blank
     if not customerName:  # ' ' => blank
         customerName = '(Not Specified)'
     logging.info(f"\nSold the following to {customerName}")  # you'll see this often, in case any bills go missing
+    return customerName
     # logs are the go-to place
 
 myFormat = "{:<25}{:<15}{:<15}{:<15}"  # format for the .format() :)
@@ -239,7 +241,6 @@ def bill_write(ar):
             fileOpen.write(f'\nBalance: Rs. {bal}')
             break
     input("\n(enter) to proceed...")
-    quit()
 
 
 def duplicate_check(ar, records):
@@ -287,7 +288,8 @@ def appending_to_ar(name, price, quantity, total):
 
 
 def main():
-    startup()
+    global customerName
+    customerName = startup()
     idInput = 69420666  # well, had to declare it as something -\_/-
     ar = []  # declared as empty, will get filled in the process
     while idInput != ' ':
@@ -295,6 +297,7 @@ def main():
             idInput = input("\nID: ")  # ID As In The First Column
             if '' == idInput:  # if you just hit enter
                 bill_write(ar)
+                break
             elif idInput == 'Kill':  # had to add an emergency kill function :)
                 kill_this()
             elif idInput == 'del':
@@ -321,6 +324,3 @@ def main():
                     logging.warning(f"Entered Wrong ID / CMD: {idInput}")
         except Exception as rim:
             logging.error(rim)  # rim alert
-
-
-main()
