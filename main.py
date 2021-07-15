@@ -90,10 +90,21 @@ def startup():
     print("Welcome! If Something Doesn't Seem Right, Check The Logs!\n")
 
     # Third Phase - Checks For Updates
-    init3()
+    try:
+        config = open('./credentials/options.txt', 'r').read().splitlines()
+        if config[0] == 'check_for_updates=True':
 
-    # Fourth Phase - Checks Integrity Of Credentials
-    init5(mycursor)
+            # Third Phase - Checks For Updates
+            init3()
+
+        if config[1] == 'check_file_integrity=True':
+
+            # Fourth Phase - Checks Integrity Of Credentials
+            init5(mycursor)
+    except FileNotFoundError as e:
+        logging.warning(e)
+        print("[!] Config File Not Found!\n[*] Generating...")
+        
 
     # Final Phase - Main Program
     main(messageOfTheSecond, credz)
@@ -319,27 +330,15 @@ def init1(logging):
 
 
 def init3():
-    if not os.path.exists('./credentials/options.txt'):
-        options = open('./credentials/options.txt', 'w')
-        print("[*] Options File Doesn't Exist.")
-        up = input("[*] Check For Updates On Startup? (y/n): ")
-        if up == 'y':
-            options.write("check_for_updates=True")
-        else:
-            options.write("check_for_updates=False")
-        options.close()
-    with open('./credentials/options.txt', 'r') as pop:
-        if pop.read().splitlines()[0] == 'check_for_updates=True':
-            subprocess.run('git fetch', stdout=subprocess.DEVNULL)
-            raw = subprocess.check_output('git status')
-            check = raw.decode().splitlines()
-            if check[1] == "Your branch is up to date with 'origin/main'." or check[1].startswith("Your branch is ahead of 'origin/main'"):
-                print("[*] No Update Found, Continuing...")
-            else:
-                print("[*] Update Found... Updating...\n")
-                print(subprocess.check_output('git pull origin main').decode())
-                print("\n[*] Success!")
-        pop.close()
+    subprocess.run('git fetch', stdout=subprocess.DEVNULL)
+    raw = subprocess.check_output('git status')
+    check = raw.decode().splitlines()
+    if check[1] == "Your branch is up to date with 'origin/main'." or check[1].startswith("Your branch is ahead of 'origin/main'"):
+        print("[*] No Update Found, Continuing...")
+    else:
+        print("[*] Update Found... Updating...\n")
+        print(subprocess.check_output('git pull origin main').decode())
+        print("\n[*] Success!")
 
 
 def init5(mycursor):
