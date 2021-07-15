@@ -24,7 +24,8 @@
 >  you can recover it. And I added different phases to main.py, Init0 which checks your log file, Init1 which looks for
 >  your SQL Credentials, Init3 which checks for code updates and Init5 which checks the integrity of all the files in ./credentials</font>
 (15th July)
-><font size="6">The program can run two ways, either as a compiled .exe file, or from source. To compile it you have to use pyinstaller but im implementing a feature through GitHub which will compile it and release it as a .exe</font>
+><font size="6">The program can run two ways, either as a compiled .exe file, or from source. To compile it you have to use pyinstaller but im implementing a feature through GitHub which will compile it and release it as a .exe<br>
+>Update: It Worked, It Now Compiles And Adds The Exe onto the Assets Section. Im still trying to find out how to append this file to it.</font>
 # How To Use It?
 ***DELETE THIS FILE WHEN YOU'VE READ IT, ANYONE OTHER UNTRUSTED PARTY WHO READS THIS IS A THREAT***
 ### Prerequisites
