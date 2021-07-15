@@ -23,26 +23,22 @@
 > main.py sends the credentials as a CL Argument. And the RSA Key is now stored in the logs, so whenever its deleted
 >  you can recover it. And I added different phases to main.py, Init0 which checks your log file, Init1 which looks for
 >  your SQL Credentials, Init3 which checks for code updates and Init5 which checks the integrity of all the files in ./credentials</font>
+
 (15th July)
-><font size="6">The program can run two ways, either as a compiled .exe file, or from source. To compile it you have to use pyinstaller but im implementing a feature through GitHub which will compile it and release it as a .exe<br>
->Update: It Worked, It Now Compiles And Adds The Exe onto the Assets Section. Im still trying to find out how to append this file to it.</font>
+><font size="6">The program can run two ways, either as a compiled .exe file, or from source. If its compiled, you don't need to install python or anything, just the file and README.md (For reference). If you're Git Cloning and running the .py files, then you have to install the requirements (main.py will do it for you) and all. So its all upto your preference.</font>
 # How To Use It?
 ***DELETE THIS FILE WHEN YOU'VE READ IT, ANYONE OTHER UNTRUSTED PARTY WHO READS THIS IS A THREAT***
 ### Prerequisites
-- <font size="6">Download [Python 3.9.4](https://www.python.org/downloads/release/python-394/) and install it.
+- Running From Source
+    - <font size="6">Download [Python 3.9.4](https://www.python.org/downloads/release/python-394/) and install it.
 
-- Then you're good to go! Just go to the directory where you downloaded it (via Powershell) and type
-  `python main.py`, it'll check for log.txt, if it's not present, it'll run
-  the shell script related to your OS! **Do Not Delete Your log.txt, If you want you may clear it, but not delete it.**</font>
-
-### Condensed
-<font size="6">In the ID Screen, enter an ID, if you want to check
-the invoice use '--', if you want to delete an item from the current list type 'del' and
-follow the on-screen prompt, if you want to update the quantity of an item, type
-update, and interact with the prompt. If for whatever reason, you want to kill the process, use
-Kill, and enter the password you set. Once you're 100% sure you're done adding the items and everything
-hit (enter) without any other input in the ID Screen to create the bill, you may enter a discount here.
-More on the rest in the following sections.</font>
+    - Then you're good to go! Just go to the directory where you downloaded it (via Powershell) and type
+    `python main.py`, it'll check for log.txt, if it's not present, it'll run
+    the shell script related to your OS! **Do Not Delete Your log.txt, If you want you may clear it, but not delete it.**</font>
+- Running The .exe
+    - <font size="6">Download The Latest (main.zip) From The GitHub Page
+        **(Optional: Read README.md, its the manual)**
+    - Open Powershell and Type `./main.exe` And It Should Setup Everything</font>
 
 ### Scenarios and Combatting Them
 <font size="6">Here are some scenarios you are quite likely to encounter, even if you don't you'll know
