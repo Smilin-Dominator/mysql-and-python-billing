@@ -47,13 +47,14 @@ def startup():
         auth_plugin='mysql_native_password',
         host=credz[0],
         user=credz[1],
-        password=credz[2],
-        database=credz[3]
+        port=credz[2],
+        password=credz[3],
+        database=credz[4]
     )
 
     mycursor = mydb.cursor()
-    if len(credz) == 5:
-        if credz[4] == 'y':
+    if len(credz) == 6:
+        if credz[5] == 'y':
             print("[*] Creating Tables")
             print("[*] Creating 'paddigurlTest'")
             mycursor.execute("""
@@ -171,7 +172,8 @@ def main(messageOfTheSecond, credz):
                 quit()
             elif key == '2':
                 logging.info("Transferring to (connector.py)")
-                os.system(f'python3 connector.py {ncredz}')
+                import connector
+                connector.main()
             elif key == '3':
                 logging.info("Transferring to (master-bill.py)")
                 os.system("python3 master-bill.py")
@@ -264,6 +266,7 @@ def init1(logging):
         user = input("Username: ")
         password = input("Password: ")
         db = input("Database: ")
+        port = input("Port (default = 3306): ")
         print("[*] Generating Keys....")
         pubKey, privKey = rsa.newkeys(1096)
         print("[*] Writing Public Key..")
@@ -282,13 +285,13 @@ def init1(logging):
             pop.close()
         logging.info("Wrote RSA Keys")
         print("[*] Success.. Final Touches...")
-        st = f"{host},{user},{password},{db}".encode()
+        st = f"{host},{user},{port},{password},{db}".encode()
         with open('./credentials/mysql.txt', 'wb+') as mcdonalds:
             var = rsa.encrypt(st, pubKey)
             mcdonalds.write(var)
         print("[*] Successfully Wrote The Changes To The File..")
         conf = input("[*] Create Tables? (y/n): ")
-        return [host, user, password, db, conf]
+        return [host, user, port, password, db, conf]
     else:
         with open("./credentials/mysql.txt", 'rb') as fillet:
             privKey = rsa.PrivateKey.load_pkcs1(open("./credentials/private.pem", 'rb').read())

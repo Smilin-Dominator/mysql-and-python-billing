@@ -25,8 +25,9 @@ while badPass:
             auth_plugin='mysql_native_password',
             host=credz[0],
             user=credz[1],
-            password=credz[2],
-            database=credz[3]
+            port=credz[2],
+            password=credz[3],
+            database=credz[4]
         )
         pass_read.close()
         break

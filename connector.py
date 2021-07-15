@@ -14,16 +14,20 @@ mydb = mysql.connector.connect(
     auth_plugin='mysql_native_password',
     host=credz[0],
     user=credz[1],
-    password=credz[2],
-    database=credz[3]
+    port=credz[2],
+    password=credz[3],
+    database=credz[4]
 )
 
 BUF_SIZE = 65536
-customerName = input("Customer: ")  # Optional, if you're in a hurry, just leave blank
-if not customerName:  # ' ' => blank
-    customerName = '(Not Specified)'
-logging.info(f"\nSold the following to {customerName}")  # you'll see this often, in case any bills go missing
-# logs are the go-to place
+
+def startup():
+    global customerName
+    customerName = input("Customer: ")  # Optional, if you're in a hurry, just leave blank
+    if not customerName:  # ' ' => blank
+        customerName = '(Not Specified)'
+    logging.info(f"\nSold the following to {customerName}")  # you'll see this often, in case any bills go missing
+    # logs are the go-to place
 
 myFormat = "{:<25}{:<15}{:<15}{:<15}"  # format for the .format() :)
 fileHeaderFormat = "{:^70}"  # headers
@@ -283,6 +287,7 @@ def appending_to_ar(name, price, quantity, total):
 
 
 def main():
+    startup()
     idInput = 69420666  # well, had to declare it as something -\_/-
     ar = []  # declared as empty, will get filled in the process
     while idInput != ' ':

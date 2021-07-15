@@ -102,7 +102,8 @@ def sales_reports(multiverse):
         total_ar = []
 
 
-def main(multiverse):
+def main():
+    multiverse = os.listdir('./bills')
     main_ar = []
     key = input_screen()
     if key == 'T':
@@ -128,6 +129,3 @@ def main(multiverse):
             main_ar = []
         sales_reports(multiverse)
 
-
-multiverse = os.listdir('./bills')
-main(multiverse)
