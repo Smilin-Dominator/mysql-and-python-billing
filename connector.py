@@ -1,5 +1,6 @@
 import getpass
 import hashlib
+import sys
 import mysql.connector
 import logging
 import time
@@ -155,7 +156,7 @@ def kill_this():
     pass_check = salt1 + killPass + salt2
     pass_hash = hashlib.sha512(pass_check.encode()).hexdigest()
     if hash_check == pass_hash:
-        quit()
+        sys.exit(66)
     else:
         print("\n[ Wrong Password ]\n")  # thats the wrong number! (ooohhhh)
 
