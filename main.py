@@ -15,7 +15,7 @@ from shred.shredders import FileShredder
 import rsa
 import base64
 import subprocess
-from configuration import vars, commands
+from configuration import vars, commands, colours
 
 
 def startup():
@@ -64,7 +64,7 @@ def startup():
     else:
         os.system('cls')
 
-    print("Welcome! If Something Doesn't Seem Right, Check The Logs!\n")
+    print(colours.BackgroundCyan, "Welcome! If Something Doesn't Seem Right, Check The Logs!", colours.ENDC, end="\n")
 
     # Third Phase - Checks For Updates
     try:
@@ -152,16 +152,21 @@ def main(messageOfTheSecond, credz):
     key = 2
     while key != '1':
         randomNumGen = random.randint(1, len(messageOfTheSecond))  # RNG, unscripted order
-        print(f"\nRandom Line from HUMBLE.: {messageOfTheSecond[randomNumGen]}")  # pulls from the Dictionary
+        print(f"\n{colours.BackgroundDarkGray}Random Line from HUMBLE.:{colours.ENDC} {colours.BackgroundLightMagenta}{messageOfTheSecond[randomNumGen]}{colours.ENDC}")  # pulls from the Dictionary
         print(
-            "Commands:\n\n1 - Exit\n2 - Make A Bill\n3 - Create Master Bill & Sales Reports\n4 - SQL Client\n5 - Verifier\n6 - Configure Options")
+            f"\n\n{colours.Red}1 - Exit{colours.ENDC}\n{colours.Green}2 - Make A Bill{colours.ENDC}\n"
+            f"{colours.LightYellow}3 - Create Master Bill & Sales Reports{colours.ENDC}\n{colours.Cyan}4 - SQL Client{colours.ENDC}\n"
+            f"{colours.LightGray}5 - Verifier{colours.ENDC}\n{colours.LightMagenta}6 - Configure Options{colours.ENDC}"
+        )
         date = time.strftime('%c')
         time_prompt = time.strftime('%I:%M %p')
-        key = input(f"\n[{date}]-[{time_prompt}]\nSmilinPython> ")
+        key = input(f"\n{colours.BackgroundLightGreen}[{date}]{colours.ENDC}-{colours.BackgroundLightCyan}[{time_prompt}]{colours.ENDC}\n"
+                f"{colours.BackgroundLightMagenta}SmilinPython>{colours.ENDC} ")
         ncredz = ' '.join(credz).replace(' ', ',')
         try:
             if key == '1':
                 logging.info("Exiting Gracefully;")
+                os.system("cls")
                 sys.exit()
             elif key == '2':
                 logging.info("Transferring to (connector.py)")
@@ -181,8 +186,10 @@ def main(messageOfTheSecond, credz):
                 verify.init(ncredz)
             elif key == '6':
                 conifguration_file()
+            os.system('cls')
         except Exception as e:
             logging.error(e)
+            os.system('cls')
 
 
 def conifguration_file():
