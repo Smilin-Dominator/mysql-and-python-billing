@@ -114,6 +114,7 @@ def main():
                 price_to_change = int(input("New Price: "))
                 new_str = command_check + f"name = '{name_to_change}', price = {price_to_change} WHERE id = {id_of_change};"
                 mycursor.execute(new_str)
+                mydb.commit()
                 print("Success!")
             elif command == "add id":
                 id_to_add = int(input("ID: "))
