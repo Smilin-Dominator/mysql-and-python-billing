@@ -15,6 +15,7 @@ from shred.shredders import FileShredder
 import rsa
 import base64
 import subprocess
+from configuration import vars, commands, colours
 
 
 def startup():
@@ -34,11 +35,11 @@ def startup():
         11: "This, That, Grey Poupon, That Evian, That Ted Talk",
         12: "Watch My Soul Speak. You, Let The Meds Talk"
     }
+
+    logging.basicConfig(filename='log.txt', format=vars.log_format, datefmt='[%Y-%m-%d] [%H:%M:%S]', level=logging.DEBUG)
+
     # First Boot - Checks For Log.txt
     init0()
-
-    log_format = '%(asctime)s (%(filename)s): %(message)s'  # this basically says that the time and date come first, error next
-    logging.basicConfig(filename='log.txt', format=log_format, datefmt='[%Y-%m-%d] [%H:%M:%S]', level=logging.DEBUG)
 
     # Second Phase - Checks For SQL Credentials
     credz = init1(logging)
@@ -59,56 +60,23 @@ def startup():
     mycursor = mydb.cursor()
     if len(credz) == 6:
         if credz[5] == 'y':
-            print("[*] Creating Tables")
-            print("[*] Creating 'paddigurlTest'")
-            mycursor.execute("""
-                CREATE TABLE paddigurlTest (
-                    id INT AUTO_INCREMENT PRIMARY KEY,
-                    name VARCHAR(256),
-                    price INT
-                )
-            """)
-            print("[*] Creating 'paddigurlRemoved'")
-            mycursor.execute("""
-                CREATE TABLE paddigurlRemoved (
-                    id INT AUTO_INCREMENT PRIMARY KEY,
-                    name VARCHAR(256),
-                    price INT
-                )
-                        """)
-            print("[*] Creating 'paddigurlHashes'")
-            mycursor.execute("""
-                CREATE TABLE paddigurlHashes (
-                    id INT AUTO_INCREMENT PRIMARY KEY,
-                    filepath TEXT,
-                    hash MEDIUMTEXT,
-                    filecontents LONGTEXT
-                )
-                        """)
-            mydb.commit()
-            print("[*] Success!")
-            os.system('cls')
+            commands.sql_tables(mycursor, mydb)
     else:
         os.system('cls')
 
-    print("Welcome! If Something Doesn't Seem Right, Check The Logs!\n")
+    print(colours.BackgroundCyan, "Welcome! If Something Doesn't Seem Right, Check The Logs!", colours.ENDC, end="\n")
 
-    # Third Phase - Checks For Updates
+
     try:
+         # Third Phase - Checks For Updates
         config = open('./credentials/options.txt', 'r').read().splitlines()
         if config[0] == 'check_for_updates=True':
-
-            # Third Phase - Checks For Updates
             init3()
-
+        # Fourth Phase - Checks Integrity Of Credentials
         if config[1] == 'check_file_integrity=True':
-
-            # Fourth Phase - Checks Integrity Of Credentials
             init5(mycursor, True)
-
         else:
             init5(mycursor, False)
-
     except FileNotFoundError as e:
         logging.warning(e)
         print("[!] Config File Not Found!\n[*] Generating...")
@@ -179,16 +147,21 @@ def main(messageOfTheSecond, credz):
     key = 2
     while key != '1':
         randomNumGen = random.randint(1, len(messageOfTheSecond))  # RNG, unscripted order
-        print(f"\nRandom Line from HUMBLE.: {messageOfTheSecond[randomNumGen]}")  # pulls from the Dictionary
+        print(f"\n{colours.BackgroundDarkGray}Random Line from HUMBLE.:{colours.ENDC} {colours.BackgroundLightMagenta}{messageOfTheSecond[randomNumGen]}{colours.ENDC}")  # pulls from the Dictionary
         print(
-            "Commands:\n\n1 - Exit\n2 - Make A Bill\n3 - Create Master Bill & Sales Reports\n4 - SQL Client\n5 - Verifier\n6 - Configure Options")
+            f"\n\n{colours.Red}1 - Exit{colours.ENDC}\n{colours.Green}2 - Make A Bill{colours.ENDC}\n"
+            f"{colours.LightYellow}3 - Create Master Bill & Sales Reports{colours.ENDC}\n{colours.Cyan}4 - SQL Client{colours.ENDC}\n"
+            f"{colours.LightGray}5 - Verifier{colours.ENDC}\n{colours.LightMagenta}6 - Configure Options{colours.ENDC}"
+        )
         date = time.strftime('%c')
         time_prompt = time.strftime('%I:%M %p')
-        key = input(f"\n[{date}]-[{time_prompt}]\nSmilinPython> ")
+        key = input(f"\n{colours.BackgroundLightGreen}[{date}]{colours.ENDC}-{colours.BackgroundLightCyan}[{time_prompt}]{colours.ENDC}\n"
+                f"{colours.BackgroundLightMagenta}SmilinPython>{colours.ENDC} ")
         ncredz = ' '.join(credz).replace(' ', ',')
         try:
             if key == '1':
                 logging.info("Exiting Gracefully;")
+                os.system("cls")
                 sys.exit()
             elif key == '2':
                 logging.info("Transferring to (connector.py)")
@@ -208,8 +181,10 @@ def main(messageOfTheSecond, credz):
                 verify.init(ncredz)
             elif key == '6':
                 conifguration_file()
+            os.system('cls')
         except Exception as e:
             logging.error(e)
+            os.system('cls')
 
 
 def conifguration_file():
@@ -317,10 +292,10 @@ def init1(logging):
     if not check_for_file:
         print("[*] No MySQL Configuration File Detected, Enter The Details Below.")
         host = input("Host: ")
+        port = input("Port (default = 3306): ")
         user = input("Username: ")
         password = input("Password: ")
         db = input("Database: ")
-        port = input("Port (default = 3306): ")
         print("[*] Generating Keys....")
         pubKey, privKey = rsa.newkeys(1096)
         print("[*] Writing Public Key..")
@@ -444,4 +419,5 @@ def init5(mycursor, conf):
             print(integrityCheck('none', scrape, 'none', mycursor).hash_write())
 
 
-startup()
+if __name__ == "__main__":
+    startup()

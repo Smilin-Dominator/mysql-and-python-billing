@@ -4,9 +4,9 @@ import mysql.connector
 import pandas as pd
 import logging
 import hashlib
+from configuration import vars
 
-log_format = '%(asctime)s (%(filename)s): %(message)s'  # this basically says that the time and date come first, error next
-logging.basicConfig(filename='log.txt', format=log_format, datefmt='[%Y-%m-%d] [%H:%M:%S]', level=logging.DEBUG)
+logging.basicConfig(filename='log.txt', format=vars.log_format, datefmt='[%Y-%m-%d] [%H:%M:%S]', level=logging.DEBUG)
 
 
 def init(raw):
@@ -114,6 +114,7 @@ def main():
                 price_to_change = int(input("New Price: "))
                 new_str = command_check + f"name = '{name_to_change}', price = {price_to_change} WHERE id = {id_of_change};"
                 mycursor.execute(new_str)
+                mydb.commit()
                 print("Success!")
             elif command == "add id":
                 id_to_add = int(input("ID: "))
