@@ -1,11 +1,12 @@
 import getpass
 import hashlib
+import random
 import sys
 import mysql.connector
 import logging
 import time
 import os
-from configuration import vars
+from configuration import colours, vars
 
 logging.basicConfig(filename='log.txt', format=vars.log_format, datefmt='[%Y-%m-%d] [%H:%M:%S]', level=logging.DEBUG)
 
@@ -49,7 +50,7 @@ class printingBills(object):
         print(f'\n{self.formPrep}')
         for i in range(len(self.ar)):
             final = self.form.format(self.ar[i][0], self.ar[i][1], self.ar[i][2], self.ar[i][3])
-            print(final)
+            print(colours.LightCyan, final, colours.ENDC)
         return ''
 
     def write_bill_items(self):
@@ -182,20 +183,20 @@ def bill_write(ar):
     write_the_values.write_bill_items()
 
     var_tot = printingBills(ar, myFormat, 'var').print_total()
-    print("Subtotal: Rs.", var_tot)
+    print(f"{colours.Red}Subtotal: Rs. {var_tot}{colours.ENDC}")
     fileOpen.write(f'\n\nSubtotal: Rs. {str(var_tot)}')
     logging.info(f'Subtotal: Rs. {var_tot}')  # Three simultaneous actions here lol
 
     passOff = False
     while not passOff:
-        discountInput = float(input("Discount (%): "))
+        discountInput = float(input(f"{colours.LightYellow}Discount (%): {colours.ENDC}"))
         if discountInput >= 0:
             discountAmount = var_tot * (discountInput / 100)
             discountSum = var_tot - discountAmount
             if discountSum >= 0:
                 discountTotal = round(discountSum, 2)
-                print(f"Discount Amount: Rs. {round(discountAmount, 2)}")
-                print(f"Subtotal w/ Discount: Rs. {round(discountTotal, 2)}")
+                print(f"{colours.LightGreen}Discount Amount: Rs. {round(discountAmount, 2)}{colours.ENDC}")
+                print(f"{colours.LightGray}Subtotal w/ Discount: Rs. {round(discountTotal, 2)}{colours.ENDC}")
                 fileOpen.write(f"\nDiscount: {discountInput}%")
                 fileOpen.write(f"\nDiscount Amount: Rs. {round(discountAmount, 2)}")
                 fileOpen.write(f"\nSubtotal w/ Discount: Rs. {round(discountTotal, 2)}")
@@ -204,7 +205,7 @@ def bill_write(ar):
                 logging.info(f"Subtotal w/ Discount: Rs. {round(discountTotal, 2)}")
                 passOff = True
             else:
-                print("[ Try Again, The Discount Sum is Negative ]")
+                print(colours.Red, "[ Try Again, The Discount Sum is Negative ]", colours.ENDC)
                 logging.warning("Entered Incorrect Discount %")
                 passOff = False
         else:
@@ -213,31 +214,31 @@ def bill_write(ar):
             passOff = False
     vatAmount = discountTotal * (15 / 100)
     finalTotal = discountTotal + vatAmount
-    print(f"Tax: Rs. {vatAmount}")
-    print(f"Grand Total: Rs. {finalTotal}")
+    print(f"{colours.LightMagenta}Tax: Rs. {vatAmount}{colours.ENDC}")
+    print(f"{colours.LightGreen}Grand Total: Rs. {finalTotal}{colours.ENDC}")
     logging.info(f"Tax: Rs. {vatAmount}")
     logging.info(f"Grand Total: Rs. {finalTotal}")
     fileOpen.write(f"\nTax : Rs. {vatAmount}")
     fileOpen.write(f"\nGrand Total: Rs. {finalTotal}")
     passOff = False
     while not passOff:
-        cashGiven = int(input('Cash Given: Rs. '))
+        cashGiven = int(input(f'{colours.LightRed}Cash Given: Rs. {colours.ENDC}'))
         bal = int(cashGiven - finalTotal)
         if bal < 0:  # loops if its a negative number!
-            print("Negative Value, Something's Off, Retry")  # something's **really** off (why doesnt MD work?)
+            print(colours.Red, "Negative Value, Something's Off, Retry", colours.ENDC)  # something's **really** off (why doesnt MD work?)
             logging.warning('Negative Balance')
             passOff = False
         elif bal == 0:
             logging.info(f'Cash Given: Rs. {cashGiven}')
             fileOpen.write(f'\n\nCash Given: Rs. {cashGiven}')
-            print('\nNo Balance!')
+            print(colours.Green, '\nNo Balance!', colours.ENDC)
             logging.info('No Balance')
             fileOpen.write(f'\nNo Balance!')
             break  # passes if its not
         elif bal > 0:
             logging.info(f'Cash Given: Rs. {cashGiven}')
             fileOpen.write(f'\nCash Given: Rs. {cashGiven}')
-            print(f'Balance: Rs. {bal}')
+            print(f'{colours.Green}Balance: Rs. {bal}{colours.ENDC}')
             logging.info(f'Balance: Rs. {str(bal)}\n')
             fileOpen.write(f'\nBalance: Rs. {bal}')
             break
@@ -305,7 +306,7 @@ def main():
                 ar = delete_from_list(ar)
             elif idInput == '--':
                 print(printingBills(ar, myFormat, 'none').print_bill_items())
-                print(f"Subtotal: {printingBills(ar, myFormat, 'none').print_total()}")
+                print(f"{colours.LightMagenta}Subtotal: {printingBills(ar, myFormat, 'none').print_total()}{colours.ENDC}")
             elif idInput == 'update':
                 ar = update_list(ar)
             else:
@@ -321,7 +322,7 @@ def main():
                     else:
                         ar.append(appending_to_ar(dup[0], dup[1], dup[2], dup[3]))
                 else:
-                    print("\nDid You Enter The Right ID / Command?")  # congratulations! you're a failure!
+                    print(f"\n{colours.Red}Did You Enter The Right ID / Command?{colours.ENDC}")  # congratulations! you're a failure!
                     logging.warning(f"Entered Wrong ID / CMD: {idInput}")
         except Exception as rim:
             logging.error(rim)  # rim alert
