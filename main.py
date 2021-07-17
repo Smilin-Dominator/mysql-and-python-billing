@@ -213,12 +213,22 @@ def main(messageOfTheSecond, credz):
 
 
 def conifguration_file():
-    up = input("[*] Check For Updates On Startup? (y/n): ")
     options = open('./credentials/options.txt', 'w+')
-    if up == 'y':
-        options.write("check_for_updates=True")
+    f = os.listdir()
+    for i in range(len(f)):
+        if f[i].endswith('.exe'):
+            f = True
+            break
     else:
+        f = False
+    if f == True:
         options.write("check_for_updates=False")
+    else:
+        up = input("[*] Check For Updates On Startup? (y/n): ")
+        if up == 'y':
+            options.write("check_for_updates=True")
+        else:
+            options.write("check_for_updates=False")
     incheck = input("[*] Check Password Integrity On Startup? (y/n): ")
     if incheck == 'y':
         options.write("\ncheck_file_integrity=True")
