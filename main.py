@@ -15,6 +15,7 @@ from shred.shredders import FileShredder
 import rsa
 import base64
 import subprocess
+from configuration import vars, commands
 
 
 def startup():
@@ -34,11 +35,11 @@ def startup():
         11: "This, That, Grey Poupon, That Evian, That Ted Talk",
         12: "Watch My Soul Speak. You, Let The Meds Talk"
     }
+
+    logging.basicConfig(filename='log.txt', format=vars.log_format, datefmt='[%Y-%m-%d] [%H:%M:%S]', level=logging.DEBUG)
+
     # First Boot - Checks For Log.txt
     init0()
-
-    log_format = '%(asctime)s (%(filename)s): %(message)s'  # this basically says that the time and date come first, error next
-    logging.basicConfig(filename='log.txt', format=log_format, datefmt='[%Y-%m-%d] [%H:%M:%S]', level=logging.DEBUG)
 
     # Second Phase - Checks For SQL Credentials
     credz = init1(logging)
@@ -59,35 +60,7 @@ def startup():
     mycursor = mydb.cursor()
     if len(credz) == 6:
         if credz[5] == 'y':
-            print("[*] Creating Tables")
-            print("[*] Creating 'paddigurlTest'")
-            mycursor.execute("""
-                CREATE TABLE paddigurlTest (
-                    id INT AUTO_INCREMENT PRIMARY KEY,
-                    name VARCHAR(256),
-                    price INT
-                )
-            """)
-            print("[*] Creating 'paddigurlRemoved'")
-            mycursor.execute("""
-                CREATE TABLE paddigurlRemoved (
-                    id INT AUTO_INCREMENT PRIMARY KEY,
-                    name VARCHAR(256),
-                    price INT
-                )
-                        """)
-            print("[*] Creating 'paddigurlHashes'")
-            mycursor.execute("""
-                CREATE TABLE paddigurlHashes (
-                    id INT AUTO_INCREMENT PRIMARY KEY,
-                    filepath TEXT,
-                    hash MEDIUMTEXT,
-                    filecontents LONGTEXT
-                )
-                        """)
-            mydb.commit()
-            print("[*] Success!")
-            os.system('cls')
+            commands.sql_tables(mycursor, mydb)
     else:
         os.system('cls')
 
@@ -444,4 +417,5 @@ def init5(mycursor, conf):
             print(integrityCheck('none', scrape, 'none', mycursor).hash_write())
 
 
-startup()
+if __name__ == "__main__":
+    startup()
