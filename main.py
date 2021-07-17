@@ -66,22 +66,17 @@ def startup():
 
     print(colours.BackgroundCyan, "Welcome! If Something Doesn't Seem Right, Check The Logs!", colours.ENDC, end="\n")
 
-    # Third Phase - Checks For Updates
+
     try:
+         # Third Phase - Checks For Updates
         config = open('./credentials/options.txt', 'r').read().splitlines()
         if config[0] == 'check_for_updates=True':
-
-            # Third Phase - Checks For Updates
             init3()
-
+        # Fourth Phase - Checks Integrity Of Credentials
         if config[1] == 'check_file_integrity=True':
-
-            # Fourth Phase - Checks Integrity Of Credentials
             init5(mycursor, True)
-
         else:
             init5(mycursor, False)
-
     except FileNotFoundError as e:
         logging.warning(e)
         print("[!] Config File Not Found!\n[*] Generating...")
@@ -297,10 +292,10 @@ def init1(logging):
     if not check_for_file:
         print("[*] No MySQL Configuration File Detected, Enter The Details Below.")
         host = input("Host: ")
+        port = input("Port (default = 3306): ")
         user = input("Username: ")
         password = input("Password: ")
         db = input("Database: ")
-        port = input("Port (default = 3306): ")
         print("[*] Generating Keys....")
         pubKey, privKey = rsa.newkeys(1096)
         print("[*] Writing Public Key..")
