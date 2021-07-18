@@ -11,7 +11,6 @@ import sys
 import time
 import hashlib
 import mysql.connector
-from shred.shredders import FileShredder
 import rsa
 import base64
 import subprocess
@@ -37,10 +36,10 @@ def startup():
         12: "Watch My Soul Speak. You, Let The Meds Talk"
     }
 
-    logging.basicConfig(filename='log.txt', format=vars.log_format, datefmt='[%Y-%m-%d] [%H:%M:%S]', level=logging.DEBUG)
-
     # First Boot - Checks For Log.txt
     init0()
+
+    logging.basicConfig(filename='log.txt', format=vars.log_format, datefmt='[%Y-%m-%d] [%H:%M:%S]', level=logging.DEBUG)
 
     # Second Phase - Checks For SQL Credentials
     credz = init1(logging)
