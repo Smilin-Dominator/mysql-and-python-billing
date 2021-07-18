@@ -5,83 +5,51 @@ on:
     branches: [ main ]
 
 jobs:
-  windows-build:
-    name: Building For Windows
-    runs-on: windows-latest
+  building:
+    strategy:
+      matrix:
+        os: [ubuntu-latest, windows-latest]
+    runs-on: ${{ matrix.os }}
+    # Runs when the commit message contains "[Release]" Otherwise it doesn't run
+    if: "contains(github.event.head_commit.message, '[Release]')"
     steps:
-    - uses: actions/checkout@v2
-    - name: Set up Python 3.9
-      uses: actions/setup-python@v2
-      with:
-        python-version: 3.9.4
-    - name: Install dependencies
-      run: |
-        python -m pip install --upgrade pip
-        python -m pip install -r requirements.txt
-    - name: Building
-      run: |
-        pyinstaller --onefile main.py
-        cd dist
-        tar -cf 'main.zip' 'main.exe'
-        cd ..
-    - name: Create Release
-      id: create_release
-      uses: actions/create-release@v1
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      with:
-        tag_name: ${{ github.ref }}
-        release_name: MySQL And Python Billing
-        draft: true
-        prerelease: false
-    - name: Upload Release Asset
-      id: upload-release-asset 
-      uses: actions/upload-release-asset@v1
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      with:
-        upload_url: ${{ steps.create_release.outputs.upload_url }} # This pulls from the CREATE RELEASE step above, referencing it's ID to get its outputs object, which include a `upload_url`. See this blog post for more info: https://jasonet.co/posts/new-features-of-github-actions/#passing-data-to-future-steps 
-        asset_path: ./dist/main.zip
-        asset_name: main-windows.zip
-        asset_content_type: application/zip
+      - uses: actions/checkout@v2
+      - name: Set up Python 3.9
+        uses: actions/setup-python@v2
+        with:
+          python-version: 3.9.4
+      - name: Preparation
+        run: |
+          pip3 install -r requirements.txt
+          pyinstaller --onefile main.py
+    
+    # Condition to only run this whenever the runner os is Ubuntu
+      - name: Build Release Linux
+        if: matrix.os == 'ubuntu-latest'
+        run: |
+          cd ./dist
+          tar -cf main-linux-x86_64.zip 'main'
+          cd .. 
+          
+      # Condition to only run this whenever the runner os is Windows
+      - name: Build Release Win
+        if: matrix.os == 'windows-latest'
+        run: |
+          cd ./dist
+          tar -cf main-windows-x86_64.zip 'main.exe'
+          cd ..
+       
+      # This will draft a new release & will attach the binaries produced by the above outputs.
+      # You still need to publish this release though after job ends.
+      - name: Release
+        uses: softprops/action-gh-release@v1
+        with:
+          tag_name: ${{ github.ref }}
+          release_name: Release ${{ github.ref }}
+          draft: true
+          files: |
+            ./dist/main-linux-x86_64.zip
+            ./dist/main-windows-x86_64.zip
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}  # You don't need to add this in secrets it's by default.
 
-  linux-build:
-    name: Building For Linux
-    runs-on: ubuntu-latest
-    steps:
-    - uses: actions/checkout@v2
-    - name: Set up Python 3.9
-      uses: actions/setup-python@v2
-      with:
-        python-version: 3.9.4
-    - name: Install dependencies
-      run: |
-        python -m pip install --upgrade pip
-        python -m pip install -r requirements.txt
-    - name: Building
-      run: |
-        pyinstaller --onefile main.py
-        cd dist
-        mv main main.exe
-        tar -cf 'main.zip' 'main.exe'
-        cd ..
-    - name: Create Release
-      id: create_release
-      uses: actions/create-release@v1
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      with:
-        tag_name: ${{ github.ref }}
-        release_name: MySQL And Python Billing
-        draft: true
-        prerelease: false
-    - name: Upload Release Asset
-      id: upload-release-asset 
-      uses: actions/upload-release-asset@v1
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      with:
-        upload_url: ${{ steps.create_release.outputs.upload_url }} # This pulls from the CREATE RELEASE step above, referencing it's ID to get its outputs object, which include a `upload_url`. See this blog post for more info: https://jasonet.co/posts/new-features-of-github-actions/#passing-data-to-future-steps 
-        asset_path: ./dist/main.zip
-        asset_name: main-linux.zip
-        asset_content_type: application/zip
