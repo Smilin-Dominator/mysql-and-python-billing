@@ -116,7 +116,6 @@ def main():
                 main_ar.append(to_write)
         print(master_bill(var_path, 'none', main_ar).bill_write())
         sales_reports(multiverse)
-        input("(enter to continue..)")
     else:
         for dir in multiverse:
             var_path = os.path.join('./bills/', dir)
@@ -129,5 +128,4 @@ def main():
             print("\n")
             main_ar = []
         sales_reports(multiverse)
-        input("(enter to continue..)")
 

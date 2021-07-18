@@ -171,6 +171,7 @@ def main(messageOfTheSecond, credz):
                 logging.info("Transferring to (master-bill.py)")
                 import master_bill
                 master_bill.main()
+                input("(enter to continue...)")
             elif key == '4':
                 logging.info("Transferring to (sql-client.py)")
                 import sql_client
