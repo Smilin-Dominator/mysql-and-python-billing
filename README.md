@@ -26,6 +26,11 @@
 
 (15th July)
 ><font size="6">The program can run two ways, either as a compiled .exe file, or from source. If its compiled, you don't need to install python or anything, just the file and README.md (For reference). If you're Git Cloning and running the .py files, then you have to install the requirements (main.py will do it for you) and all. So its all upto your preference.</font>
+
+(18th July)
+><font size="6">Successfully made GitHub actions compile two versions of the program (Linux and Windows), it now auto publishes them to a 
+> release draft. GitHub Actions is very hard and lacks a lot of documentation, specially for Python.</font>
+
 # How To Use It?
 ***DELETE THIS FILE WHEN YOU'VE READ IT, ANYONE OTHER UNTRUSTED PARTY WHO READS THIS IS A THREAT***
 ### Prerequisites
