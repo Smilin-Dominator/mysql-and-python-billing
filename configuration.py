@@ -5,6 +5,14 @@ class vars:
 
     log_format = '%(asctime)s (%(filename)s): %(message)s'  # this basically says that the time and date come first, error next
 
+    def execheck():
+        f = os.listdir()
+        for i in range(len(f)):
+            if f[i].endswith('.exe'):
+                return True
+        else:
+            return False
+
 class commands:
 
     def sql_tables(mycursor, mydb):

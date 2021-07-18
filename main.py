@@ -189,13 +189,7 @@ def main(messageOfTheSecond, credz):
 
 def conifguration_file():
     options = open('./credentials/options.txt', 'w+')
-    f = os.listdir()
-    for i in range(len(f)):
-        if f[i].endswith('.exe'):
-            f = True
-            break
-    else:
-        f = False
+    f = vars.execheck()
     if f == True:
         options.write("check_for_updates=False")
     else:
@@ -212,13 +206,7 @@ def conifguration_file():
 
 
 def init0():
-    f = os.listdir()
-    for i in range(len(f)):
-        if f[i].endswith('.exe'):
-            f = True
-            break
-    else:
-        f = False
+    f = vars.execheck()
     firstTime = os.path.exists('./log.txt')
     check = os.path.exists('./credentials')
     if not check:
@@ -337,7 +325,7 @@ def init3():
         print("[*] No Update Found, Continuing...")
     else:
         print("[*] Update Found... Updating...\n")
-        print(subprocess.check_output('git pull origin main').decode())
+        print(subprocess.check_output('git pull https://Smilin-Dominator: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@github.com/Smilin-Dominator/mysql-and-python-billing.git').decode())
         print("\n[*] Success!")
 
 
