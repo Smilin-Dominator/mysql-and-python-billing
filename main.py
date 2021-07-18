@@ -16,6 +16,7 @@ import rsa
 import base64
 import subprocess
 from configuration import vars, commands, colours
+import setup
 
 
 def startup():
@@ -212,39 +213,10 @@ def init0():
     if not check:
         os.mkdir('./credentials')
         print('[*] Made Directory "./Credentials"..')
-    if not firstTime:
-        shredder = FileShredder()
-        system = sys.platform
-        if system in ['linux', 'darwin']:  # darwin => mac
-            print("[*] Initializing First Time Setup..")
-            input("[ Read The README.md File, Once Done, Hit Enter, It'll Be Shredded ]")
-            shredder.destroy('README.md', rew=500)
-            shredder.remove('README.md')
-            print("[*] Successfully Shredded README.md")
-            conifguration_file()
-            print("[*] Initializing Environment Setup..")
-            print(f"[*] OS: {system}")
-            if f:
-                os.system("touch log.txt")
-                print("[*] Configuration Successful! Please Restart main.exe")
-            else:
-                os.system('bash setup.sh')
-            print("[*] Success.. Run This File Again.")
-        elif system == 'win32':
-            print("[*] Initializing First Time Setup..")
-            input("[ Read The README.md File, Once Done, Hit Enter, It'll Be Shredded ]")
-            shredder.destroy('README.md', rew=500)
-            shredder.remove('README.md')
-            print("[*] Successfully Shredded README.md")
-            conifguration_file()
-            print("[*] Initializing Environment Setup..")
-            print(f"[*] OS: {system}")
-            if f:
-                os.system('powershell.exe New-Item -Name "log.txt" -ItemType "file"')
-                print("[*] Configuration Successful! Please Restart main.exe")
-            else:
-                os.system('powershell ./setup.ps1') 
-        sys.exit(0)
+    if not firstTime and not f:
+        setup.main()
+    elif not firstTime and f:
+        os.system("touch log.txt")
 
 
 def init1(logging):
