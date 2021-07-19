@@ -54,6 +54,16 @@ def startup():
             database=credz[4]
         )
     except mysql.connector.Error as e:
+        print("[*] MySQL Database Not Connecting")
+        if os.path.exists('docker-compose.yml'):
+            print("[*] (Realization) Docker Container, Attempting To Start It")
+            try:
+                subprocess.run("docker start Maria")
+                print("[*] Successful!, Rerun This File...")
+                sys.exit(1)
+            except subprocess.SubprocessError:
+                print("[*] Unable To Start Container...")
+                sys.exit(5)
         logging.error(e)
         sys.exit(5)
 
@@ -171,6 +181,7 @@ def main(messageOfTheSecond, credz):
                 logging.info("Transferring to (master-bill.py)")
                 import master_bill
                 master_bill.main()
+                input("(enter to continue...)")
             elif key == '4':
                 logging.info("Transferring to (sql-client.py)")
                 import sql_client
@@ -250,11 +261,30 @@ def init1(logging):
     check_for_file = os.path.exists('./credentials/mysql.txt')
     if not check_for_file:
         print("[*] No MySQL Configuration File Detected, Enter The Details Below.")
-        host = input("Host: ")
-        port = input("Port (default = 3306): ")
-        user = input("Username: ")
-        password = input("Password: ")
-        db = input("Database: ")
+        create_container = input("[*] Would You Like To Create A Docker Container? (y/n): ")
+        if create_container == 'y':
+            print("[*] Creating Docker Image..")
+            try:
+                user = input("Username: ")
+                password = input("Password: ")
+                db = 'paddigurl'
+                port = 3306
+                host = '127.0.0.1'
+                with open("docker-compose.yml", 'w') as docker:
+                    port = int(port)
+                    dc = vars.docker_compose % (user, password)
+                    docker.write(dc)
+                    docker.close()
+                subprocess.run("docker-compose up -d", shell=True)
+                time.sleep(15)
+            except subprocess.SubprocessError:
+                print("[*] An Error Occured, Is docker-compose Installed?")
+        else:
+            host = input("Host: ")
+            port = input("Port (default = 3306): ")
+            user = input("Username: ")
+            password = input("Password: ")
+            db = input("Database: ")
         print("[*] Generating Keys....")
         pubKey, privKey = rsa.newkeys(1096)
         print("[*] Writing Public Key..")

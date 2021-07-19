@@ -50,6 +50,7 @@ jobs:
           files: |
             ./dist/main-linux-x86_64.zip
             ./dist/main-windows-x86_64.zip
+            ./README.md
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}  # You don't need to add this in secrets it's by default.
 
