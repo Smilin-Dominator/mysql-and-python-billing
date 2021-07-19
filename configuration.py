@@ -13,22 +13,21 @@ class vars:
         else:
             return False
 
-    docker_compose = """
-        # Use root/example as user/password credentials
-        version: '3.1'
+    docker_compose = """# Use root/example as user/password credentials
+version: '3.1'
 
-        services:
+services:
 
-        db:
-            image: mariadb
-            restart: always
-            environment:
-                MARIADB_ROOT_PASSWORD: 123
-                MARIADB_DATABASE: %s
-                MARIADB_USER: %s
-                MARIADB_PASSWORD: %s
-            ports:
-                - %d:%d
+    Maria:
+        image: mariadb:latest
+        restart: always
+        environment:
+            MARIADB_ROOT_PASSWORD: 123
+            MARIADB_DATABASE: paddigurl
+            MARIADB_USER: %s
+            MARIADB_PASSWORD: %s
+        ports:
+            - 3306:3306
     """
 
 class commands:
