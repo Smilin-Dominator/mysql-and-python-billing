@@ -19,6 +19,7 @@ version: '3.1'
 services:
 
     Maria:
+        container_name: Maria
         image: mariadb:latest
         restart: always
         environment:

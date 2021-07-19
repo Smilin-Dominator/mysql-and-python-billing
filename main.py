@@ -54,6 +54,15 @@ def startup():
             database=credz[4]
         )
     except mysql.connector.Error as e:
+        print("[*] MySQL Database Not Connecting")
+        if os.path.exists('docker-compose.yml'):
+            print("[*] (Realization) Docker Container, Attempting To Start It")
+            try:
+                subprocess.run("docker start Marie")
+                print("[*] Successful!, Rerun This File...")
+                sys.exit(1)
+            except subprocess.SubprocessError:
+                print("[*] Unable To Start Container...")
         logging.error(e)
         sys.exit(5)
 
@@ -266,9 +275,9 @@ def init1(logging):
                     docker.write(dc)
                     docker.close()
                 subprocess.run("docker-compose up -d", shell=True)
-                time.sleep(10)
+                time.sleep(15)
             except subprocess.SubprocessError:
-                print("[*] An Error Occured, Is Docker Installed?")
+                print("[*] An Error Occured, Is docker-compose Installed?")
         else:
             host = input("Host: ")
             port = input("Port (default = 3306): ")
