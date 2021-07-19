@@ -62,6 +62,7 @@ class commands:
                     """)
         mydb.commit()
         print("[*] Success!")
+        input("(enter to continue...)")
         os.system('cls')
 
 class colours:

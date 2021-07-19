@@ -276,7 +276,7 @@ def init1(logging):
                     docker.write(dc)
                     docker.close()
                 subprocess.run("docker-compose up -d", shell=True)
-                time.sleep(15)
+                time.sleep(10)
             except subprocess.SubprocessError:
                 print("[*] An Error Occured, Is docker-compose Installed?")
         else:
@@ -308,7 +308,10 @@ def init1(logging):
             var = rsa.encrypt(st, pubKey)
             mcdonalds.write(var)
         print("[*] Successfully Wrote The Changes To The File..")
-        conf = input("[*] Create Tables? (y/n): ")
+        if create_container == 'n':
+            conf = input("[*] Create Tables? (y/n): ")
+        else:
+            conf = 'y'
         return [host, user, port, password, db, conf]
     else:
         with open("./credentials/mysql.txt", 'rb') as fillet:
