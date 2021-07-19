@@ -251,11 +251,22 @@ def init1(logging):
     check_for_file = os.path.exists('./credentials/mysql.txt')
     if not check_for_file:
         print("[*] No MySQL Configuration File Detected, Enter The Details Below.")
+        create_container = input("[*] Would You Like To Create A Docker Container? (y/n): ")
         host = input("Host: ")
         port = input("Port (default = 3306): ")
         user = input("Username: ")
         password = input("Password: ")
         db = input("Database: ")
+        if create_container == 'y':
+            print("[*] Creating Docker Image..")
+            try:
+                with open("docker-compose.yml", 'w') as docker:
+                    port = int(port)
+                    dc = vars.docker_compose % (db, user, password, port, port)
+                    docker.write(dc)
+                    docker.close()
+            except subprocess.SubprocessError:
+                print("[*] An Error Occured, Is Docker Installed?")
         print("[*] Generating Keys....")
         pubKey, privKey = rsa.newkeys(1096)
         print("[*] Writing Public Key..")

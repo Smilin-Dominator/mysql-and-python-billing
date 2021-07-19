@@ -13,6 +13,24 @@ class vars:
         else:
             return False
 
+    docker_compose = """
+        # Use root/example as user/password credentials
+        version: '3.1'
+
+        services:
+
+        db:
+            image: mariadb
+            restart: always
+            environment:
+                MARIADB_ROOT_PASSWORD: 123
+                MARIADB_DATABASE: %s
+                MARIADB_USER: %s
+                MARIADB_PASSWORD: %s
+            ports:
+                - %d:%d
+    """
+
 class commands:
 
     def sql_tables(mycursor, mydb):
