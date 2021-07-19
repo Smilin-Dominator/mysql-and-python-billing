@@ -58,11 +58,12 @@ def startup():
         if os.path.exists('docker-compose.yml'):
             print("[*] (Realization) Docker Container, Attempting To Start It")
             try:
-                subprocess.run("docker start Marie")
+                subprocess.run("docker start Maria")
                 print("[*] Successful!, Rerun This File...")
                 sys.exit(1)
             except subprocess.SubprocessError:
                 print("[*] Unable To Start Container...")
+                sys.exit(5)
         logging.error(e)
         sys.exit(5)
 

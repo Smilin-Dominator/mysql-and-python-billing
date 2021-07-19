@@ -29,7 +29,8 @@
 
 (18th July)
 ><font size="6">Successfully made GitHub actions compile two versions of the program (Linux and Windows), it now auto publishes them to a 
-> release draft. GitHub Actions is very hard and lacks a lot of documentation, specially for Python.</font>
+> release draft. GitHub Actions is very hard and lacks a lot of documentation, specially for Python. Also created a docker-compose.yml format
+> in configuration.py so you get the option to create a docker container at startup.</font>
 
 # How To Use It?
 ***DELETE THIS FILE WHEN YOU'VE READ IT, ANYONE OTHER UNTRUSTED PARTY WHO READS THIS IS A THREAT***
@@ -44,6 +45,8 @@
     - <font size="6">Download The Latest (main.zip) From The GitHub Page
         **(Optional: Read README.md, its the manual)**
     - Open Powershell and Type `./main.exe` And It Should Setup Everything</font>
+- Notes Common To Both
+    - If you have a MySQL Server instance, don't create a docker container, but if you don't install [docker-compose](https://docs.docker.com/compose/install/) and then run the program.
 
 ### Scenarios and Combatting Them
 <font size="6">Here are some scenarios you are quite likely to encounter, even if you don't you'll know
