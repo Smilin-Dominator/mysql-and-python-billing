@@ -18,6 +18,29 @@ from configuration import vars, commands, colours
 import setup
 
 
+class errors(object):
+
+    class subprocessError(object):
+        
+        def __init__(self, scenario):
+            self.scenario = scenario
+            self.string = "[ Subprocess Error: %s ]"
+            self.var = self.string % self.scenario
+            print(self.var)
+            logging.error(self.var)
+            sys.exit(5)
+    
+    class mysqlConnectionError(object):
+
+        def __init__(self, scenario):
+            self.scenario = scenario
+            self.string = "[ MySQL Connection Error: %s ]"
+            self.var = self.string % self.scenario
+            print(self.var)
+            logging.error(self.var)
+            sys.exit(5)
+
+
 def startup():
 
     messageOfTheSecond = {
@@ -62,10 +85,9 @@ def startup():
                 print("[*] Successful!, Rerun This File...")
                 sys.exit(1)
             except subprocess.SubprocessError:
-                print("[*] Unable To Start Container...")
-                sys.exit(5)
-        logging.error(e)
-        sys.exit(5)
+                raise errors.subprocessError("Unable To Start Docker Container...")
+        else:
+            raise errors.mysqlConnectionError("Couldn't Connect To Database..")
 
     mycursor = mydb.cursor()
     if len(credz) == 6:
