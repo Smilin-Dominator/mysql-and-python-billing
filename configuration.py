@@ -1,4 +1,4 @@
-import os
+import os, logging, sys
 
 
 class vars:
@@ -103,3 +103,26 @@ class colours:
     BackgroundLightMagenta = "\033[105m"
     BackgroundLightCyan    = "\033[106m"
     BackgroundWhite        = "\033[107m"
+
+class errors(object):
+
+    class subprocessError(Exception):
+        
+        def __init__(self, scenario):
+            self.scenario = scenario
+            self.string = "[ Subprocess Error: %s ]"
+            self.var = self.string % self.scenario
+            print(self.var)
+            logging.error(self.var)
+            sys.exit(5)
+    
+    class mysqlConnectionError(Exception):
+
+        def __init__(self, scenario):
+            self.scenario = scenario
+            self.string = "[ MySQL Connection Error: %s ]"
+            self.var = self.string % self.scenario
+            print(self.var)
+            logging.error(self.var)
+            sys.exit(5)
+

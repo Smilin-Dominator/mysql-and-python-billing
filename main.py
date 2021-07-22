@@ -18,29 +18,6 @@ from configuration import vars, commands, colours
 import setup
 
 
-class errors(object):
-
-    class subprocessError(object):
-        
-        def __init__(self, scenario):
-            self.scenario = scenario
-            self.string = "[ Subprocess Error: %s ]"
-            self.var = self.string % self.scenario
-            print(self.var)
-            logging.error(self.var)
-            sys.exit(5)
-    
-    class mysqlConnectionError(object):
-
-        def __init__(self, scenario):
-            self.scenario = scenario
-            self.string = "[ MySQL Connection Error: %s ]"
-            self.var = self.string % self.scenario
-            print(self.var)
-            logging.error(self.var)
-            sys.exit(5)
-
-
 def startup():
 
     messageOfTheSecond = {
