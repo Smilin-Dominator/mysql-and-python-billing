@@ -57,12 +57,14 @@ def startup():
         print("[*] MySQL Database Not Connecting")
         if os.path.exists('docker-compose.yml'):
             print("[*] (Realization) Docker Container, Attempting To Start It")
-            try:
-                subprocess.run("docker start Maria")
+            check = subprocess.getoutput("docker start Maria")
+            newcheck = check.splitlines()
+            for line in newcheck:
+                if line.startswith("Error"):
+                    raise errors.dockerError("Unable To Start Docker Container...", check)
+            else:
                 print("[*] Successful!, Rerun This File...")
                 sys.exit(1)
-            except subprocess.SubprocessError:
-                raise errors.subprocessError("Unable To Start Docker Container...")
         else:
             raise errors.mysqlConnectionError("Couldn't Connect To Database..")
 

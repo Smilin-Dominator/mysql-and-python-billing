@@ -106,12 +106,13 @@ class colours:
 
 class errors(object):
 
-    class subprocessError(Exception):
+    class dockerError(Exception):
         
-        def __init__(self, scenario):
+        def __init__(self, scenario, message):
             self.scenario = scenario
-            self.string = "[ Subprocess Error: %s ]"
-            self.var = self.string % self.scenario
+            self.message = message
+            self.string = "[ Docker Error: %s ]\n[ Error Message: { %s } ]"
+            self.var = self.string % (self.scenario, self.message)
             print(self.var)
             logging.error(self.var)
             sys.exit(5)
