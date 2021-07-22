@@ -1,4 +1,4 @@
-import os
+import os, logging, sys
 
 
 class vars:
@@ -103,3 +103,37 @@ class colours:
     BackgroundLightMagenta = "\033[105m"
     BackgroundLightCyan    = "\033[106m"
     BackgroundWhite        = "\033[107m"
+
+class errors(object):
+
+    class dockerError(Exception):
+        
+        def __init__(self, scenario, message):
+            self.scenario = scenario
+            self.message = message
+            self.string = "[ Docker Error: %s ]\n[ Error Message: { %s } ]"
+            self.var = self.string % (self.scenario, self.message)
+            print(self.var)
+            logging.error(self.var)
+            sys.exit(5)
+    
+    class mysqlConnectionError(Exception):
+
+        def __init__(self, scenario):
+            self.scenario = scenario
+            self.string = "[ MySQL Connection Error: %s ]"
+            self.var = self.string % self.scenario
+            print(self.var)
+            logging.error(self.var)
+            sys.exit(5)
+
+    class valueErrors(Exception):
+
+        def __init__(self, scenario):
+            self.scenario = scenario
+            self.string = "[ Value Error: %s ]"
+            self.var = self.string % self.scenario
+            print(self.var)
+            logging.error(self.var)
+            input("(enter to continue...)")
+            os.system('cls')

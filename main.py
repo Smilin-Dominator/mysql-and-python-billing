@@ -14,7 +14,7 @@ import mysql.connector
 import rsa
 import base64
 import subprocess
-from configuration import vars, commands, colours
+from configuration import vars, commands, colours, errors
 import setup
 
 
@@ -57,15 +57,16 @@ def startup():
         print("[*] MySQL Database Not Connecting")
         if os.path.exists('docker-compose.yml'):
             print("[*] (Realization) Docker Container, Attempting To Start It")
-            try:
-                subprocess.run("docker start Maria")
+            check = subprocess.getoutput("docker start Maria")
+            newcheck = check.splitlines()
+            for line in newcheck:
+                if line.startswith("Error"):
+                    raise errors.dockerError("Unable To Start Docker Container...", check)
+            else:
                 print("[*] Successful!, Rerun This File...")
                 sys.exit(1)
-            except subprocess.SubprocessError:
-                print("[*] Unable To Start Container...")
-                sys.exit(5)
-        logging.error(e)
-        sys.exit(5)
+        else:
+            raise errors.mysqlConnectionError("Couldn't Connect To Database..")
 
     mycursor = mydb.cursor()
     if len(credz) == 6:
@@ -193,9 +194,8 @@ def main(messageOfTheSecond, credz):
             elif key == '6':
                 conifguration_file()
             os.system('cls')
-        except Exception as e:
-            logging.error(e)
-            os.system('cls')
+        except ValueError:
+            raise errors.valueErrors("Entered A Non Integer During The Main Prompt")
 
 
 def conifguration_file():

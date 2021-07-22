@@ -149,7 +149,7 @@ def delete_from_list(ar):
 
 def kill_this():
     killPass = str(getpass.getpass("Enter Password: "))
-    pass_read = open('./passwd.txt', 'r')
+    pass_read = open('./credentials/passwd.txt', 'r')
     check_pass_file = pass_read.read().split(',')
     salt1 = check_pass_file[0]
     salt2 = check_pass_file[1]
