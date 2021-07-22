@@ -170,7 +170,6 @@ def main(messageOfTheSecond, credz):
                 f"{colours.BackgroundLightMagenta}SmilinPython>{colours.ENDC} ")
         ncredz = ' '.join(credz).replace(' ', ',')
         try:
-            key = int(key)
             if key == '1':
                 logging.info("Exiting Gracefully;")
                 os.system("cls")
