@@ -126,3 +126,13 @@ class errors(object):
             logging.error(self.var)
             sys.exit(5)
 
+    class valueErrors(Exception):
+
+        def __init__(self, scenario):
+            self.scenario = scenario
+            self.string = "[ Value Error: %s ]"
+            self.var = self.string % self.scenario
+            print(self.var)
+            logging.error(self.var)
+            input("(enter to continue...)")
+            os.system('cls')

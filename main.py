@@ -14,7 +14,7 @@ import mysql.connector
 import rsa
 import base64
 import subprocess
-from configuration import vars, commands, colours
+from configuration import vars, commands, colours, errors
 import setup
 
 
@@ -168,6 +168,7 @@ def main(messageOfTheSecond, credz):
                 f"{colours.BackgroundLightMagenta}SmilinPython>{colours.ENDC} ")
         ncredz = ' '.join(credz).replace(' ', ',')
         try:
+            key = int(key)
             if key == '1':
                 logging.info("Exiting Gracefully;")
                 os.system("cls")
@@ -192,9 +193,8 @@ def main(messageOfTheSecond, credz):
             elif key == '6':
                 conifguration_file()
             os.system('cls')
-        except Exception as e:
-            logging.error(e)
-            os.system('cls')
+        except ValueError:
+            raise errors.valueErrors("Entered A Non Integer During The Main Prompt")
 
 
 def conifguration_file():
