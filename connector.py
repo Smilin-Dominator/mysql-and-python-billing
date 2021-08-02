@@ -1,6 +1,5 @@
 import getpass
 import hashlib
-import random
 import sys
 import mysql.connector
 import logging
@@ -9,6 +8,7 @@ import os
 from configuration import colours, vars
 
 logging.basicConfig(filename='log.txt', format=vars.log_format, datefmt='[%Y-%m-%d] [%H:%M:%S]', level=logging.DEBUG)
+
 
 def init(raw):
     global mydb
@@ -23,7 +23,9 @@ def init(raw):
     )
     main()
 
+
 BUF_SIZE = 65536
+
 
 def startup():
     customerName = input("Customer: ")  # Optional, if you're in a hurry, just leave blank
@@ -32,6 +34,7 @@ def startup():
     logging.info(f"\nSold the following to {customerName}")  # you'll see this often, in case any bills go missing
     return customerName
     # logs are the go-to place
+
 
 myFormat = "{:<25}{:<15}{:<15}{:<15}"  # format for the .format() :)
 fileHeaderFormat = "{:^70}"  # headers
@@ -225,7 +228,8 @@ def bill_write(ar):
         cashGiven = int(input(f'{colours.LightRed}Cash Given: Rs. {colours.ENDC}'))
         bal = int(cashGiven - finalTotal)
         if bal < 0:  # loops if its a negative number!
-            print(colours.Red, "Negative Value, Something's Off, Retry", colours.ENDC)  # something's **really** off (why doesnt MD work?)
+            print(colours.Red, "Negative Value, Something's Off, Retry",
+                  colours.ENDC)  # something's **really** off (why doesnt MD work?)
             logging.warning('Negative Balance')
             passOff = False
         elif bal == 0:
@@ -306,7 +310,8 @@ def main():
                 ar = delete_from_list(ar)
             elif idInput == '--':
                 print(printingBills(ar, myFormat, 'none').print_bill_items())
-                print(f"{colours.LightMagenta}Subtotal: {printingBills(ar, myFormat, 'none').print_total()}{colours.ENDC}")
+                print(
+                    f"{colours.LightMagenta}Subtotal: {printingBills(ar, myFormat, 'none').print_total()}{colours.ENDC}")
             elif idInput == 'update':
                 ar = update_list(ar)
             else:
@@ -322,7 +327,9 @@ def main():
                     else:
                         ar.append(appending_to_ar(dup[0], dup[1], dup[2], dup[3]))
                 else:
-                    print(f"\n{colours.Red}Did You Enter The Right ID / Command?{colours.ENDC}")  # congratulations! you're a failure!
+                    print(
+                        f"\n{colours.Red}Did You Enter The Right ID / Command?{colours.ENDC}")  # congratulations!
+                    # you're a failure!
                     logging.warning(f"Entered Wrong ID / CMD: {idInput}")
         except Exception as rim:
             logging.error(rim)  # rim alert

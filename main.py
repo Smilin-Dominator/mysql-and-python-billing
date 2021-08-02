@@ -19,7 +19,6 @@ import setup
 
 
 def startup():
-
     messageOfTheSecond = {
         # if you don't recognize this song, stop reading this and listen <https://open.spotify.com/track/7KXjTSCq5nL1LoYtL7XAwS?si=9f86d9e08cac4cd2>
         1: "Nobody Pray for Me, It Been That Day For Me, Yeah!",  # actually who are you? Why are you reading this?
@@ -39,7 +38,8 @@ def startup():
     # First Boot - Checks For Log.txt
     init0()
 
-    logging.basicConfig(filename='log.txt', format=vars.log_format, datefmt='[%Y-%m-%d] [%H:%M:%S]', level=logging.DEBUG)
+    logging.basicConfig(filename='log.txt', format=vars.log_format, datefmt='[%Y-%m-%d] [%H:%M:%S]',
+                        level=logging.DEBUG)
 
     # Second Phase - Checks For SQL Credentials
     credz = init1(logging)
@@ -77,9 +77,8 @@ def startup():
 
     print(colours.BackgroundCyan, "Welcome! If Something Doesn't Seem Right, Check The Logs!", colours.ENDC, end="\n")
 
-
     try:
-         # Third Phase - Checks For Updates
+        # Third Phase - Checks For Updates
         config = open('./credentials/options.txt', 'r').read().splitlines()
         if config[0] == 'check_for_updates=True':
             init3()
@@ -92,7 +91,6 @@ def startup():
         logging.warning(e)
         print("[!] Config File Not Found!\n[*] Generating...")
         conifguration_file()
-
 
     # Final Phase - Main Program
     main(messageOfTheSecond, credz)
@@ -121,7 +119,8 @@ class integrityCheck(object):
                         critical_ar = (salt1, salt2, hashed_pw)
                         critical.append(critical_ar)
                     else:
-                        print("[*] Authenticity Not Recognized.. Reset log.txt and passwd.txt, Data Might've been breached")
+                        print("[*] Authenticity Not Recognized.. Reset log.txt and passwd.txt, Data Might've been "
+                              "breached")
                         sys.exit(66)
             except Exception as e:
                 logging.warning(e)
@@ -158,7 +157,9 @@ def main(messageOfTheSecond, credz):
     key = 2
     while key != '1':
         randomNumGen = random.randint(1, len(messageOfTheSecond))  # RNG, unscripted order
-        print(f"\n{colours.BackgroundDarkGray}Random Line from HUMBLE.:{colours.ENDC} {colours.BackgroundLightMagenta}{messageOfTheSecond[randomNumGen]}{colours.ENDC}")  # pulls from the Dictionary
+        print(
+            f"\n{colours.BackgroundDarkGray}Random Line from HUMBLE.:{colours.ENDC} {colours.BackgroundLightMagenta}"
+            f"{messageOfTheSecond[randomNumGen]}{colours.ENDC}")  # pulls from the Dictionary
         print(
             f"\n\n{colours.Red}1 - Exit{colours.ENDC}\n{colours.Green}2 - Make A Bill{colours.ENDC}\n"
             f"{colours.LightYellow}3 - Create Master Bill & Sales Reports{colours.ENDC}\n{colours.Cyan}4 - SQL Client{colours.ENDC}\n"
@@ -166,8 +167,9 @@ def main(messageOfTheSecond, credz):
         )
         date = time.strftime('%c')
         time_prompt = time.strftime('%I:%M %p')
-        key = input(f"\n{colours.BackgroundLightGreen}[{date}]{colours.ENDC}-{colours.BackgroundLightCyan}[{time_prompt}]{colours.ENDC}\n"
-                f"{colours.BackgroundLightMagenta}SmilinPython>{colours.ENDC} ")
+        key = input(
+            f"\n{colours.BackgroundLightGreen}[{date}]{colours.ENDC}-{colours.BackgroundLightCyan}[{time_prompt}]{colours.ENDC}\n"
+            f"{colours.BackgroundLightMagenta}SmilinPython>{colours.ENDC} ")
         ncredz = ' '.join(credz).replace(' ', ',')
         try:
             if key == '1':
@@ -325,11 +327,13 @@ def init3():
     subprocess.run('git fetch', stdout=subprocess.DEVNULL)
     raw = subprocess.check_output('git status')
     check = raw.decode().splitlines()
-    if check[1] == "Your branch is up to date with 'origin/main'." or check[1].startswith("Your branch is ahead of 'origin/main'"):
+    if check[1] == "Your branch is up to date with 'origin/main'." or check[1].startswith(
+            "Your branch is ahead of 'origin/main'"):
         print("[*] No Update Found, Continuing...")
     else:
         print("[*] Update Found... Updating...\n")
-        print(subprocess.check_output('git pull https://Smilin-Dominator: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@github.com/Smilin-Dominator/mysql-and-python-billing.git').decode())
+        print(subprocess.check_output(
+            'git pull https://Smilin-Dominator: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@github.com/Smilin-Dominator/mysql-and-python-billing.git').decode())
         print("\n[*] Success!")
 
 
@@ -372,7 +376,7 @@ def init5(mycursor, conf):
         else:
             print(integrityCheck('none', 'none', critical, mycursor).pass_write())
 
-    if checkPass and conf == True:
+    if checkPass and conf:
         critical = integrityCheck('./log.txt', 'none', 'none', mycursor).pass_check()
         read_pass = open('./credentials/passwd.txt', 'r')
         read_pass_re = read_pass.read()
@@ -394,7 +398,7 @@ def init5(mycursor, conf):
         else:
             print(integrityCheck('none', scrape, 'none', mycursor).hash_write())
 
-    if checkHash and conf == True:
+    if checkHash and conf:
         scrape = integrityCheck('none', 'none', 'none', mycursor).hash_check()
         scrape_file = open('./credentials/hashes.txt', 'r')
         scrape2 = scrape_file.read().splitlines()
