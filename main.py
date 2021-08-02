@@ -19,8 +19,10 @@ import setup
 
 
 def startup():
+
     messageOfTheSecond = {
-        # if you don't recognize this song, stop reading this and listen <https://open.spotify.com/track/7KXjTSCq5nL1LoYtL7XAwS?si=9f86d9e08cac4cd2>
+        # if you don't recognize this song, stop reading this and listen
+        # <https://open.spotify.com/track/7KXjTSCq5nL1LoYtL7XAwS?si=9f86d9e08cac4cd2>
         1: "Nobody Pray for Me, It Been That Day For Me, Yeah!",  # actually who are you? Why are you reading this?
         2: "I remember syrup, sandwiches and crime allowances",  # how did you find this document?
         3: "Pull up to your block, and break it, now we playing Tetris",
@@ -42,7 +44,7 @@ def startup():
                         level=logging.DEBUG)
 
     # Second Phase - Checks For SQL Credentials
-    credz = init1(logging)
+    credz = init1()
 
     try:
         mydb = mysql.connector.connect(
@@ -203,7 +205,7 @@ def main(messageOfTheSecond, credz):
 def conifguration_file():
     options = open('./credentials/options.txt', 'w+')
     f = vars.execheck()
-    if f == True:
+    if f:
         options.write("check_for_updates=False")
     else:
         up = input("[*] Check For Updates On Startup? (y/n): ")
@@ -231,7 +233,7 @@ def init0():
         os.system("touch log.txt")
 
 
-def init1(logging):
+def init1():
     keycheck1 = os.path.exists('./credentials/private.pem')
     keycheck2 = os.path.exists('./credentials/public.pem')
     if not keycheck1 or (not keycheck2):
@@ -327,13 +329,16 @@ def init3():
     subprocess.run('git fetch', stdout=subprocess.DEVNULL)
     raw = subprocess.check_output('git status')
     check = raw.decode().splitlines()
-    if check[1] == "Your branch is up to date with 'origin/main'." or check[1].startswith(
-            "Your branch is ahead of 'origin/main'"):
+    if \
+            check[1] == "Your branch is up to date with 'origin/main'." \
+            or check[1].startswith("Your branch is ahead of 'origin/main'") \
+            or check[1].startswith("fatal: not a git repository"):
         print("[*] No Update Found, Continuing...")
     else:
         print("[*] Update Found... Updating...\n")
         print(subprocess.check_output(
-            'git pull https://Smilin-Dominator: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@github.com/Smilin-Dominator/mysql-and-python-billing.git').decode())
+            'git pull https://Smilin-Dominator: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@github.com/Smilin-Dominator'
+            '/mysql-and-python-billing.git').decode())
         print("\n[*] Success!")
 
 
