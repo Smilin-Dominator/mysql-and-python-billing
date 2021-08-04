@@ -4,7 +4,9 @@ import os
 import mysql.connector
 from configuration import variables, colours
 
-logging.basicConfig(filename='log.txt', format=variables.log_format, datefmt='[%Y-%m-%d] [%H:%M:%S]', level=logging.DEBUG)
+logging.basicConfig(filename='log.txt', format=variables.log_format, datefmt='[%Y-%m-%d] [%H:%M:%S]',
+                    level=logging.DEBUG)
+
 
 def init(raw):
     global mydb, mycursor
@@ -19,6 +21,7 @@ def init(raw):
     )
     mycursor = mydb.cursor()
     main()
+
 
 print("Welcome To The Verifier!\n\n'Nobody Will Tamper With Your Data!' \n- People Before Their Data Got Tampered\n")
 print("This Will Verify The Hashes Of Your Bills, Not The Master Bills And Sales Reports, as they're Dynamic")
@@ -39,30 +42,31 @@ def hash_file(filepath):
 
 
 # ---------Hash------------#
+
 def hash():
     hashwrite = open('./credentials/hashes.txt', 'a')
     read_hash = open("./credentials/hashes.txt", 'r')
     multiverse = os.listdir('bills')
     read_the_file = read_hash.read().splitlines()
-    for dir in multiverse:
-        bill_path = os.path.join('./bills/', dir)
+    for directory in multiverse:
+        bill_path = os.path.join('./bills/', directory)
         ls_l = os.listdir(bill_path)
         for file in ls_l:
             the_new = os.path.join(bill_path + '/' + file)
-            hash = hash_file(the_new)
+            filehash = hash_file(the_new)
             for data in read_the_file:
                 if the_new.endswith('master_bill.txt'):
                     print(f"{colours.Blue}[*] Skipping Master Bill..{colours.ENDC}")
                     break
-                if hash in data:
+                if filehash in data:
                     print(f"{colours.LightCyan}[*] Skipping Adding Existing Entry....{colours.ENDC}")
                     break
             else:
-                hashwrite.write(f"\n{the_new},{hash}")
+                hashwrite.write(f"\n{the_new},{filehash}")
                 mycursor.execute(
-                    f"INSERT INTO paddigurlHashes(filepath, hash, filecontents) VALUES('{the_new}', '{hash}', '{open(the_new, 'r').read()}')")
-                print(f"{colours.Blue}[*] Hashed {file} .. {hash}{colours.ENDC}")
-                logging.info(f"Hashed .. {file} .. {hash}")
+                    f"INSERT INTO paddigurlHashes(filepath, hash, filecontents) VALUES('{the_new}', '{filehash}', '{open(the_new, 'r').read()}')")
+                print(f"{colours.Blue}[*] Hashed {file} .. {filehash}{colours.ENDC}")
+                logging.info(f"Hashed .. {file} .. {filehash}")
         mydb.commit()
 
 
@@ -107,7 +111,10 @@ def verify():
                 recover_write.flush()
                 recover_write.close()
                 logging.info("Successful Recovery...")
-                print(f"{colours.DarkGray}[*] Attempting Recovery....{colours.ENDC}\n{colours.Green}[*] Success...{colours.ENDC}")
+                print(
+                    f"{colours.DarkGray}[*] Attempting Recovery....{colours.ENDC}\n{colours.Green}"
+                    f"[*] Success...{colours.ENDC}"
+                )
         except Exception as e:
             logging.error(e)
 
