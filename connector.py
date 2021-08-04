@@ -316,7 +316,7 @@ def main():
                 ar = update_list(ar)
             else:
                 proceed = int(idInput)
-                sql_select_Query = f"select * from paddigurlTest WHERE id = {proceed}"  # This Will Be Sent To The Database
+                sql_select_Query = f"select * from paddigurlTest WHERE id = {proceed}"  #  Sent To The Database
                 cursor = mydb.cursor()  # This Is As If You Were Entering It Yourself
                 cursor.execute(sql_select_Query)  # Executes
                 records = cursor.fetchall()  # Gets All The Outputs
