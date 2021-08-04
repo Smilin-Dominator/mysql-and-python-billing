@@ -4,9 +4,10 @@ import mysql.connector
 import pandas as pd
 import logging
 import hashlib
-from configuration import vars
+from configuration import variables
 
-logging.basicConfig(filename='log.txt', format=vars.log_format, datefmt='[%Y-%m-%d] [%H:%M:%S]', level=logging.DEBUG)
+logging.basicConfig(filename='log.txt', format=variables.log_format, datefmt='[%Y-%m-%d] [%H:%M:%S]',
+                    level=logging.DEBUG)
 
 
 def init(raw):
@@ -43,6 +44,7 @@ def auth():
             logging.warning("Wrong Pass")
             badPass = True
 
+
 help_string = "\nhelp --> displays this\nshow all --> selects all the dolls\nbye --> exits\nadd --> adds an " \
               "item\nremove --> removes an item\nchange --> alters an item\nadd id --> adds item with ID\n custom -->" \
               "executes your custom query\n"
@@ -61,8 +63,8 @@ command_legend = {
 
 def main():
     mycursor = mydb.cursor()
-    exit = False
-    while not exit:
+    getOut = False
+    while not getOut:
         command = input("\nSmilin_DB> ")
         try:
             command_check = command_legend[command]
@@ -94,8 +96,14 @@ def main():
                 get_all = mycursor.fetchall()
                 for i in range(len(get_all)):
                     if get_all[i][0] == id_of_removal:
-                        logging.warning(f"Proceeding To Delete Item:\nID: {id_of_removal}\nName: {get_all[i][1]}\nPrice: {get_all[i][2]}")
-                        mycursor.execute(f"INSERT INTO paddigurlRemoved(id, name, price) VALUES({id_of_removal}, '{get_all[i][1]}', {get_all[i][2]})")
+                        logging.warning(
+                            f"Proceeding To Delete Item:\nID: {id_of_removal}\nName: {get_all[i][1]}\nPrice: "
+                            f"{get_all[i][2]}"
+                        )
+                        mycursor.execute(
+                            f"INSERT INTO paddigurlRemoved(id, name, price) VALUES({id_of_removal}, '{get_all[i][1]}', "
+                            f"{get_all[i][2]})"
+                        )
                 del_string = command_check + f"{id_of_removal};"
                 mycursor.execute(del_string)
                 mydb.commit()
@@ -108,11 +116,14 @@ def main():
                 for i in range(len(get_all)):
                     if get_all[i][0] == id_of_change:
                         logging.warning(
-                            f"Proceeding To Delete Item:\nID: {id_of_change}\nName: {get_all[i][1]}\nPrice: {get_all[i][2]}")
+                            f"Proceeding To Delete Item:\nID: {id_of_change}\nName: {get_all[i][1]}\nPrice: "
+                            f"{get_all[i][2]}"
+                        )
                         print(f"\nCurrent Name: {get_all[i][1]}\nCurrent Price: {get_all[i][2]}\n")
                 name_to_change = input("New Name: ")
                 price_to_change = int(input("New Price: "))
-                new_str = command_check + f"name = '{name_to_change}', price = {price_to_change} WHERE id = {id_of_change};"
+                new_str = command_check + f"name = '{name_to_change}', price = {price_to_change} WHERE id = " \
+                                          f"{id_of_change};"
                 mycursor.execute(new_str)
                 mydb.commit()
                 print("Success!")
@@ -134,7 +145,8 @@ def main():
                     print(it_vol2.to_string(index=False))
                 else:
                     print("Successful!")
+                mydb.commit()
         except Exception as e:
             print("\nCorrect Command or Error?")
             logging.error(e)
-            exit = False
+            getOut = False

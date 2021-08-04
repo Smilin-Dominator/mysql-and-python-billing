@@ -1,14 +1,15 @@
 import getpass
 import hashlib
-import random
 import sys
 import mysql.connector
 import logging
 import time
 import os
-from configuration import colours, vars
+from configuration import colours, variables
 
-logging.basicConfig(filename='log.txt', format=vars.log_format, datefmt='[%Y-%m-%d] [%H:%M:%S]', level=logging.DEBUG)
+logging.basicConfig(filename='log.txt', format=variables.log_format, datefmt='[%Y-%m-%d] [%H:%M:%S]',
+                    level=logging.DEBUG)
+
 
 def init(raw):
     global mydb
@@ -23,26 +24,32 @@ def init(raw):
     )
     main()
 
+
 BUF_SIZE = 65536
 
+
 def startup():
-    customerName = input("Customer: ")  # Optional, if you're in a hurry, just leave blank
-    if not customerName:  # ' ' => blank
-        customerName = '(Not Specified)'
-    logging.info(f"\nSold the following to {customerName}")  # you'll see this often, in case any bills go missing
-    return customerName
+    nameOfCustomer = input("Customer: ")  # Optional, if you're in a hurry, just leave blank
+    if not nameOfCustomer:  # ' ' => blank
+        nameOfCustomer = '(Not Specified)'
+    logging.info(f"\nSold the following to {nameOfCustomer}")  # you'll see this often, in case any bills go missing
+    return nameOfCustomer
     # logs are the go-to place
+
 
 myFormat = "{:<25}{:<15}{:<15}{:<15}"  # format for the .format() :)
 fileHeaderFormat = "{:^70}"  # headers
 varTime = time.strftime("%d_of_%B")
 
 
+# --------------------------------------- Bill Related Functions ---------------------------------------#
+
+
 class printingBills(object):
 
-    def __init__(self, ar, myFormat, file):
+    def __init__(self, ar, new_format, file):
         self.ar = ar
-        self.form = myFormat
+        self.form = new_format
         self.formPrep = self.form.format('Name', 'Price (Rs.)', 'Quantity', 'Total (Rs.)')
         self.file = file
 
@@ -69,97 +76,6 @@ class printingBills(object):
         for i in range(0, len(price_unchained)):
             tot = tot + price_unchained[i]  # paradox alert! this variable is dynamic, it remembers the past state.
         return tot
-
-
-def update_list(ar):
-    print(printingBills(ar, myFormat, 'none').print_bill_items())
-    theLoop = True
-    while theLoop:
-        try:
-            updateValue = input("What Would You Like To Update? (Name): ")
-            tempList = [list(tup) for tup in ar]
-            for i in range(len(tempList)):
-                up_name = tempList[i][0]
-                if updateValue == up_name:
-                    update_key = input("Add Or Remove How Much? (+ amount/ - amount): ")
-                    update_key_check = (update_key.split(' '))
-                    upQuan = int(update_key_check[1])
-                    oldQuan = tempList[i][2]
-                    if update_key_check[0] == '+':
-                        newQuan = upQuan + oldQuan
-                        newTot = newQuan * tempList[i][1]
-                        tempList[i][2] = newQuan
-                        tempList[i][3] = newTot
-                        logging.info(
-                            f"Updated: {updateValue}, {ar[i][1]}\nSet Quantity {oldQuan} => {newQuan}\nUpdated Total {tempList[i][3]} => {newTot}")
-                        ar = [tuple(entry) for entry in tempList]
-                    elif update_key_check[0] == '-':
-                        newQuanCheck = oldQuan - upQuan
-                        if newQuanCheck > 0:
-                            newQuan = newQuanCheck
-                        else:
-                            print("[ The Value Is Either Negative or 0, And Will Be Set To 1 ]")
-                            print("[ If Your Intention Was To Delete This, Use The 'del' Command Instead ]")
-                            confirm = input("Proceed? (Y/N): ")
-                            if confirm == 'Y':
-                                logging.warning(f"Set {updateValue}, {ar[i][1]}'s Quantity to 1")
-                                newQuan = 1
-                            else:
-                                logging.warning(f"Didn't Change {updateValue}, {ar[i][1]}'s Quantity")
-                                newQuan = oldQuan
-                        newTot = newQuan * tempList[i][1]
-                        tempList[i][2] = newQuan
-                        tempList[i][3] = newTot
-                        logging.info(
-                            f"Updated: {updateValue}, {ar[i][1]}\nSet Quantity {oldQuan} => {newQuan}\nUpdated Total => {newTot}")
-                    elif update_key_check[0] == 'exit':
-                        break
-                    print("Success!")
-                    break
-            return [tuple(entry) for entry in tempList]
-        except Exception as e:
-            logging.error(e)
-            theLoop = True
-
-
-def delete_from_list(ar):
-    print(printingBills(ar, myFormat, 'none').print_bill_items())
-    theLoop = True
-    while theLoop:
-        try:
-            delKey = input("The (Name) To Be Removed: ")
-            if delKey == 'abort':
-                print("Aborting...")
-                break
-            else:
-                for i in range(len(ar)):
-                    if ar[i][0] == delKey:
-                        popTime = ar[i]
-                        ar.remove(popTime)
-                        break
-                print("\nSuccess! Type  '--' in the ID prompt To See The Updated Version!")
-                logging.info(f"Successfully Deleted Entry {delKey}")
-                theLoop = False
-        except Exception as e:
-            logging.error(e)
-            print("[ Error Occurred, Please Retry ]")
-            theLoop = True
-    return ar
-
-
-def kill_this():
-    killPass = str(getpass.getpass("Enter Password: "))
-    pass_read = open('./credentials/passwd.txt', 'r')
-    check_pass_file = pass_read.read().split(',')
-    salt1 = check_pass_file[0]
-    salt2 = check_pass_file[1]
-    hash_check = check_pass_file[2]
-    pass_check = salt1 + killPass + salt2
-    pass_hash = hashlib.sha512(pass_check.encode()).hexdigest()
-    if hash_check == pass_hash:
-        sys.exit(66)
-    else:
-        print("\n[ Wrong Password ]\n")  # thats the wrong number! (ooohhhh)
 
 
 def bill_write(ar):
@@ -225,7 +141,8 @@ def bill_write(ar):
         cashGiven = int(input(f'{colours.LightRed}Cash Given: Rs. {colours.ENDC}'))
         bal = int(cashGiven - finalTotal)
         if bal < 0:  # loops if its a negative number!
-            print(colours.Red, "Negative Value, Something's Off, Retry", colours.ENDC)  # something's **really** off (why doesnt MD work?)
+            print(colours.Red, "Negative Value, Something's Off, Retry",
+                  colours.ENDC)  # something's **really** off (why doesnt MD work?)
             logging.warning('Negative Balance')
             passOff = False
         elif bal == 0:
@@ -243,6 +160,27 @@ def bill_write(ar):
             fileOpen.write(f'\nBalance: Rs. {bal}')
             break
     input("\n(enter) to proceed...")
+
+
+# ------------------------------------- Miscellaneous Functions -------------------------------------------#
+
+
+def kill_this():
+    killPass = str(getpass.getpass("Enter Password: "))
+    pass_read = open('./credentials/passwd.txt', 'r')
+    check_pass_file = pass_read.read().split(',')
+    salt1 = check_pass_file[0]
+    salt2 = check_pass_file[1]
+    hash_check = check_pass_file[2]
+    pass_check = salt1 + killPass + salt2
+    pass_hash = hashlib.sha512(pass_check.encode()).hexdigest()
+    if hash_check == pass_hash:
+        sys.exit(66)
+    else:
+        print("\n[ Wrong Password ]\n")  # thats the wrong number! (ooohhhh)
+
+
+# ------------------------------------------ Array Related Functions ----------------------------------------------#
 
 
 def duplicate_check(ar, records):
@@ -269,7 +207,9 @@ def duplicate_check(ar, records):
                         tempList[i][2] = newQuantity
                         print("Success!")
                         logging.info(
-                            f"Updated: {checkName}, {checkPrice}\nSet Quantity {currentQuantity} => {newQuantity}\nSet Total: {currentTotal} => {newTotal}")
+                            f"Updated: {checkName}, {checkPrice}\nSet Quantity {currentQuantity} => "
+                            f"{newQuantity}\nSet Total: {currentTotal} => {newTotal}"
+                        )
                         ar = [tuple(entry) for entry in tempList]
                         return ar
                     except Exception as e:
@@ -289,6 +229,89 @@ def appending_to_ar(name, price, quantity, total):
     return tuppence
 
 
+def update_list(ar):
+    print(printingBills(ar, myFormat, 'none').print_bill_items())
+    theLoop = True
+    while theLoop:
+        try:
+            updateValue = input("What Would You Like To Update? (Name): ")
+            tempList = [list(tup) for tup in ar]
+            for i in range(len(tempList)):
+                up_name = tempList[i][0]
+                if updateValue == up_name:
+                    update_key = input("Add Or Remove How Much? (+ amount/ - amount): ")
+                    update_key_check = (update_key.split(' '))
+                    upQuan = int(update_key_check[1])
+                    oldQuan = tempList[i][2]
+                    if update_key_check[0] == '+':
+                        newQuan = upQuan + oldQuan
+                        newTot = newQuan * tempList[i][1]
+                        tempList[i][2] = newQuan
+                        tempList[i][3] = newTot
+                        logging.info(
+                            f"Updated: {updateValue}, {ar[i][1]}\nSet Quantity {oldQuan} => "
+                            f"{newQuan}\nUpdated Total {tempList[i][3]} => {newTot}"
+                        )
+                        ar = [tuple(entry) for entry in tempList]
+                    elif update_key_check[0] == '-':
+                        newQuanCheck = oldQuan - upQuan
+                        if newQuanCheck > 0:
+                            newQuan = newQuanCheck
+                        else:
+                            print("[ The Value Is Either Negative or 0, And Will Be Set To 1 ]")
+                            print("[ If Your Intention Was To Delete This, Use The 'del' Command Instead ]")
+                            confirm = input("Proceed? (Y/N): ")
+                            if confirm == 'Y':
+                                logging.warning(f"Set {updateValue}, {ar[i][1]}'s Quantity to 1")
+                                newQuan = 1
+                            else:
+                                logging.warning(f"Didn't Change {updateValue}, {ar[i][1]}'s Quantity")
+                                newQuan = oldQuan
+                        newTot = newQuan * tempList[i][1]
+                        tempList[i][2] = newQuan
+                        tempList[i][3] = newTot
+                        logging.info(
+                            f"Updated: {updateValue}, {ar[i][1]}\nSet Quantity {oldQuan} => {newQuan}\n"
+                            f"Updated Total => {newTot}"
+                        )
+                    elif update_key_check[0] == 'exit':
+                        break
+                    print("Success!")
+                    break
+            return [tuple(entry) for entry in tempList]
+        except Exception as e:
+            logging.error(e)
+            theLoop = True
+
+
+def delete_from_list(ar):
+    print(printingBills(ar, myFormat, 'none').print_bill_items())
+    theLoop = True
+    while theLoop:
+        try:
+            delKey = input("The (Name) To Be Removed: ")
+            if delKey == 'abort':
+                print("Aborting...")
+                break
+            else:
+                for i in range(len(ar)):
+                    if ar[i][0] == delKey:
+                        popTime = ar[i]
+                        ar.remove(popTime)
+                        break
+                print("\nSuccess! Type  '--' in the ID prompt To See The Updated Version!")
+                logging.info(f"Successfully Deleted Entry {delKey}")
+                theLoop = False
+        except Exception as e:
+            logging.error(e)
+            print("[ Error Occurred, Please Retry ]")
+            theLoop = True
+    return ar
+
+
+# -------------------------------------------- Main Code --------------------------------------------------#
+
+
 def main():
     global customerName
     customerName = startup()
@@ -306,12 +329,14 @@ def main():
                 ar = delete_from_list(ar)
             elif idInput == '--':
                 print(printingBills(ar, myFormat, 'none').print_bill_items())
-                print(f"{colours.LightMagenta}Subtotal: {printingBills(ar, myFormat, 'none').print_total()}{colours.ENDC}")
+                print(
+                    f"{colours.LightMagenta}Subtotal: {printingBills(ar, myFormat, 'none').print_total()}{colours.ENDC}"
+                )
             elif idInput == 'update':
                 ar = update_list(ar)
             else:
                 proceed = int(idInput)
-                sql_select_Query = f"select * from paddigurlTest WHERE id = {proceed}"  # This Will Be Sent To The Database
+                sql_select_Query = f"select * from paddigurlTest WHERE id = {proceed}"  # Sent To The Database
                 cursor = mydb.cursor()  # This Is As If You Were Entering It Yourself
                 cursor.execute(sql_select_Query)  # Executes
                 records = cursor.fetchall()  # Gets All The Outputs
@@ -322,7 +347,9 @@ def main():
                     else:
                         ar.append(appending_to_ar(dup[0], dup[1], dup[2], dup[3]))
                 else:
-                    print(f"\n{colours.Red}Did You Enter The Right ID / Command?{colours.ENDC}")  # congratulations! you're a failure!
+                    print(
+                        f"\n{colours.Red}Did You Enter The Right ID / Command?{colours.ENDC}")  # congratulations!
+                    # you're a failure!
                     logging.warning(f"Entered Wrong ID / CMD: {idInput}")
         except Exception as rim:
             logging.error(rim)  # rim alert

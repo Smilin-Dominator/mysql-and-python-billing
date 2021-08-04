@@ -1,19 +1,22 @@
-import os, logging, sys
+import logging
+import os
+import sys
 
 
-class vars:
+def execheck():
+    f = os.listdir()
+    for i in range(len(f)):
+        if f[i].endswith('.exe'):
+            return True
+    else:
+        return False
 
-    log_format = '%(asctime)s (%(filename)s): %(message)s'  # this basically says that the time and date come first, error next
 
-    def execheck():
-        f = os.listdir()
-        for i in range(len(f)):
-            if f[i].endswith('.exe'):
-                return True
-        else:
-            return False
+class variables:
+    log_format = '%(asctime)s (%(filename)s): %(message)s'  # this basically says that the time and date come first,
+    # error next
 
-    docker_compose = """# Use root/example as user/password credentials
+    docker_compose = """# Devisha's Docker MariaDB Creation File!
 version: '3.1'
 
 services:
@@ -30,6 +33,7 @@ services:
         ports:
             - 3306:3306
     """
+
 
 class commands:
 
@@ -65,49 +69,50 @@ class commands:
         input("(enter to continue...)")
         os.system('cls')
 
+
 class colours:
-
-    Default      = "\033[39m"
-    Black        = "\033[30m"
-    Red          = "\033[31m"
-    Green        = "\033[32m"
-    Yellow       = "\033[33m"
-    Blue         = "\033[34m"
-    Magenta      = "\033[35m"
-    Cyan         = "\033[36m"
-    LightGray    = "\033[37m"
-    DarkGray     = "\033[90m"
-    LightRed     = "\033[91m"
-    LightGreen   = "\033[92m"
-    LightYellow  = "\033[93m"
-    LightBlue    = "\033[94m"
+    Default = "\033[39m"
+    Black = "\033[30m"
+    Red = "\033[31m"
+    Green = "\033[32m"
+    Yellow = "\033[33m"
+    Blue = "\033[34m"
+    Magenta = "\033[35m"
+    Cyan = "\033[36m"
+    LightGray = "\033[37m"
+    DarkGray = "\033[90m"
+    LightRed = "\033[91m"
+    LightGreen = "\033[92m"
+    LightYellow = "\033[93m"
+    LightBlue = "\033[94m"
     LightMagenta = "\033[95m"
-    LightCyan    = "\033[96m"
-    White        = "\033[97m"
-    ENDC         = '\033[0m'
+    LightCyan = "\033[96m"
+    White = "\033[97m"
+    ENDC = '\033[0m'
 
-    BackgroundDefault      = "\033[49m"
-    BackgroundBlack        = "\033[40m"
-    BackgroundRed          = "\033[41m"
-    BackgroundGreen        = "\033[42m"
-    BackgroundYellow       = "\033[43m"
-    BackgroundBlue         = "\033[44m"
-    BackgroundMagenta      = "\033[45m"
-    BackgroundCyan         = "\033[46m"
-    BackgroundLightGray    = "\033[47m"
-    BackgroundDarkGray     = "\033[100m"
-    BackgroundLightRed     = "\033[101m"
-    BackgroundLightGreen   = "\033[102m"
-    BackgroundLightYellow  = "\033[103m"
-    BackgroundLightBlue    = "\033[104m"
+    BackgroundDefault = "\033[49m"
+    BackgroundBlack = "\033[40m"
+    BackgroundRed = "\033[41m"
+    BackgroundGreen = "\033[42m"
+    BackgroundYellow = "\033[43m"
+    BackgroundBlue = "\033[44m"
+    BackgroundMagenta = "\033[45m"
+    BackgroundCyan = "\033[46m"
+    BackgroundLightGray = "\033[47m"
+    BackgroundDarkGray = "\033[100m"
+    BackgroundLightRed = "\033[101m"
+    BackgroundLightGreen = "\033[102m"
+    BackgroundLightYellow = "\033[103m"
+    BackgroundLightBlue = "\033[104m"
     BackgroundLightMagenta = "\033[105m"
-    BackgroundLightCyan    = "\033[106m"
-    BackgroundWhite        = "\033[107m"
+    BackgroundLightCyan = "\033[106m"
+    BackgroundWhite = "\033[107m"
+
 
 class errors(object):
 
     class dockerError(Exception):
-        
+
         def __init__(self, scenario, message):
             self.scenario = scenario
             self.message = message
@@ -116,7 +121,7 @@ class errors(object):
             print(self.var)
             logging.error(self.var)
             sys.exit(5)
-    
+
     class mysqlConnectionError(Exception):
 
         def __init__(self, scenario):
