@@ -20,6 +20,8 @@ import setup
 
 def startup():
 
+    initial_time = time.time()
+
     messageOfTheSecond = {
         # if you don't recognize this song, stop reading this and listen
         # <https://open.spotify.com/track/7KXjTSCq5nL1LoYtL7XAwS?si=9f86d9e08cac4cd2>
@@ -93,6 +95,9 @@ def startup():
         logging.warning(e)
         print("[!] Config File Not Found!\n[*] Generating...")
         conifguration_file()
+
+    # Logs Boot Time Taken
+    logging.info("Booting Up Took: %f Seconds" % (time.time() - initial_time))
 
     # Final Phase - Main Program
     main(messageOfTheSecond, credz)
