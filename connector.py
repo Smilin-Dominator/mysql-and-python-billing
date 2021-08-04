@@ -42,6 +42,9 @@ fileHeaderFormat = "{:^70}"  # headers
 varTime = time.strftime("%d_of_%B")
 
 
+# --------------------------------------- Bill Related Functions ---------------------------------------#
+
+
 class printingBills(object):
 
     def __init__(self, ar, new_format, file):
@@ -73,101 +76,6 @@ class printingBills(object):
         for i in range(0, len(price_unchained)):
             tot = tot + price_unchained[i]  # paradox alert! this variable is dynamic, it remembers the past state.
         return tot
-
-
-def update_list(ar):
-    print(printingBills(ar, myFormat, 'none').print_bill_items())
-    theLoop = True
-    while theLoop:
-        try:
-            updateValue = input("What Would You Like To Update? (Name): ")
-            tempList = [list(tup) for tup in ar]
-            for i in range(len(tempList)):
-                up_name = tempList[i][0]
-                if updateValue == up_name:
-                    update_key = input("Add Or Remove How Much? (+ amount/ - amount): ")
-                    update_key_check = (update_key.split(' '))
-                    upQuan = int(update_key_check[1])
-                    oldQuan = tempList[i][2]
-                    if update_key_check[0] == '+':
-                        newQuan = upQuan + oldQuan
-                        newTot = newQuan * tempList[i][1]
-                        tempList[i][2] = newQuan
-                        tempList[i][3] = newTot
-                        logging.info(
-                            f"Updated: {updateValue}, {ar[i][1]}\nSet Quantity {oldQuan} => "
-                            f"{newQuan}\nUpdated Total {tempList[i][3]} => {newTot}"
-                        )
-                        ar = [tuple(entry) for entry in tempList]
-                    elif update_key_check[0] == '-':
-                        newQuanCheck = oldQuan - upQuan
-                        if newQuanCheck > 0:
-                            newQuan = newQuanCheck
-                        else:
-                            print("[ The Value Is Either Negative or 0, And Will Be Set To 1 ]")
-                            print("[ If Your Intention Was To Delete This, Use The 'del' Command Instead ]")
-                            confirm = input("Proceed? (Y/N): ")
-                            if confirm == 'Y':
-                                logging.warning(f"Set {updateValue}, {ar[i][1]}'s Quantity to 1")
-                                newQuan = 1
-                            else:
-                                logging.warning(f"Didn't Change {updateValue}, {ar[i][1]}'s Quantity")
-                                newQuan = oldQuan
-                        newTot = newQuan * tempList[i][1]
-                        tempList[i][2] = newQuan
-                        tempList[i][3] = newTot
-                        logging.info(
-                            f"Updated: {updateValue}, {ar[i][1]}\nSet Quantity {oldQuan} => {newQuan}\n"
-                            f"Updated Total => {newTot}"
-                        )
-                    elif update_key_check[0] == 'exit':
-                        break
-                    print("Success!")
-                    break
-            return [tuple(entry) for entry in tempList]
-        except Exception as e:
-            logging.error(e)
-            theLoop = True
-
-
-def delete_from_list(ar):
-    print(printingBills(ar, myFormat, 'none').print_bill_items())
-    theLoop = True
-    while theLoop:
-        try:
-            delKey = input("The (Name) To Be Removed: ")
-            if delKey == 'abort':
-                print("Aborting...")
-                break
-            else:
-                for i in range(len(ar)):
-                    if ar[i][0] == delKey:
-                        popTime = ar[i]
-                        ar.remove(popTime)
-                        break
-                print("\nSuccess! Type  '--' in the ID prompt To See The Updated Version!")
-                logging.info(f"Successfully Deleted Entry {delKey}")
-                theLoop = False
-        except Exception as e:
-            logging.error(e)
-            print("[ Error Occurred, Please Retry ]")
-            theLoop = True
-    return ar
-
-
-def kill_this():
-    killPass = str(getpass.getpass("Enter Password: "))
-    pass_read = open('./credentials/passwd.txt', 'r')
-    check_pass_file = pass_read.read().split(',')
-    salt1 = check_pass_file[0]
-    salt2 = check_pass_file[1]
-    hash_check = check_pass_file[2]
-    pass_check = salt1 + killPass + salt2
-    pass_hash = hashlib.sha512(pass_check.encode()).hexdigest()
-    if hash_check == pass_hash:
-        sys.exit(66)
-    else:
-        print("\n[ Wrong Password ]\n")  # thats the wrong number! (ooohhhh)
 
 
 def bill_write(ar):
@@ -254,6 +162,27 @@ def bill_write(ar):
     input("\n(enter) to proceed...")
 
 
+# ------------------------------------- Miscellaneous Functions -------------------------------------------#
+
+
+def kill_this():
+    killPass = str(getpass.getpass("Enter Password: "))
+    pass_read = open('./credentials/passwd.txt', 'r')
+    check_pass_file = pass_read.read().split(',')
+    salt1 = check_pass_file[0]
+    salt2 = check_pass_file[1]
+    hash_check = check_pass_file[2]
+    pass_check = salt1 + killPass + salt2
+    pass_hash = hashlib.sha512(pass_check.encode()).hexdigest()
+    if hash_check == pass_hash:
+        sys.exit(66)
+    else:
+        print("\n[ Wrong Password ]\n")  # thats the wrong number! (ooohhhh)
+
+
+# ------------------------------------------ Array Related Functions ----------------------------------------------#
+
+
 def duplicate_check(ar, records):
     quantity = int(input("Quantity: "))
     for row in records:
@@ -298,6 +227,89 @@ def appending_to_ar(name, price, quantity, total):
         f'Sold {quantity} Of Item;\n\nName: {name}\nPrice: {price}\n\nbringing the total to Rs. {total}'
     )
     return tuppence
+
+
+def update_list(ar):
+    print(printingBills(ar, myFormat, 'none').print_bill_items())
+    theLoop = True
+    while theLoop:
+        try:
+            updateValue = input("What Would You Like To Update? (Name): ")
+            tempList = [list(tup) for tup in ar]
+            for i in range(len(tempList)):
+                up_name = tempList[i][0]
+                if updateValue == up_name:
+                    update_key = input("Add Or Remove How Much? (+ amount/ - amount): ")
+                    update_key_check = (update_key.split(' '))
+                    upQuan = int(update_key_check[1])
+                    oldQuan = tempList[i][2]
+                    if update_key_check[0] == '+':
+                        newQuan = upQuan + oldQuan
+                        newTot = newQuan * tempList[i][1]
+                        tempList[i][2] = newQuan
+                        tempList[i][3] = newTot
+                        logging.info(
+                            f"Updated: {updateValue}, {ar[i][1]}\nSet Quantity {oldQuan} => "
+                            f"{newQuan}\nUpdated Total {tempList[i][3]} => {newTot}"
+                        )
+                        ar = [tuple(entry) for entry in tempList]
+                    elif update_key_check[0] == '-':
+                        newQuanCheck = oldQuan - upQuan
+                        if newQuanCheck > 0:
+                            newQuan = newQuanCheck
+                        else:
+                            print("[ The Value Is Either Negative or 0, And Will Be Set To 1 ]")
+                            print("[ If Your Intention Was To Delete This, Use The 'del' Command Instead ]")
+                            confirm = input("Proceed? (Y/N): ")
+                            if confirm == 'Y':
+                                logging.warning(f"Set {updateValue}, {ar[i][1]}'s Quantity to 1")
+                                newQuan = 1
+                            else:
+                                logging.warning(f"Didn't Change {updateValue}, {ar[i][1]}'s Quantity")
+                                newQuan = oldQuan
+                        newTot = newQuan * tempList[i][1]
+                        tempList[i][2] = newQuan
+                        tempList[i][3] = newTot
+                        logging.info(
+                            f"Updated: {updateValue}, {ar[i][1]}\nSet Quantity {oldQuan} => {newQuan}\n"
+                            f"Updated Total => {newTot}"
+                        )
+                    elif update_key_check[0] == 'exit':
+                        break
+                    print("Success!")
+                    break
+            return [tuple(entry) for entry in tempList]
+        except Exception as e:
+            logging.error(e)
+            theLoop = True
+
+
+def delete_from_list(ar):
+    print(printingBills(ar, myFormat, 'none').print_bill_items())
+    theLoop = True
+    while theLoop:
+        try:
+            delKey = input("The (Name) To Be Removed: ")
+            if delKey == 'abort':
+                print("Aborting...")
+                break
+            else:
+                for i in range(len(ar)):
+                    if ar[i][0] == delKey:
+                        popTime = ar[i]
+                        ar.remove(popTime)
+                        break
+                print("\nSuccess! Type  '--' in the ID prompt To See The Updated Version!")
+                logging.info(f"Successfully Deleted Entry {delKey}")
+                theLoop = False
+        except Exception as e:
+            logging.error(e)
+            print("[ Error Occurred, Please Retry ]")
+            theLoop = True
+    return ar
+
+
+# -------------------------------------------- Main Code --------------------------------------------------#
 
 
 def main():
