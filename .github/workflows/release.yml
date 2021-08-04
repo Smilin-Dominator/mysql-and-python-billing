@@ -8,7 +8,7 @@ jobs:
   building:
     strategy:
       matrix:
-        os: [ubuntu-latest, windows-latest, macos-latest]
+        os: [ubuntu-latest, windows-latest]
     runs-on: ${{ matrix.os }}
     # Runs when the commit message contains "[Release]" Otherwise it doesn't run
     if: "contains(github.event.head_commit.message, '[Release]')"
@@ -38,14 +38,6 @@ jobs:
           cd ./dist
           tar -cf main-windows-x86_64.zip 'main.exe'
           cd ..
-
-      # Runs in Mac
-      - name: Building Release For Mac
-        if: matrix.os == 'macos-latest'
-        run: |
-          cd ./dist
-          tar -cf main-macos-x86_64.zip 'main'
-          cd ..
        
       # This will draft a new release & will attach the binaries produced by the above outputs.
       # You still need to publish this release though after job ends.
@@ -58,7 +50,6 @@ jobs:
           files: |
             ./dist/main-linux-x86_64.zip
             ./dist/main-windows-x86_64.zip
-            ./dist/main-macos-x86_64.zip
             ./README.md
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}  # You don't need to add this in secrets it's by default.
