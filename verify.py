@@ -2,9 +2,9 @@ import hashlib
 import logging
 import os
 import mysql.connector
-from configuration import vars, colours
+from configuration import variables, colours
 
-logging.basicConfig(filename='log.txt', format=vars.log_format, datefmt='[%Y-%m-%d] [%H:%M:%S]', level=logging.DEBUG)
+logging.basicConfig(filename='log.txt', format=variables.log_format, datefmt='[%Y-%m-%d] [%H:%M:%S]', level=logging.DEBUG)
 
 def init(raw):
     global mydb, mycursor

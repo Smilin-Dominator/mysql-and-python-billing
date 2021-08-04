@@ -5,9 +5,9 @@ import mysql.connector
 import logging
 import time
 import os
-from configuration import colours, vars
+from configuration import colours, variables
 
-logging.basicConfig(filename='log.txt', format=vars.log_format, datefmt='[%Y-%m-%d] [%H:%M:%S]', level=logging.DEBUG)
+logging.basicConfig(filename='log.txt', format=variables.log_format, datefmt='[%Y-%m-%d] [%H:%M:%S]', level=logging.DEBUG)
 
 
 def init(raw):

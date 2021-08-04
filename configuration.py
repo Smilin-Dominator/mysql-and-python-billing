@@ -3,18 +3,19 @@ import os
 import sys
 
 
-class vars:
+def execheck():
+    f = os.listdir()
+    for i in range(len(f)):
+        if f[i].endswith('.exe'):
+            return True
+    else:
+        return False
+
+
+class variables:
     log_format = '%(asctime)s (%(filename)s): %(message)s'  # this basically says that the time and date come first, error next
 
-    def execheck():
-        f = os.listdir()
-        for i in range(len(f)):
-            if f[i].endswith('.exe'):
-                return True
-        else:
-            return False
-
-    docker_compose = """# Use root/example as user/password credentials
+    docker_compose = """# Devisha's Docker MariaDB Creation File!
 version: '3.1'
 
 services:

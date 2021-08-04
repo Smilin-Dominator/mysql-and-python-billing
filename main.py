@@ -14,7 +14,7 @@ import mysql.connector
 import rsa
 import base64
 import subprocess
-from configuration import vars, commands, colours, errors
+from configuration import variables, commands, colours, errors, execheck
 import setup
 
 
@@ -42,7 +42,7 @@ def startup():
     # First Boot - Checks For Log.txt
     init0()
 
-    logging.basicConfig(filename='log.txt', format=vars.log_format, datefmt='[%Y-%m-%d] [%H:%M:%S]',
+    logging.basicConfig(filename='log.txt', format=variables.log_format, datefmt='[%Y-%m-%d] [%H:%M:%S]',
                         level=logging.DEBUG)
 
     # Second Phase - Checks For SQL Credentials
@@ -209,7 +209,7 @@ def main(messageOfTheSecond, credz):
 
 def conifguration_file():
     options = open('./credentials/options.txt', 'w+')
-    f = vars.execheck()
+    f = execheck()
     if f:
         options.write("check_for_updates=False")
     else:
@@ -226,7 +226,7 @@ def conifguration_file():
 
 
 def init0():
-    f = vars.execheck()
+    f = execheck()
     firstTime = os.path.exists('./log.txt')
     check = os.path.exists('./credentials')
     if not check:
@@ -281,7 +281,7 @@ def init1():
                 host = '127.0.0.1'
                 with open("docker-compose.yml", 'w') as docker:
                     port = int(port)
-                    dc = vars.docker_compose % (user, password)
+                    dc = variables.docker_compose % (user, password)
                     docker.write(dc)
                     docker.close()
                 subprocess.run("docker-compose up -d", shell=True)

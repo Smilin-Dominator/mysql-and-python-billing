@@ -4,9 +4,9 @@ import mysql.connector
 import pandas as pd
 import logging
 import hashlib
-from configuration import vars
+from configuration import variables
 
-logging.basicConfig(filename='log.txt', format=vars.log_format, datefmt='[%Y-%m-%d] [%H:%M:%S]', level=logging.DEBUG)
+logging.basicConfig(filename='log.txt', format=variables.log_format, datefmt='[%Y-%m-%d] [%H:%M:%S]', level=logging.DEBUG)
 
 
 def init(raw):
