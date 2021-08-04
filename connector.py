@@ -7,7 +7,8 @@ import time
 import os
 from configuration import colours, variables
 
-logging.basicConfig(filename='log.txt', format=variables.log_format, datefmt='[%Y-%m-%d] [%H:%M:%S]', level=logging.DEBUG)
+logging.basicConfig(filename='log.txt', format=variables.log_format, datefmt='[%Y-%m-%d] [%H:%M:%S]',
+                    level=logging.DEBUG)
 
 
 def init(raw):
@@ -28,11 +29,11 @@ BUF_SIZE = 65536
 
 
 def startup():
-    customerName = input("Customer: ")  # Optional, if you're in a hurry, just leave blank
-    if not customerName:  # ' ' => blank
-        customerName = '(Not Specified)'
-    logging.info(f"\nSold the following to {customerName}")  # you'll see this often, in case any bills go missing
-    return customerName
+    nameOfCustomer = input("Customer: ")  # Optional, if you're in a hurry, just leave blank
+    if not nameOfCustomer:  # ' ' => blank
+        nameOfCustomer = '(Not Specified)'
+    logging.info(f"\nSold the following to {nameOfCustomer}")  # you'll see this often, in case any bills go missing
+    return nameOfCustomer
     # logs are the go-to place
 
 
@@ -43,9 +44,9 @@ varTime = time.strftime("%d_of_%B")
 
 class printingBills(object):
 
-    def __init__(self, ar, myFormat, file):
+    def __init__(self, ar, new_format, file):
         self.ar = ar
-        self.form = myFormat
+        self.form = new_format
         self.formPrep = self.form.format('Name', 'Price (Rs.)', 'Quantity', 'Total (Rs.)')
         self.file = file
 
@@ -94,7 +95,9 @@ def update_list(ar):
                         tempList[i][2] = newQuan
                         tempList[i][3] = newTot
                         logging.info(
-                            f"Updated: {updateValue}, {ar[i][1]}\nSet Quantity {oldQuan} => {newQuan}\nUpdated Total {tempList[i][3]} => {newTot}")
+                            f"Updated: {updateValue}, {ar[i][1]}\nSet Quantity {oldQuan} => "
+                            f"{newQuan}\nUpdated Total {tempList[i][3]} => {newTot}"
+                        )
                         ar = [tuple(entry) for entry in tempList]
                     elif update_key_check[0] == '-':
                         newQuanCheck = oldQuan - upQuan
@@ -114,7 +117,9 @@ def update_list(ar):
                         tempList[i][2] = newQuan
                         tempList[i][3] = newTot
                         logging.info(
-                            f"Updated: {updateValue}, {ar[i][1]}\nSet Quantity {oldQuan} => {newQuan}\nUpdated Total => {newTot}")
+                            f"Updated: {updateValue}, {ar[i][1]}\nSet Quantity {oldQuan} => {newQuan}\n"
+                            f"Updated Total => {newTot}"
+                        )
                     elif update_key_check[0] == 'exit':
                         break
                     print("Success!")
@@ -273,7 +278,9 @@ def duplicate_check(ar, records):
                         tempList[i][2] = newQuantity
                         print("Success!")
                         logging.info(
-                            f"Updated: {checkName}, {checkPrice}\nSet Quantity {currentQuantity} => {newQuantity}\nSet Total: {currentTotal} => {newTotal}")
+                            f"Updated: {checkName}, {checkPrice}\nSet Quantity {currentQuantity} => "
+                            f"{newQuantity}\nSet Total: {currentTotal} => {newTotal}"
+                        )
                         ar = [tuple(entry) for entry in tempList]
                         return ar
                     except Exception as e:
@@ -311,12 +318,13 @@ def main():
             elif idInput == '--':
                 print(printingBills(ar, myFormat, 'none').print_bill_items())
                 print(
-                    f"{colours.LightMagenta}Subtotal: {printingBills(ar, myFormat, 'none').print_total()}{colours.ENDC}")
+                    f"{colours.LightMagenta}Subtotal: {printingBills(ar, myFormat, 'none').print_total()}{colours.ENDC}"
+                )
             elif idInput == 'update':
                 ar = update_list(ar)
             else:
                 proceed = int(idInput)
-                sql_select_Query = f"select * from paddigurlTest WHERE id = {proceed}"  #  Sent To The Database
+                sql_select_Query = f"select * from paddigurlTest WHERE id = {proceed}"  # Sent To The Database
                 cursor = mydb.cursor()  # This Is As If You Were Entering It Yourself
                 cursor.execute(sql_select_Query)  # Executes
                 records = cursor.fetchall()  # Gets All The Outputs
