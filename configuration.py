@@ -13,7 +13,8 @@ def execheck():
 
 
 class variables:
-    log_format = '%(asctime)s (%(filename)s): %(message)s'  # this basically says that the time and date come first, error next
+    log_format = '%(asctime)s (%(filename)s): %(message)s'  # this basically says that the time and date come first,
+    # error next
 
     docker_compose = """# Devisha's Docker MariaDB Creation File!
 version: '3.1'
