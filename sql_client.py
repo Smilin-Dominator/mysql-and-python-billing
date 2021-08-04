@@ -134,6 +134,7 @@ def main():
                     print(it_vol2.to_string(index=False))
                 else:
                     print("Successful!")
+                mydb.commit()
         except Exception as e:
             print("\nCorrect Command or Error?")
             logging.error(e)
