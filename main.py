@@ -57,7 +57,7 @@ def startup():
             password=credz[3],
             database=credz[4]
         )
-    except mysql.connector.Error as e:
+    except mysql.connector.Error:
         print("[*] MySQL Database Not Connecting")
         if os.path.exists('docker-compose.yml'):
             print("[*] (Realization) Docker Container, Attempting To Start It")
