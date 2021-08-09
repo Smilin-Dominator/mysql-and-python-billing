@@ -1,7 +1,7 @@
 # MySQL and Python Billing 
 [![Publish](https://github.com/Smilin-Dominator/mysql-and-python-billing/actions/workflows/release.yml/badge.svg)](https://github.com/Smilin-Dominator/mysql-and-python-billing/actions/workflows/release.yml)
 [![Syntax Highlighting](https://github.com/Smilin-Dominator/mysql-and-python-billing/actions/workflows/main.yml/badge.svg)](https://github.com/Smilin-Dominator/mysql-and-python-billing/actions/workflows/main.yml)
-#Logs
+# Logs
 
 (22nd May)
 ><font size="6">I made this random program to test out if I could extract data from a MySQL Server

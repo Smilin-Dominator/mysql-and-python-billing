@@ -1,4 +1,3 @@
-from connector import main
 import getpass
 import mysql.connector
 import pandas as pd
