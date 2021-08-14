@@ -15,6 +15,7 @@ import rsa
 import base64
 import subprocess
 from configuration import variables, commands, colours, errors, execheck
+from bank_transfer import bank_transactions
 import setup
 
 
@@ -80,56 +81,40 @@ def startup():
         os.system('cls')
 
     print(colours.BackgroundCyan, "Welcome! If Something Doesn't Seem Right, Check The Logs!", colours.ENDC, end="\n")
-# fix
-    try:
-        # Third Phase - Checks For Updates
-        config = open('./credentials/options.txt', 'r').read().splitlines()
-        if config[0] == 'check_for_updates=True':
-            init3()
-        # Fourth Phase - Checks Integrity Of Credentials
-        if config[1] == 'check_file_integrity=True':
-            init5(mycursor, True)
-        else:
-            init5(mycursor, False)
-        if config[2] == "transactions_or_cash=True":
-            transactions = True
-        else:
-            transactions = False
-    except FileNotFoundError as e:
-        logging.warning(e)
-        print("[!] Config File Not Found!\n[*] Generating...")
-        conifguration_file()
 
     # Logs Boot Time Taken
     logging.info("Booting Up Took: %f Seconds" % (time.time() - initial_time))
 
     # Final Phase - Main Program
-    main(messageOfTheSecond, credz, transactions)
+    main(messageOfTheSecond, credz, mycursor)
 
 
-def bank_transactions():
-    has = []
-    has_not = []
-    file_prefix = "bills/%s/%s"
-    dir_prefix = "bills/%s"
-    for d in os.listdir("bills/"):
-        for file in os.listdir(dir_prefix % d):
-            with open(file_prefix % (d, file), "r") as f:
-                a = f.read().splitlines()
-                has_or_not = a[len(a) - 1]
-                has_or_not = ''.join(has_or_not.split("Transfered Cash: "))
-                name = ''.join(a[6].split("Customer: "))
-                if has_or_not == "True":
-                    has.append(name)
-                else:
-                    has_not.append(name)
-    print(f"{colours.LightGreen}Transfered:{colours.ENDC}")
-    for name in has:
-        print(f"{colours.LightBlue}\t%s{colours.ENDC}" % name)
-    print(f"{colours.Red}Has Not Transfered:{colours.ENDC}")
-    for name in has:
-        print(f"{colours.LightBlue}\t%s{colours.ENDC}" % name)
-    input("(enter to continue...)")
+def read_config(mycursor):
+    while True:
+        try:
+            # Third Phase - Checks For Updates
+            config = open('./credentials/options.txt', 'r').read().splitlines()
+            if config[0] == 'check_for_updates=True':
+                init3()
+            # Fourth Phase - Checks Integrity Of Credentials
+            if config[1] == 'check_file_integrity=True':
+                init5(mycursor, True)
+            else:
+                init5(mycursor, False)
+            if config[2] == "transactions_or_cash=True":
+                transactions = True
+            else:
+                transactions = False
+            break
+        except FileNotFoundError as e:
+            logging.warning(e)
+            print("[!] Config File Not Found!\n[*] Generating...")
+            conifguration_file()
+        except IndexError as e:
+            logging.warning(e)
+            print("[!] Not Enough Arguments!\n[*] Regenerating...")
+            conifguration_file()
+    return transactions
 
 
 class integrityCheck(object):
@@ -189,9 +174,10 @@ class integrityCheck(object):
         return "[*] Successfully Recovered The Hashes!\n"
 
 
-def main(messageOfTheSecond, credz, transactions):
+def main(messageOfTheSecond, credz, mycursor):
     key = 2
     while key != '1':
+        transactions = read_config(mycursor)
         randomNumGen = random.randint(1, len(messageOfTheSecond))  # RNG, unscripted order
         print(
             f"\n{colours.BackgroundDarkGray}Random Line from HUMBLE.:{colours.ENDC} {colours.BackgroundLightMagenta}"
