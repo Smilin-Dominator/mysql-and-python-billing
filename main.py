@@ -15,7 +15,7 @@ import rsa
 import base64
 import subprocess
 from configuration import variables, commands, colours, errors, execheck
-from bank_transfer import bank_transactions
+from bank_transfer import view_bank_transactions
 import setup
 
 
@@ -89,34 +89,6 @@ def startup():
     main(messageOfTheSecond, credz, mycursor)
 
 
-def read_config(mycursor):
-    while True:
-        try:
-            # Third Phase - Checks For Updates
-            config = open('./credentials/options.txt', 'r').read().splitlines()
-            if config[0] == 'check_for_updates=True':
-                init3()
-            # Fourth Phase - Checks Integrity Of Credentials
-            if config[1] == 'check_file_integrity=True':
-                init5(mycursor, True)
-            else:
-                init5(mycursor, False)
-            if config[2] == "transactions_or_cash=True":
-                transactions = True
-            else:
-                transactions = False
-            break
-        except FileNotFoundError as e:
-            logging.warning(e)
-            print("[!] Config File Not Found!\n[*] Generating...")
-            conifguration_file()
-        except IndexError as e:
-            logging.warning(e)
-            print("[!] Not Enough Arguments!\n[*] Regenerating...")
-            conifguration_file()
-    return transactions
-
-
 class integrityCheck(object):
 
     def __init__(self, check_log, hash_array, password_array, mycursor):
@@ -174,6 +146,59 @@ class integrityCheck(object):
         return "[*] Successfully Recovered The Hashes!\n"
 
 
+def read_config(mycursor):
+    while True:
+        try:
+            # Third Phase - Checks For Updates
+            config = open('./credentials/options.txt', 'r').read().splitlines()
+            if config[0] == 'check_for_updates=True':
+                init3()
+            # Fourth Phase - Checks Integrity Of Credentials
+            if config[1] == 'check_file_integrity=True':
+                init5(mycursor, True)
+            else:
+                init5(mycursor, False)
+            if config[2] == "transactions_or_cash=True":
+                transactions = True
+            else:
+                transactions = False
+            break
+        except FileNotFoundError as e:
+            logging.warning(e)
+            print("[!] Config File Not Found!\n[*] Generating...")
+            conifguration_file()
+        except IndexError as e:
+            logging.warning(e)
+            print("[!] Not Enough Arguments!\n[*] Regenerating...")
+            conifguration_file()
+    return transactions
+
+
+def conifguration_file():
+    options = open('./credentials/options.txt', 'w+')
+    f = execheck()
+    if f:
+        options.write("check_for_updates=False")
+    else:
+        up = input("[*] Check For Updates On Startup? (y/n): ")
+        if up == 'y':
+            options.write("check_for_updates=True")
+        else:
+            options.write("check_for_updates=False")
+    incheck = input("[*] Check Password Integrity On Startup? (y/n): ")
+    if incheck == 'y':
+        options.write("\ncheck_file_integrity=True")
+    else:
+        options.write("\ncheck_file_integrity=False")
+    incheck = input("[*] Transaction Mode? (y/n): ")
+    if incheck == 'y':
+        options.write("\ntransactions_or_cash=True")
+    else:
+        options.write("\ntransactions_or_cash=False")
+    options.flush()
+    options.close()
+
+
 def main(messageOfTheSecond, credz, mycursor):
     key = 2
     while key != '1':
@@ -223,35 +248,10 @@ def main(messageOfTheSecond, credz, mycursor):
             elif key == '6':
                 conifguration_file()
             elif key == '7' and transactions:
-                bank_transactions()
+                view_bank_transactions()
             os.system('cls')
         except ValueError:
             raise errors.valueErrors("Entered A Non Integer During The Main Prompt")
-
-
-def conifguration_file():
-    options = open('./credentials/options.txt', 'w+')
-    f = execheck()
-    if f:
-        options.write("check_for_updates=False")
-    else:
-        up = input("[*] Check For Updates On Startup? (y/n): ")
-        if up == 'y':
-            options.write("check_for_updates=True")
-        else:
-            options.write("check_for_updates=False")
-    incheck = input("[*] Check Password Integrity On Startup? (y/n): ")
-    if incheck == 'y':
-        options.write("\ncheck_file_integrity=True")
-    else:
-        options.write("\ncheck_file_integrity=False")
-    incheck = input("[*] Transaction Mode? (y/n): ")
-    if incheck == 'y':
-        options.write("\ntransactions_or_cash=True")
-    else:
-        options.write("\ntransactions_or_cash=False")
-    options.flush()
-    options.close()
 
 
 def init0():
