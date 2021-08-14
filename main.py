@@ -80,7 +80,7 @@ def startup():
         os.system('cls')
 
     print(colours.BackgroundCyan, "Welcome! If Something Doesn't Seem Right, Check The Logs!", colours.ENDC, end="\n")
-
+# fix
     try:
         # Third Phase - Checks For Updates
         config = open('./credentials/options.txt', 'r').read().splitlines()
@@ -94,7 +94,7 @@ def startup():
         if config[2] == "transactions_or_cash=True":
             transactions = True
         else:
-            transactions = True
+            transactions = False
     except FileNotFoundError as e:
         logging.warning(e)
         print("[!] Config File Not Found!\n[*] Generating...")
@@ -108,12 +108,28 @@ def startup():
 
 
 def bank_transactions():
+    has = []
+    has_not = []
     file_prefix = "bills/%s/%s"
     dir_prefix = "bills/%s"
     for d in os.listdir("bills/"):
-        for file in (dir_prefix % d):
-            with open(file_prefix % (d, file), "r"):
-
+        for file in os.listdir(dir_prefix % d):
+            with open(file_prefix % (d, file), "r") as f:
+                a = f.read().splitlines()
+                has_or_not = a[len(a) - 1]
+                has_or_not = ''.join(has_or_not.split("Transfered Cash: "))
+                name = ''.join(a[6].split("Customer: "))
+                if has_or_not == "True":
+                    has.append(name)
+                else:
+                    has_not.append(name)
+    print(f"{colours.LightGreen}Transfered:{colours.ENDC}")
+    for name in has:
+        print(f"{colours.LightBlue}\t%s{colours.ENDC}" % name)
+    print(f"{colours.Red}Has Not Transfered:{colours.ENDC}")
+    for name in has:
+        print(f"{colours.LightBlue}\t%s{colours.ENDC}" % name)
+    input("(enter to continue...)")
 
 
 class integrityCheck(object):
@@ -180,10 +196,15 @@ def main(messageOfTheSecond, credz, transactions):
         print(
             f"\n{colours.BackgroundDarkGray}Random Line from HUMBLE.:{colours.ENDC} {colours.BackgroundLightMagenta}"
             f"{messageOfTheSecond[randomNumGen]}{colours.ENDC}")  # pulls from the Dictionary
+        if transactions:
+            tra = f"{colours.Red}7 - Transactions{colours.ENDC}"
+        else:
+            tra = ""
         print(
             f"\n\n{colours.Red}1 - Exit{colours.ENDC}\n{colours.Green}2 - Make A Bill{colours.ENDC}\n"
             f"{colours.LightYellow}3 - Create Master Bill & Sales Reports{colours.ENDC}\n{colours.Cyan}4 - SQL Client{colours.ENDC}\n"
-            f"{colours.LightGray}5 - Verifier{colours.ENDC}\n{colours.LightMagenta}6 - Configure Options{colours.ENDC}"
+            f"{colours.LightGray}5 - Verifier{colours.ENDC}\n{colours.LightMagenta}6 - Configure Options{colours.ENDC}\n"
+            f"{tra}"
         )
         date = time.strftime('%c')
         time_prompt = time.strftime('%I:%M %p')
@@ -215,6 +236,8 @@ def main(messageOfTheSecond, credz, transactions):
                 verify.init(ncredz)
             elif key == '6':
                 conifguration_file()
+            elif key == '7' and transactions:
+                bank_transactions()
             os.system('cls')
         except ValueError:
             raise errors.valueErrors("Entered A Non Integer During The Main Prompt")
