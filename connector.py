@@ -11,7 +11,7 @@ logging.basicConfig(filename='log.txt', format=variables.log_format, datefmt='[%
                     level=logging.DEBUG)
 
 
-def init(raw):
+def init(raw, transfer):
     global mydb
     credz = raw.split(',')
     mydb = mysql.connector.connect(
@@ -22,7 +22,7 @@ def init(raw):
         password=credz[3],
         database=credz[4]
     )
-    main()
+    main(transfer)
 
 
 BUF_SIZE = 65536
@@ -78,7 +78,7 @@ class printingBills(object):
         return tot
 
 
-def bill_write(ar):
+def bill_write(ar, transfer):
     fileTime = str(time.strftime('%I.%M_%p'))  # eg: 07.10 PM
     customerNameFormat = customerName.replace(' ', '_')
     fileName = f"[BILL]-{customerNameFormat}-{fileTime}.txt"  # format of the filename
@@ -137,28 +137,35 @@ def bill_write(ar):
     fileOpen.write(f"\nTax : Rs. {vatAmount}")
     fileOpen.write(f"\nGrand Total: Rs. {finalTotal}")
     passOff = False
-    while not passOff:
-        cashGiven = int(input(f'{colours.LightRed}Cash Given: Rs. {colours.ENDC}'))
-        bal = int(cashGiven - finalTotal)
-        if bal < 0:  # loops if its a negative number!
-            print(colours.Red, "Negative Value, Something's Off, Retry",
-                  colours.ENDC)  # something's **really** off (why doesnt MD work?)
-            logging.warning('Negative Balance')
-            passOff = False
-        elif bal == 0:
-            logging.info(f'Cash Given: Rs. {cashGiven}')
-            fileOpen.write(f'\n\nCash Given: Rs. {cashGiven}')
-            print(colours.Green, '\nNo Balance!', colours.ENDC)
-            logging.info('No Balance')
-            fileOpen.write(f'\nNo Balance!')
-            break  # passes if its not
-        elif bal > 0:
-            logging.info(f'Cash Given: Rs. {cashGiven}')
-            fileOpen.write(f'\nCash Given: Rs. {cashGiven}')
-            print(f'{colours.Green}Balance: Rs. {bal}{colours.ENDC}')
-            logging.info(f'Balance: Rs. {str(bal)}\n')
-            fileOpen.write(f'\nBalance: Rs. {bal}')
-            break
+    if not transfer:
+        while not passOff:
+            cashGiven = int(input(f'{colours.LightRed}Cash Given: Rs. {colours.ENDC}'))
+            bal = int(cashGiven - finalTotal)
+            if bal < 0:  # loops if its a negative number!
+                print(colours.Red, "Negative Value, Something's Off, Retry",
+                      colours.ENDC)  # something's **really** off (why doesnt MD work?)
+                logging.warning('Negative Balance')
+                passOff = False
+            elif bal == 0:
+                logging.info(f'Cash Given: Rs. {cashGiven}')
+                fileOpen.write(f'\n\nCash Given: Rs. {cashGiven}')
+                print(colours.Green, '\nNo Balance!', colours.ENDC)
+                logging.info('No Balance')
+                fileOpen.write(f'\nNo Balance!')
+                break  # passes if its not
+            elif bal > 0:
+                logging.info(f'Cash Given: Rs. {cashGiven}')
+                fileOpen.write(f'\nCash Given: Rs. {cashGiven}')
+                print(f'{colours.Green}Balance: Rs. {bal}{colours.ENDC}')
+                logging.info(f'Balance: Rs. {str(bal)}\n')
+                fileOpen.write(f'\nBalance: Rs. {bal}')
+                break
+    else:
+        hasOrHasnt = input(f'{colours.LightRed}Has Transfered (y/n): Rs. {colours.ENDC}')
+        if hasOrHasnt == "y":
+            fileOpen.write(f'\nTransfered Cash: True')
+        else:
+            fileOpen.write(f'\nTransfered Cash: False')
     input("\n(enter) to proceed...")
 
 
@@ -312,7 +319,7 @@ def delete_from_list(ar):
 # -------------------------------------------- Main Code --------------------------------------------------#
 
 
-def main():
+def main(transfer):
     global customerName
     customerName = startup()
     idInput = 69420666  # well, had to declare it as something -\_/-
@@ -321,7 +328,7 @@ def main():
         try:
             idInput = input("\nID: ")  # ID As In The First Column
             if '' == idInput:  # if you just hit enter
-                bill_write(ar)
+                bill_write(ar, transfer)
                 break
             elif idInput == 'Kill':  # had to add an emergency kill function :)
                 kill_this()

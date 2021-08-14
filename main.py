@@ -91,6 +91,10 @@ def startup():
             init5(mycursor, True)
         else:
             init5(mycursor, False)
+        if config[2] == "transactions_or_cash=True":
+            transactions = True
+        else:
+            transactions = True
     except FileNotFoundError as e:
         logging.warning(e)
         print("[!] Config File Not Found!\n[*] Generating...")
@@ -100,7 +104,16 @@ def startup():
     logging.info("Booting Up Took: %f Seconds" % (time.time() - initial_time))
 
     # Final Phase - Main Program
-    main(messageOfTheSecond, credz)
+    main(messageOfTheSecond, credz, transactions)
+
+
+def bank_transactions():
+    file_prefix = "bills/%s/%s"
+    dir_prefix = "bills/%s"
+    for d in os.listdir("bills/"):
+        for file in (dir_prefix % d):
+            with open(file_prefix % (d, file), "r"):
+
 
 
 class integrityCheck(object):
@@ -160,7 +173,7 @@ class integrityCheck(object):
         return "[*] Successfully Recovered The Hashes!\n"
 
 
-def main(messageOfTheSecond, credz):
+def main(messageOfTheSecond, credz, transactions):
     key = 2
     while key != '1':
         randomNumGen = random.randint(1, len(messageOfTheSecond))  # RNG, unscripted order
@@ -186,7 +199,7 @@ def main(messageOfTheSecond, credz):
             elif key == '2':
                 logging.info("Transferring to (connector.py)")
                 import connector
-                connector.init(ncredz)
+                connector.init(ncredz, transactions)
             elif key == '3':
                 logging.info("Transferring to (master-bill.py)")
                 import master_bill
@@ -223,6 +236,13 @@ def conifguration_file():
         options.write("\ncheck_file_integrity=True")
     else:
         options.write("\ncheck_file_integrity=False")
+    incheck = input("[*] Transaction Mode? (y/n): ")
+    if incheck == 'y':
+        options.write("\ntransactions_or_cash=True")
+    else:
+        options.write("\ntransactions_or_cash=False")
+    options.flush()
+    options.close()
 
 
 def init0():
