@@ -1,6 +1,5 @@
 import getpass
 import hashlib
-import sys
 import mysql.connector
 import logging
 import time
@@ -29,7 +28,7 @@ BUF_SIZE = 65536
 
 
 def startup():
-    nameOfCustomer = input("Customer: ")  # Optional, if you're in a hurry, just leave blank
+    nameOfCustomer = input(f"{colours.White}Customer: {colours.ENDC}")  # Optional, if you're in a hurry, just leave blank
     if not nameOfCustomer:  # ' ' => blank
         nameOfCustomer = '(Not Specified)'
     logging.info(f"\nSold the following to {nameOfCustomer}")  # you'll see this often, in case any bills go missing
@@ -182,9 +181,10 @@ def kill_this():
     pass_check = salt1 + killPass + salt2
     pass_hash = hashlib.sha512(pass_check.encode()).hexdigest()
     if hash_check == pass_hash:
-        sys.exit(66)
+        return True
     else:
         print("\n[ Wrong Password ]\n")  # thats the wrong number! (ooohhhh)
+        return False
 
 
 # ------------------------------------------ Array Related Functions ----------------------------------------------#
@@ -331,7 +331,9 @@ def main(transfer):
                 bill_write(ar, transfer)
                 break
             elif idInput == 'Kill':  # had to add an emergency kill function :)
-                kill_this()
+                go = kill_this()
+                if go:
+                    break
             elif idInput == 'del':
                 ar = delete_from_list(ar)
             elif idInput == '--':
