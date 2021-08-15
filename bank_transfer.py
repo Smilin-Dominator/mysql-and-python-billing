@@ -18,13 +18,18 @@ def view_bank_transactions():
                 if has_or_not.startswith("Transfered Cash: "):
                     has_or_not = ''.join(has_or_not.split("Transfered Cash: "))
                     name = ''.join(a[6].split("Customer: "))
+                    time = ''.join(a[5].split("Time: "))
                     if has_or_not == "True":
-                        has.append(name)
                         files.append(file_prefix % (d, file))
+                        if name in combined:
+                            name = name + " - " + time
+                        has.append(name)
                         combined.append(name)
                     else:
-                        has_not.append(name)
                         files.append(file_prefix % (d, file))
+                        if name in combined:
+                            name = name + " - " + time
+                        has_not.append(name)
                         combined.append(name)
     print(f"{colours.LightGreen}Transfered:{colours.ENDC}")
     for name in has:
