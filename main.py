@@ -15,7 +15,7 @@ import rsa
 import base64
 import subprocess
 from configuration import variables, commands, colours, errors, execheck
-from bank_transfer import view_bank_transactions
+import bank_transfer
 import setup
 
 
@@ -248,7 +248,8 @@ def main(messageOfTheSecond, credz, mycursor):
             elif key == '6':
                 conifguration_file()
             elif key == '7' and transactions:
-                view_bank_transactions()
+                bank_transfer.interface()
+                input("(enter to continue..)")
             os.system('cls')
         except ValueError:
             raise errors.valueErrors("Entered A Non Integer During The Main Prompt")
