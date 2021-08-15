@@ -239,11 +239,11 @@ def main(messageOfTheSecond, credz, mycursor, mydb):
             elif key == '4':
                 logging.info("Transferring to (sql-client.py)")
                 import sql_client
-                sql_client.init(ncredz)
+                sql_client.auth(mydb)
             elif key == '5':
                 logging.info("Transferring to (verify.py)")
                 import verify
-                verify.init(ncredz)
+                verify.main(mydb, mycursor)
             elif key == '6':
                 conifguration_file()
             elif key == '7' and transactions:
