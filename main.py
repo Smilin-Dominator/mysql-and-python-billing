@@ -107,37 +107,12 @@ def read_config(mycursor):
         except FileNotFoundError as e:
             logging.warning(e)
             print("[!] Config File Not Found!\n[*] Generating...")
-            conifguration_file()
+            commands().conifguration_file()
         except IndexError as e:
             logging.warning(e)
             print("[!] Not Enough Arguments!\n[*] Regenerating...")
-            conifguration_file()
+            commands().conifguration_file()
     return transactions
-
-
-def conifguration_file():
-    options = open('./credentials/options.txt', 'w+')
-    f = execheck()
-    if f:
-        options.write("check_for_updates=False")
-    else:
-        up = input("[*] Check For Updates On Startup? (y/n): ")
-        if up == 'y':
-            options.write("check_for_updates=True")
-        else:
-            options.write("check_for_updates=False")
-    incheck = input("[*] Check Password Integrity On Startup? (y/n): ")
-    if incheck == 'y':
-        options.write("\ncheck_file_integrity=True")
-    else:
-        options.write("\ncheck_file_integrity=False")
-    incheck = input("[*] Transaction Mode? (y/n): ")
-    if incheck == 'y':
-        options.write("\ntransactions_or_cash=True")
-    else:
-        options.write("\ntransactions_or_cash=False")
-    options.flush()
-    options.close()
 
 
 def main(messageOfTheSecond, mycursor, mydb):
@@ -186,7 +161,7 @@ def main(messageOfTheSecond, mycursor, mydb):
                 import verify
                 verify.main(mydb, mycursor)
             elif key == '6':
-                conifguration_file()
+                commands().conifguration_file()
             elif key == '7' and transactions:
                 bank_transfer.interface(mycursor, mydb)
                 input("(enter to continue..)")
