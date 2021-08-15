@@ -36,24 +36,27 @@ def view_bank_transactions():
 
 def edit_bank_transactions():
     names, files = view_bank_transactions()
-    name = input("Which Transaction Would You Like To Change (name): ")
-    if name in names:
-        choice = int(input("[+] Has Transferred or Hasn't Transfered? (1/2): "))
-        if choice == 1:
-            choice = "True"
+    try:
+        name = input(f"{colours.White}[!] Which Transaction Would You Like To Change (name): {colours.ENDC}")
+        if name in names:
+            choice = int(input(f"{colours.Green}[+] Has Transferred or Hasn't Transfered? (1/2): {colours.ENDC}"))
+            if choice == 1:
+                choice = "True"
+            else:
+                choice = "False"
+            n = names.index(name)
+            file = files[n]
+            with open(file, "r") as fil:
+                con = fil.read().splitlines()
+                con.pop()
+                con.append(f"Transfered Cash: {choice}")
+            with open(file, "w") as fil:
+                fil.write("\n".join(con))
+                fil.close()
         else:
-            choice = "False"
-        n = names.index(name)
-        file = files[n]
-        with open(file, "r") as fil:
-            con = fil.read().splitlines()
-            con.pop()
-            con.append(f"Transfered Cash: {choice}")
-        with open(file, "w") as fil:
-            fil.write("\n".join(con))
-            fil.close()
-    else:
-        print("[*] Invalid Name!")
+            print(f"{colours.Yellow}[*] Invalid Name!{colours.ENDC}")
+    except KeyboardInterrupt:
+        print(f"{colours.Red}[*] Successfully Aborted!{colours.ENDC}")
 
 
 def interface():
