@@ -7,10 +7,6 @@ logging.basicConfig(filename='log.txt', format=variables.log_format, datefmt='[%
                     level=logging.DEBUG)
 
 
-print("Welcome To The Verifier!\n\n'Nobody Will Tamper With Your Data!' \n- People Before Their Data Got Tampered\n")
-print("This Will Verify The Hashes Of Your Bills, Not The Master Bills And Sales Reports, as they're Dynamic")
-
-
 def hash_file(filepath):
     sha256 = hashlib.sha256()
     if os.path.exists(filepath):
@@ -104,6 +100,8 @@ def verify(mydb, mycursor):
 
 
 def main(mydb, mycursor):
+    print("Welcome To The Verifier!\n\n'Nobody Will Tamper With Your Data!' \n- People Before Their Data Got Tampered\n")
+    print("This Will Verify The Hashes Of Your Bills, Not The Master Bills And Sales Reports, as they're Dynamic")
     key = input("Verify or Hash or Quit? (v/h/q): ")
     if key == 'v':
         verify(mydb, mycursor)
