@@ -88,7 +88,7 @@ def bill_write(ar, transfer):
     print(print_the_values.print_bill_items())
 
     fileOpen.write(f"{fileHeaderFormat.format(70 * '-')}")
-    fileOpen.write(f"\n{fileHeaderFormat.format('Paddy Enterprises (Pvt) Ltd.')}")
+    fileOpen.write(f"\n{fileHeaderFormat.format('Paddigurl Dolls - 0777710090')}")
     fileOpen.write(f"\n{fileHeaderFormat.format(70 * '-')}")
     fileOpen.write(f'\n\nDate: {str(time.strftime("%d/%m/%Y"))}')  # eg: 02/05/2021
     fileOpen.write(f'\nTime: {str(fileTime.replace("_", " "))}')  # uses the variable set earlier
