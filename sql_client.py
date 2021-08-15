@@ -1,5 +1,4 @@
 import getpass
-import mysql.connector
 import pandas as pd
 import logging
 import hashlib
@@ -9,21 +8,7 @@ logging.basicConfig(filename='log.txt', format=variables.log_format, datefmt='[%
                     level=logging.DEBUG)
 
 
-def init(raw):
-    global mydb
-    credz = raw.split(',')
-    mydb = mysql.connector.connect(
-        auth_plugin='mysql_native_password',
-        host=credz[0],
-        user=credz[1],
-        port=credz[2],
-        password=credz[3],
-        database=credz[4]
-    )
-    auth()
-
-
-def auth():
+def auth(mydb):
     badPass = True
     while badPass:
         passwd = getpass.getpass("Master Password: ")
@@ -37,7 +22,7 @@ def auth():
         if pass_hash == hash_check:
             print("Success!")
             pass_read.close()
-            main()
+            main(mydb)
             break
         else:
             logging.warning("Wrong Pass")
@@ -60,7 +45,7 @@ command_legend = {
 }
 
 
-def main():
+def main(mydb):
     mycursor = mydb.cursor()
     getOut = False
     while not getOut:

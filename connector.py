@@ -1,6 +1,5 @@
 import getpass
 import hashlib
-import mysql.connector
 import logging
 import time
 import os
@@ -8,20 +7,6 @@ from configuration import colours, variables
 
 logging.basicConfig(filename='log.txt', format=variables.log_format, datefmt='[%Y-%m-%d] [%H:%M:%S]',
                     level=logging.DEBUG)
-
-
-def init(raw, transfer):
-    global mydb
-    credz = raw.split(',')
-    mydb = mysql.connector.connect(
-        auth_plugin='mysql_native_password',
-        host=credz[0],
-        user=credz[1],
-        port=credz[2],
-        password=credz[3],
-        database=credz[4]
-    )
-    main(transfer)
 
 
 BUF_SIZE = 65536
@@ -88,7 +73,7 @@ def bill_write(ar, transfer):
     print(print_the_values.print_bill_items())
 
     fileOpen.write(f"{fileHeaderFormat.format(70 * '-')}")
-    fileOpen.write(f"\n{fileHeaderFormat.format('Paddy Enterprises (Pvt) Ltd.')}")
+    fileOpen.write(f"\n{fileHeaderFormat.format('Paddigurl Dolls - 0777710090')}")
     fileOpen.write(f"\n{fileHeaderFormat.format(70 * '-')}")
     fileOpen.write(f'\n\nDate: {str(time.strftime("%d/%m/%Y"))}')  # eg: 02/05/2021
     fileOpen.write(f'\nTime: {str(fileTime.replace("_", " "))}')  # uses the variable set earlier
@@ -319,7 +304,7 @@ def delete_from_list(ar):
 # -------------------------------------------- Main Code --------------------------------------------------#
 
 
-def main(transfer):
+def main(transfer, mydb):
     global customerName
     customerName = startup()
     idInput = 69420666  # well, had to declare it as something -\_/-

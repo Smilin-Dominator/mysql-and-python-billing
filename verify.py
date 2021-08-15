@@ -1,30 +1,10 @@
 import hashlib
 import logging
 import os
-import mysql.connector
 from configuration import variables, colours
 
 logging.basicConfig(filename='log.txt', format=variables.log_format, datefmt='[%Y-%m-%d] [%H:%M:%S]',
                     level=logging.DEBUG)
-
-
-def init(raw):
-    global mydb, mycursor
-    credz = raw.split(',')
-    mydb = mysql.connector.connect(
-        auth_plugin='mysql_native_password',
-        host=credz[0],
-        user=credz[1],
-        port=credz[2],
-        password=credz[3],
-        database=credz[4]
-    )
-    mycursor = mydb.cursor()
-    main()
-
-
-print("Welcome To The Verifier!\n\n'Nobody Will Tamper With Your Data!' \n- People Before Their Data Got Tampered\n")
-print("This Will Verify The Hashes Of Your Bills, Not The Master Bills And Sales Reports, as they're Dynamic")
 
 
 def hash_file(filepath):
@@ -43,7 +23,7 @@ def hash_file(filepath):
 
 # ---------Hash------------#
 
-def hash():
+def hash(mydb, mycursor):
     hashwrite = open('./credentials/hashes.txt', 'a')
     read_hash = open("./credentials/hashes.txt", 'r')
     multiverse = os.listdir('bills')
@@ -71,7 +51,7 @@ def hash():
 
 
 # -------Verify------------#
-def verify():
+def verify(mycursor):
     read_hash = open("./credentials/hashes.txt", 'r')
     read = read_hash.read().splitlines()
     read.remove('')
@@ -119,11 +99,13 @@ def verify():
             logging.error(e)
 
 
-def main():
+def main(mydb, mycursor):
+    print("Welcome To The Verifier!\n\n'Nobody Will Tamper With Your Data!' \n- People Before Their Data Got Tampered\n")
+    print("This Will Verify The Hashes Of Your Bills, Not The Master Bills And Sales Reports, as they're Dynamic")
     key = input("Verify or Hash or Quit? (v/h/q): ")
     if key == 'v':
-        verify()
+        verify(mycursor)
         input("(enter to continue...)")
     elif key == 'h':
-        hash()
+        hash(mydb, mycursor)
         input("(enter to continue...)")
