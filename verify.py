@@ -51,7 +51,7 @@ def hash(mydb, mycursor):
 
 
 # -------Verify------------#
-def verify(mydb, mycursor):
+def verify(mycursor):
     read_hash = open("./credentials/hashes.txt", 'r')
     read = read_hash.read().splitlines()
     read.remove('')
@@ -104,7 +104,7 @@ def main(mydb, mycursor):
     print("This Will Verify The Hashes Of Your Bills, Not The Master Bills And Sales Reports, as they're Dynamic")
     key = input("Verify or Hash or Quit? (v/h/q): ")
     if key == 'v':
-        verify(mydb, mycursor)
+        verify(mycursor)
         input("(enter to continue...)")
     elif key == 'h':
         hash(mydb, mycursor)

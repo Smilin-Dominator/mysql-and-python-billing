@@ -1,6 +1,5 @@
 import getpass
 import hashlib
-import mysql.connector
 import logging
 import time
 import os
