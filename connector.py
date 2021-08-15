@@ -161,7 +161,7 @@ def bill_write(ar, transfer):
                 fileOpen.write(f'\nBalance: Rs. {bal}')
                 break
     else:
-        hasOrHasnt = input(f'{colours.LightRed}Has Transfered (y/n): Rs. {colours.ENDC}')
+        hasOrHasnt = input(f'{colours.LightRed}Has Transfered (y/n): {colours.ENDC}')
         if hasOrHasnt == "y":
             fileOpen.write(f'\nTransfered Cash: True')
         else:
@@ -191,7 +191,7 @@ def kill_this():
 
 
 def duplicate_check(ar, records):
-    quantity = int(input(f"{colours.Red}[$] Quantity: {colours.ENDC}"))
+    quantity = int(input(f"{colours.LightYellow}Quantity: {colours.ENDC}"))
     for row in records:
         name = row[1]  # gets the element from the data
         price = row[2]  # and its in a fixed format, which is what matters
