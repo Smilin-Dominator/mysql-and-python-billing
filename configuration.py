@@ -69,6 +69,30 @@ class commands:
         input("(enter to continue...)")
         os.system('cls')
 
+    def conifguration_file(self):
+        options = open('./credentials/options.txt', 'w+')
+        f = execheck()
+        if f:
+            options.write("check_for_updates=False")
+        else:
+            up = input("[*] Check For Updates On Startup? (y/n): ")
+            if up == 'y':
+                options.write("check_for_updates=True")
+            else:
+                options.write("check_for_updates=False")
+        incheck = input("[*] Check Password Integrity On Startup? (y/n): ")
+        if incheck == 'y':
+            options.write("\ncheck_file_integrity=True")
+        else:
+            options.write("\ncheck_file_integrity=False")
+        incheck = input("[*] Transaction Mode? (y/n): ")
+        if incheck == 'y':
+            options.write("\ntransactions_or_cash=True")
+        else:
+            options.write("\ntransactions_or_cash=False")
+        options.flush()
+        options.close()
+
 
 class colours:
     Default = "\033[39m"

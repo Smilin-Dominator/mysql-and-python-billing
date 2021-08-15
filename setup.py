@@ -1,6 +1,6 @@
 import sys
 import subprocess
-from main import conifguration_file
+from configuration import commands
 from shred.shredders import FileShredder
 
 
@@ -12,7 +12,7 @@ def main():
     shredder.destroy('README.md', rew=500)
     shredder.remove('README.md')
     print("[*] Successfully Shredded README.md")
-    conifguration_file()
+    commands().conifguration_file()
     print("[*] Initializing Environment Setup..")
     print(f"[*] OS: {system}\n")
     subprocess.call("pip3 install -r requirements.txt", shell=True)
