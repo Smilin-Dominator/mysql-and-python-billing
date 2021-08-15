@@ -8,7 +8,7 @@ jobs:
   building:
     strategy:
       matrix:
-        os: [ubuntu-latest, windows-latest]
+        os: [macos-latest, windows-latest]
     runs-on: ${{ matrix.os }}
     # Runs when the commit message contains "[Release]" Otherwise it doesn't run
     if: "contains(github.event.head_commit.message, '[Release]')"
@@ -25,10 +25,10 @@ jobs:
     
     # Condition to only run this whenever the runner os is Ubuntu
       - name: Building Release For Linux
-        if: matrix.os == 'ubuntu-latest'
+        if: matrix.os == 'macos-latest'
         run: |
           cd ./dist
-          tar -cf main-linux-x86_64.zip 'main'
+          tar -cf main-macos-x86_64.zip 'main'
           cd .. 
           
       # Condition to only run this whenever the runner os is Windows
@@ -48,7 +48,7 @@ jobs:
           name: Release ${{ github.ref }}
           draft: true
           files: |
-            ./dist/main-linux-x86_64.zip
+            ./dist/main-macos-x86_64.zip
             ./dist/main-windows-x86_64.zip
             ./README.md
         env:
