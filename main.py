@@ -86,7 +86,7 @@ def startup():
     logging.info("Booting Up Took: %f Seconds" % (time.time() - initial_time))
 
     # Final Phase - Main Program
-    main(messageOfTheSecond, credz, mycursor)
+    main(messageOfTheSecond, credz, mycursor, mydb)
 
 
 class integrityCheck(object):
@@ -199,7 +199,7 @@ def conifguration_file():
     options.close()
 
 
-def main(messageOfTheSecond, credz, mycursor):
+def main(messageOfTheSecond, credz, mycursor, mydb):
     key = 2
     while key != '1':
         transactions = read_config(mycursor)
@@ -248,7 +248,7 @@ def main(messageOfTheSecond, credz, mycursor):
             elif key == '6':
                 conifguration_file()
             elif key == '7' and transactions:
-                bank_transfer.interface()
+                bank_transfer.interface(mycursor, mydb)
                 input("(enter to continue..)")
             os.system('cls')
         except ValueError:

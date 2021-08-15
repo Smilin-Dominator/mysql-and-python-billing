@@ -1,5 +1,6 @@
 import os
 from configuration import colours, errors
+from verify import hash_file
 
 
 def view_bank_transactions():
@@ -7,9 +8,9 @@ def view_bank_transactions():
     has_not = []
     files = []
     combined = []
-    file_prefix = "bills/%s/%s"
-    dir_prefix = "bills/%s"
-    for d in os.listdir("bills/"):
+    file_prefix = "./bills/%s/%s"
+    dir_prefix = "./bills/%s"
+    for d in os.listdir("./bills/"):
         for file in os.listdir(dir_prefix % d):
             with open(file_prefix % (d, file), "r") as f:
                 a = f.read().splitlines()
@@ -34,7 +35,7 @@ def view_bank_transactions():
     return [combined, files]
 
 
-def edit_bank_transactions():
+def edit_bank_transactions(mycursor, mydb):
     names, files = view_bank_transactions()
     try:
         name = input(f"{colours.White}[!] Which Transaction Would You Like To Change (name): {colours.ENDC}")
@@ -53,18 +54,33 @@ def edit_bank_transactions():
             with open(file, "w") as fil:
                 fil.write("\n".join(con))
                 fil.close()
+            new_hash = hash_file(file)
+            new_contents = "\n".join(con)
+            string = "UPDATE `paddigurlHashes` SET hash = \"%s\", filecontents = \"%s\" WHERE filepath = \"%s\"" % (new_hash, new_contents, file)
+            mycursor.execute(string)
+            mydb.commit()
+            with open("credentials/hashes.txt", "r") as r:
+                lines = r.read().splitlines()
+                for line in lines:
+                    values = line.split(",")
+                    if values[0] == file:
+                        lines.remove(line)
+                        lines.append("%s,%s" % (file, new_hash))
+                r.close()
+            with open("credentials/hashes.txt", "w") as w:
+                w.write("\n".join(lines))
         else:
             print(f"{colours.Yellow}[*] Invalid Name!{colours.ENDC}")
     except KeyboardInterrupt:
         print(f"{colours.Red}[*] Successfully Aborted!{colours.ENDC}")
 
 
-def interface():
+def interface(mycursor, mydb):
     try:
         choice = int(input(f"{colours.Yellow}[*] View Transactions or Edit Transactions? (1/2): "))
         if choice == 1:
             view_bank_transactions()
         else:
-            edit_bank_transactions()
+            edit_bank_transactions(mycursor, mydb)
     except ValueError:
         raise errors.valueErrors("Expected Integer")
