@@ -222,7 +222,6 @@ def main(messageOfTheSecond, credz, mycursor, mydb):
         key = input(
             f"\n{colours.BackgroundLightGreen}[{date}]{colours.ENDC}-{colours.BackgroundLightCyan}[{time_prompt}]{colours.ENDC}\n"
             f"{colours.BackgroundLightMagenta}SmilinPython>{colours.ENDC} ")
-        ncredz = ' '.join(credz).replace(' ', ',')
         try:
             if key == '1':
                 logging.info("Exiting Gracefully;")
@@ -231,7 +230,7 @@ def main(messageOfTheSecond, credz, mycursor, mydb):
             elif key == '2':
                 logging.info("Transferring to (connector.py)")
                 import connector
-                connector.init(ncredz, transactions)
+                connector.main(transactions, mydb)
             elif key == '3':
                 logging.info("Transferring to (master-bill.py)")
                 import master_bill

@@ -10,20 +10,6 @@ logging.basicConfig(filename='log.txt', format=variables.log_format, datefmt='[%
                     level=logging.DEBUG)
 
 
-def init(raw, transfer):
-    global mydb
-    credz = raw.split(',')
-    mydb = mysql.connector.connect(
-        auth_plugin='mysql_native_password',
-        host=credz[0],
-        user=credz[1],
-        port=credz[2],
-        password=credz[3],
-        database=credz[4]
-    )
-    main(transfer)
-
-
 BUF_SIZE = 65536
 
 
@@ -319,7 +305,7 @@ def delete_from_list(ar):
 # -------------------------------------------- Main Code --------------------------------------------------#
 
 
-def main(transfer):
+def main(transfer, mydb):
     global customerName
     customerName = startup()
     idInput = 69420666  # well, had to declare it as something -\_/-
