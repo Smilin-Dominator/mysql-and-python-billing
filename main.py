@@ -2,20 +2,17 @@
 # Devisha Padmaperuma!
 # Don't even think of stealing my code!
 
-import getpass
 import logging
 import os
 import random
-import string
 import sys
 import time
-import hashlib
 import mysql.connector
 import rsa
 import base64
 import subprocess
 from configuration import variables, commands, colours, errors, execheck
-from security import integrityCheck
+from security import init5_security
 import bank_transfer
 import setup
 
@@ -326,9 +323,6 @@ def init5(mycursor, conf):
     varPath = f'./bills/{varTime}'
     checkmate = os.path.exists(varPath)
     checksales = os.path.exists('./sales_reports')
-    checkPass = os.path.exists('./credentials/passwd.txt')
-    checkHash = os.path.exists('./credentials/hashes.txt')
-
     if not check:
         os.mkdir("bills/")  # Makes the DIR
         logging.info("Making the Bills Directory")
@@ -341,61 +335,7 @@ def init5(mycursor, conf):
         os.mkdir('./sales_reports')
         logging.info("Making the Sales Report Directory.")
         print("[*] Making Directory 'sales-reports/'...")
-
-    if not checkPass:
-        critical = integrityCheck('./log.txt', 'none', 'none', mycursor).pass_check()
-        if not critical:
-            print("[*] No Password Set.. Creating File..")
-            pas_enter = getpass.getpass("[*] Enter Password: ")
-            pas = open('./credentials/passwd.txt', 'w+')
-            salt1 = ''.join(random.choices(string.ascii_letters + string.hexdigits, k=95))
-            salt2 = ''.join(random.choices(string.digits + string.octdigits, k=95))
-            pass_write = str(salt1 + pas_enter + salt2)
-            hashpass = hashlib.sha512(pass_write.encode()).hexdigest()
-            signature = hashlib.md5("McDonalds_Im_Loving_It".encode()).hexdigest()
-            logging.info(f"Systemdump--Ignore--These\n{signature}\n{salt1}\n{salt2}\n{hashpass}")
-            pas.write(f'{salt1},{salt2},{hashpass}')
-            print("[*] Success!")
-        else:
-            print(integrityCheck('none', 'none', critical, mycursor).pass_write())
-
-    if checkPass and conf:
-        critical = integrityCheck('./log.txt', 'none', 'none', mycursor).pass_check()
-        read_pass = open('./credentials/passwd.txt', 'r')
-        read_pass_re = read_pass.read()
-        read_pass_tup = tuple(read_pass_re.split(','))
-        if read_pass_tup == (critical[0][0], critical[0][1], critical[0][2]):
-            print("[*] Password Check Successful.. Proceeding..")
-        else:
-            print(integrityCheck('none', 'none', critical, mycursor).pass_write())
-
-    if not checkHash:
-        print("[*] No Hash File Found...")
-        scrape = integrityCheck('none', 'none', 'none', mycursor).hash_check()
-        if not scrape:
-            print("[*] No Attempt Of Espionage...")
-            print("[*] Proceeding To Make File....")
-            write_hi = open('./credentials/hashes.txt', 'w')
-            write_hi.write('\n')
-            write_hi.close()
-        else:
-            print(integrityCheck('none', scrape, 'none', mycursor).hash_write())
-
-    if checkHash and conf:
-        scrape = integrityCheck('none', 'none', 'none', mycursor).hash_check()
-        scrape_file = open('./credentials/hashes.txt', 'r')
-        scrape2 = scrape_file.read().splitlines()
-        hash_check_ar = []
-        for i in range(len(scrape2)):
-            if scrape2[i] == '':
-                pass
-            else:
-                split = tuple(scrape2[i].split(','))
-                hash_check_ar.append(split)
-        if hash_check_ar == scrape:
-            print("[*] Hashes Match.. Proceeding...\n")
-        else:
-            print(integrityCheck('none', scrape, 'none', mycursor).hash_write())
+    init5_security(mycursor, conf)
 
 
 if __name__ == "__main__":

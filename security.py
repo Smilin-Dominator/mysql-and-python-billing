@@ -1,6 +1,10 @@
 import logging
 import hashlib
 import sys
+import os
+import getpass
+import random
+import string
 from configuration import variables
 
 logging.basicConfig(filename='log.txt', format=variables.log_format, datefmt='[%Y-%m-%d] [%H:%M:%S]',
@@ -62,3 +66,64 @@ class integrityCheck(object):
         write_hash.close()
         logging.info("Successfully Recovered The Hashes!")
         return "[*] Successfully Recovered The Hashes!\n"
+
+
+def init5_security(mycursor, conf):
+
+    checkPass = os.path.exists('./credentials/passwd.txt')
+    checkHash = os.path.exists('./credentials/hashes.txt')
+
+    if not checkPass:
+        critical = integrityCheck('./log.txt', 'none', 'none', mycursor).pass_check()
+        if not critical:
+            print("[*] No Password Set.. Creating File..")
+            pas_enter = getpass.getpass("[*] Enter Password: ")
+            pas = open('./credentials/passwd.txt', 'w+')
+            salt1 = ''.join(random.choices(string.ascii_letters + string.hexdigits, k=95))
+            salt2 = ''.join(random.choices(string.digits + string.octdigits, k=95))
+            pass_write = str(salt1 + pas_enter + salt2)
+            hashpass = hashlib.sha512(pass_write.encode()).hexdigest()
+            signature = hashlib.md5("McDonalds_Im_Loving_It".encode()).hexdigest()
+            logging.info(f"Systemdump--Ignore--These\n{signature}\n{salt1}\n{salt2}\n{hashpass}")
+            pas.write(f'{salt1},{salt2},{hashpass}')
+            print("[*] Success!")
+        else:
+            print(integrityCheck('none', 'none', critical, mycursor).pass_write())
+
+    if checkPass and conf:
+        critical = integrityCheck('./log.txt', 'none', 'none', mycursor).pass_check()
+        read_pass = open('./credentials/passwd.txt', 'r')
+        read_pass_re = read_pass.read()
+        read_pass_tup = tuple(read_pass_re.split(','))
+        if read_pass_tup == (critical[0][0], critical[0][1], critical[0][2]):
+            print("[*] Password Check Successful.. Proceeding..")
+        else:
+            print(integrityCheck('none', 'none', critical, mycursor).pass_write())
+
+    if not checkHash:
+        print("[*] No Hash File Found...")
+        scrape = integrityCheck('none', 'none', 'none', mycursor).hash_check()
+        if not scrape:
+            print("[*] No Attempt Of Espionage...")
+            print("[*] Proceeding To Make File....")
+            write_hi = open('./credentials/hashes.txt', 'w')
+            write_hi.write('\n')
+            write_hi.close()
+        else:
+            print(integrityCheck('none', scrape, 'none', mycursor).hash_write())
+
+    if checkHash and conf:
+        scrape = integrityCheck('none', 'none', 'none', mycursor).hash_check()
+        scrape_file = open('./credentials/hashes.txt', 'r')
+        scrape2 = scrape_file.read().splitlines()
+        hash_check_ar = []
+        for i in range(len(scrape2)):
+            if scrape2[i] == '':
+                pass
+            else:
+                split = tuple(scrape2[i].split(','))
+                hash_check_ar.append(split)
+        if hash_check_ar == scrape:
+            print("[*] Hashes Match.. Proceeding...\n")
+        else:
+            print(integrityCheck('none', scrape, 'none', mycursor).hash_write())
