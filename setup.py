@@ -3,6 +3,7 @@ import subprocess
 from main import conifguration_file
 from shred.shredders import FileShredder
 
+
 def main():
     shredder = FileShredder()
     system = sys.platform
@@ -17,6 +18,4 @@ def main():
     subprocess.call("pip3 install -r requirements.txt", shell=True)
     print("\n[*] Making Log.txt\n")
     subprocess.call("touch log.txt", shell=True)
-    print("\n[*] Success! Resuming Installation!")
-    print("[*] Please Restart Main.py To Complete The Installation")
-    sys.exit(0)
+    print("[*] Success! Resuming...")

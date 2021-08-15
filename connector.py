@@ -1,6 +1,5 @@
 import getpass
 import hashlib
-import sys
 import mysql.connector
 import logging
 import time
@@ -11,7 +10,7 @@ logging.basicConfig(filename='log.txt', format=variables.log_format, datefmt='[%
                     level=logging.DEBUG)
 
 
-def init(raw):
+def init(raw, transfer):
     global mydb
     credz = raw.split(',')
     mydb = mysql.connector.connect(
@@ -22,14 +21,14 @@ def init(raw):
         password=credz[3],
         database=credz[4]
     )
-    main()
+    main(transfer)
 
 
 BUF_SIZE = 65536
 
 
 def startup():
-    nameOfCustomer = input("Customer: ")  # Optional, if you're in a hurry, just leave blank
+    nameOfCustomer = input(f"{colours.White}Customer: {colours.ENDC}")  # Optional, if you're in a hurry, just leave blank
     if not nameOfCustomer:  # ' ' => blank
         nameOfCustomer = '(Not Specified)'
     logging.info(f"\nSold the following to {nameOfCustomer}")  # you'll see this often, in case any bills go missing
@@ -78,7 +77,7 @@ class printingBills(object):
         return tot
 
 
-def bill_write(ar):
+def bill_write(ar, transfer):
     fileTime = str(time.strftime('%I.%M_%p'))  # eg: 07.10 PM
     customerNameFormat = customerName.replace(' ', '_')
     fileName = f"[BILL]-{customerNameFormat}-{fileTime}.txt"  # format of the filename
@@ -137,28 +136,35 @@ def bill_write(ar):
     fileOpen.write(f"\nTax : Rs. {vatAmount}")
     fileOpen.write(f"\nGrand Total: Rs. {finalTotal}")
     passOff = False
-    while not passOff:
-        cashGiven = int(input(f'{colours.LightRed}Cash Given: Rs. {colours.ENDC}'))
-        bal = int(cashGiven - finalTotal)
-        if bal < 0:  # loops if its a negative number!
-            print(colours.Red, "Negative Value, Something's Off, Retry",
-                  colours.ENDC)  # something's **really** off (why doesnt MD work?)
-            logging.warning('Negative Balance')
-            passOff = False
-        elif bal == 0:
-            logging.info(f'Cash Given: Rs. {cashGiven}')
-            fileOpen.write(f'\n\nCash Given: Rs. {cashGiven}')
-            print(colours.Green, '\nNo Balance!', colours.ENDC)
-            logging.info('No Balance')
-            fileOpen.write(f'\nNo Balance!')
-            break  # passes if its not
-        elif bal > 0:
-            logging.info(f'Cash Given: Rs. {cashGiven}')
-            fileOpen.write(f'\nCash Given: Rs. {cashGiven}')
-            print(f'{colours.Green}Balance: Rs. {bal}{colours.ENDC}')
-            logging.info(f'Balance: Rs. {str(bal)}\n')
-            fileOpen.write(f'\nBalance: Rs. {bal}')
-            break
+    if not transfer:
+        while not passOff:
+            cashGiven = int(input(f'{colours.LightRed}Cash Given: Rs. {colours.ENDC}'))
+            bal = int(cashGiven - finalTotal)
+            if bal < 0:  # loops if its a negative number!
+                print(colours.Red, "Negative Value, Something's Off, Retry",
+                      colours.ENDC)  # something's **really** off (why doesnt MD work?)
+                logging.warning('Negative Balance')
+                passOff = False
+            elif bal == 0:
+                logging.info(f'Cash Given: Rs. {cashGiven}')
+                fileOpen.write(f'\n\nCash Given: Rs. {cashGiven}')
+                print(colours.Green, '\nNo Balance!', colours.ENDC)
+                logging.info('No Balance')
+                fileOpen.write(f'\nNo Balance!')
+                break  # passes if its not
+            elif bal > 0:
+                logging.info(f'Cash Given: Rs. {cashGiven}')
+                fileOpen.write(f'\nCash Given: Rs. {cashGiven}')
+                print(f'{colours.Green}Balance: Rs. {bal}{colours.ENDC}')
+                logging.info(f'Balance: Rs. {str(bal)}\n')
+                fileOpen.write(f'\nBalance: Rs. {bal}')
+                break
+    else:
+        hasOrHasnt = input(f'{colours.LightRed}Has Transfered (y/n): {colours.ENDC}')
+        if hasOrHasnt == "y":
+            fileOpen.write(f'\nTransfered Cash: True')
+        else:
+            fileOpen.write(f'\nTransfered Cash: False')
     input("\n(enter) to proceed...")
 
 
@@ -175,21 +181,22 @@ def kill_this():
     pass_check = salt1 + killPass + salt2
     pass_hash = hashlib.sha512(pass_check.encode()).hexdigest()
     if hash_check == pass_hash:
-        sys.exit(66)
+        return True
     else:
         print("\n[ Wrong Password ]\n")  # thats the wrong number! (ooohhhh)
+        return False
 
 
 # ------------------------------------------ Array Related Functions ----------------------------------------------#
 
 
 def duplicate_check(ar, records):
-    quantity = int(input("Quantity: "))
+    quantity = int(input(f"{colours.LightYellow}Quantity: {colours.ENDC}"))
     for row in records:
         name = row[1]  # gets the element from the data
         price = row[2]  # and its in a fixed format, which is what matters
-        print(f"\nName  : {name}")
-        print(f"Price : {price}")
+        print(f"\n{colours.LightGreen}Name  : {name}{colours.ENDC}")
+        print(f"{colours.LightGreen}Price : {price}{colours.ENDC}")
         total = int(price) * quantity
         if len(ar) > 0:
             tempList = [list(item) for item in ar]  # converts into a list, since you cant change tuples
@@ -197,7 +204,7 @@ def duplicate_check(ar, records):
                 checkName = tempList[i][0]
                 checkPrice = tempList[i][1]
                 if checkName == name and checkPrice == price:
-                    print("\nDuplicate Detected, Updating Current Entry")
+                    print(f"\n{colours.DarkGray}[!] Duplicate Detected, Updating Current Entry{colours.ENDC}")
                     currentTotal = tempList[i][3]
                     currentQuantity = tempList[i][2]
                     newTotal = int(price) * quantity + currentTotal
@@ -205,7 +212,7 @@ def duplicate_check(ar, records):
                     try:
                         tempList[i][3] = newTotal
                         tempList[i][2] = newQuantity
-                        print("Success!")
+                        print(f"{colours.Green}[!] Success!{colours.ENDC}")
                         logging.info(
                             f"Updated: {checkName}, {checkPrice}\nSet Quantity {currentQuantity} => "
                             f"{newQuantity}\nSet Total: {currentTotal} => {newTotal}"
@@ -234,12 +241,12 @@ def update_list(ar):
     theLoop = True
     while theLoop:
         try:
-            updateValue = input("What Would You Like To Update? (Name): ")
+            updateValue = input(f"{colours.Yellow}[*] What Would You Like To Update? (Name): {colours.ENDC}")
             tempList = [list(tup) for tup in ar]
             for i in range(len(tempList)):
                 up_name = tempList[i][0]
                 if updateValue == up_name:
-                    update_key = input("Add Or Remove How Much? (+ amount/ - amount): ")
+                    update_key = input(f"{colours.White}[+] Add Or Remove How Much? (+ amount/ - amount): {colours.ENDC}")
                     update_key_check = (update_key.split(' '))
                     upQuan = int(update_key_check[1])
                     oldQuan = tempList[i][2]
@@ -258,9 +265,9 @@ def update_list(ar):
                         if newQuanCheck > 0:
                             newQuan = newQuanCheck
                         else:
-                            print("[ The Value Is Either Negative or 0, And Will Be Set To 1 ]")
-                            print("[ If Your Intention Was To Delete This, Use The 'del' Command Instead ]")
-                            confirm = input("Proceed? (Y/N): ")
+                            print(f"{colours.Red}[ The Value Is Either Negative or 0, And Will Be Set To 1 ]")
+                            print(f"[ If Your Intention Was To Delete This, Use The 'del' Command Instead ]{colours.ENDC}")
+                            confirm = input(f"{colours.Yellow}[!] Proceed? (Y/N): {colours.ENDC}")
                             if confirm == 'Y':
                                 logging.warning(f"Set {updateValue}, {ar[i][1]}'s Quantity to 1")
                                 newQuan = 1
@@ -276,7 +283,7 @@ def update_list(ar):
                         )
                     elif update_key_check[0] == 'exit':
                         break
-                    print("Success!")
+                    print(f"{colours.LightGreen}[#] Success!{colours.ENDC}")
                     break
             return [tuple(entry) for entry in tempList]
         except Exception as e:
@@ -289,9 +296,9 @@ def delete_from_list(ar):
     theLoop = True
     while theLoop:
         try:
-            delKey = input("The (Name) To Be Removed: ")
+            delKey = input(f"{colours.Yellow}[!] The (Name) To Be Removed: {colours.ENDC}")
             if delKey == 'abort':
-                print("Aborting...")
+                print(f"{colours.LightRed}[!] Aborting...{colours.ENDC}")
                 break
             else:
                 for i in range(len(ar)):
@@ -299,12 +306,12 @@ def delete_from_list(ar):
                         popTime = ar[i]
                         ar.remove(popTime)
                         break
-                print("\nSuccess! Type  '--' in the ID prompt To See The Updated Version!")
+                print(f"\n{colours.Green}[*] Success! Type  '--' in the ID prompt To See The Updated Version!{colours.ENDC}")
                 logging.info(f"Successfully Deleted Entry {delKey}")
                 theLoop = False
         except Exception as e:
             logging.error(e)
-            print("[ Error Occurred, Please Retry ]")
+            print(f"{colours.Red}[ Error Occurred, Please Retry ]{colours.ENDC}")
             theLoop = True
     return ar
 
@@ -312,19 +319,21 @@ def delete_from_list(ar):
 # -------------------------------------------- Main Code --------------------------------------------------#
 
 
-def main():
+def main(transfer):
     global customerName
     customerName = startup()
     idInput = 69420666  # well, had to declare it as something -\_/-
     ar = []  # declared as empty, will get filled in the process
     while idInput != ' ':
         try:
-            idInput = input("\nID: ")  # ID As In The First Column
+            idInput = input(f"\n{colours.LightCyan}ID: {colours.ENDC}")  # ID As In The First Column
             if '' == idInput:  # if you just hit enter
-                bill_write(ar)
+                bill_write(ar, transfer)
                 break
             elif idInput == 'Kill':  # had to add an emergency kill function :)
-                kill_this()
+                go = kill_this()
+                if go:
+                    break
             elif idInput == 'del':
                 ar = delete_from_list(ar)
             elif idInput == '--':

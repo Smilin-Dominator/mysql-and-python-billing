@@ -1,7 +1,7 @@
 # MySQL and Python Billing 
 [![Publish](https://github.com/Smilin-Dominator/mysql-and-python-billing/actions/workflows/release.yml/badge.svg)](https://github.com/Smilin-Dominator/mysql-and-python-billing/actions/workflows/release.yml)
 [![Syntax Highlighting](https://github.com/Smilin-Dominator/mysql-and-python-billing/actions/workflows/main.yml/badge.svg)](https://github.com/Smilin-Dominator/mysql-and-python-billing/actions/workflows/main.yml)
-#Logs
+# Logs
 
 (22nd May)
 ><font size="6">I made this random program to test out if I could extract data from a MySQL Server
@@ -113,7 +113,7 @@ Hope these scenarios helped you! I'll add more along with the new features that 
     - Enter the discount %, if there's no discount, enter 0 (Even if you don't it'll automatically assign 0)
     - After it returns the Total, enter the amount of cash given, if the balance is negative, it keeps asking you for the correct amount, until you give the correct amount.
     - Afterwards, it returns the balance, then goes back to main.py
-    - ***(Quick Tip: The bill (located in ./bills/) will finish writing to the disk only after the program stops, so whenever free, stop when prompted.)***
+       > Note, If you selected "Bank Transfer Mode" it'll ask you if they have transfered or not, instead of asking for amount payed and balance.
 - Delete Prompt (The (Name) To Be Removed: )
     - To enter this screen, type 'del' in the ID prompt.
     - Enter the item name of what you wish to delete (The names will be displayed)
@@ -154,6 +154,7 @@ Hope these scenarios helped you! I'll add more along with the new features that 
     - If you press 4, it'll take you to (sql-client.py) where you can view and alter entries.
     - If you press 5, it'll take you to (verify.py) where you can verify your bills.
     - If you press 6, it'll allow you to edit your config file.
+    - If you selected 'Bank Transfer Mode' there'll be a number 7, which will allow you to track who sent transfers and didn't.
 # Function List (sql-client.py)
 - Master Password: 
     - Enter the master password you set in (main.py)

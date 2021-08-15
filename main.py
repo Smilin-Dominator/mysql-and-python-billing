@@ -15,6 +15,7 @@ import rsa
 import base64
 import subprocess
 from configuration import variables, commands, colours, errors, execheck
+import bank_transfer
 import setup
 
 
@@ -57,7 +58,7 @@ def startup():
             password=credz[3],
             database=credz[4]
         )
-    except mysql.connector.Error as e:
+    except mysql.connector.Error:
         print("[*] MySQL Database Not Connecting")
         if os.path.exists('docker-compose.yml'):
             print("[*] (Realization) Docker Container, Attempting To Start It")
@@ -81,26 +82,11 @@ def startup():
 
     print(colours.BackgroundCyan, "Welcome! If Something Doesn't Seem Right, Check The Logs!", colours.ENDC, end="\n")
 
-    try:
-        # Third Phase - Checks For Updates
-        config = open('./credentials/options.txt', 'r').read().splitlines()
-        if config[0] == 'check_for_updates=True':
-            init3()
-        # Fourth Phase - Checks Integrity Of Credentials
-        if config[1] == 'check_file_integrity=True':
-            init5(mycursor, True)
-        else:
-            init5(mycursor, False)
-    except FileNotFoundError as e:
-        logging.warning(e)
-        print("[!] Config File Not Found!\n[*] Generating...")
-        conifguration_file()
-
     # Logs Boot Time Taken
     logging.info("Booting Up Took: %f Seconds" % (time.time() - initial_time))
 
     # Final Phase - Main Program
-    main(messageOfTheSecond, credz)
+    main(messageOfTheSecond, credz, mycursor, mydb)
 
 
 class integrityCheck(object):
@@ -160,51 +146,32 @@ class integrityCheck(object):
         return "[*] Successfully Recovered The Hashes!\n"
 
 
-def main(messageOfTheSecond, credz):
-    key = 2
-    while key != '1':
-        randomNumGen = random.randint(1, len(messageOfTheSecond))  # RNG, unscripted order
-        print(
-            f"\n{colours.BackgroundDarkGray}Random Line from HUMBLE.:{colours.ENDC} {colours.BackgroundLightMagenta}"
-            f"{messageOfTheSecond[randomNumGen]}{colours.ENDC}")  # pulls from the Dictionary
-        print(
-            f"\n\n{colours.Red}1 - Exit{colours.ENDC}\n{colours.Green}2 - Make A Bill{colours.ENDC}\n"
-            f"{colours.LightYellow}3 - Create Master Bill & Sales Reports{colours.ENDC}\n{colours.Cyan}4 - SQL Client{colours.ENDC}\n"
-            f"{colours.LightGray}5 - Verifier{colours.ENDC}\n{colours.LightMagenta}6 - Configure Options{colours.ENDC}"
-        )
-        date = time.strftime('%c')
-        time_prompt = time.strftime('%I:%M %p')
-        key = input(
-            f"\n{colours.BackgroundLightGreen}[{date}]{colours.ENDC}-{colours.BackgroundLightCyan}[{time_prompt}]{colours.ENDC}\n"
-            f"{colours.BackgroundLightMagenta}SmilinPython>{colours.ENDC} ")
-        ncredz = ' '.join(credz).replace(' ', ',')
+def read_config(mycursor):
+    while True:
         try:
-            if key == '1':
-                logging.info("Exiting Gracefully;")
-                os.system("cls")
-                sys.exit()
-            elif key == '2':
-                logging.info("Transferring to (connector.py)")
-                import connector
-                connector.init(ncredz)
-            elif key == '3':
-                logging.info("Transferring to (master-bill.py)")
-                import master_bill
-                master_bill.main()
-                input("(enter to continue...)")
-            elif key == '4':
-                logging.info("Transferring to (sql-client.py)")
-                import sql_client
-                sql_client.init(ncredz)
-            elif key == '5':
-                logging.info("Transferring to (verify.py)")
-                import verify
-                verify.init(ncredz)
-            elif key == '6':
-                conifguration_file()
-            os.system('cls')
-        except ValueError:
-            raise errors.valueErrors("Entered A Non Integer During The Main Prompt")
+            # Third Phase - Checks For Updates
+            config = open('./credentials/options.txt', 'r').read().splitlines()
+            if config[0] == 'check_for_updates=True':
+                init3()
+            # Fourth Phase - Checks Integrity Of Credentials
+            if config[1] == 'check_file_integrity=True':
+                init5(mycursor, True)
+            else:
+                init5(mycursor, False)
+            if config[2] == "transactions_or_cash=True":
+                transactions = True
+            else:
+                transactions = False
+            break
+        except FileNotFoundError as e:
+            logging.warning(e)
+            print("[!] Config File Not Found!\n[*] Generating...")
+            conifguration_file()
+        except IndexError as e:
+            logging.warning(e)
+            print("[!] Not Enough Arguments!\n[*] Regenerating...")
+            conifguration_file()
+    return transactions
 
 
 def conifguration_file():
@@ -223,6 +190,69 @@ def conifguration_file():
         options.write("\ncheck_file_integrity=True")
     else:
         options.write("\ncheck_file_integrity=False")
+    incheck = input("[*] Transaction Mode? (y/n): ")
+    if incheck == 'y':
+        options.write("\ntransactions_or_cash=True")
+    else:
+        options.write("\ntransactions_or_cash=False")
+    options.flush()
+    options.close()
+
+
+def main(messageOfTheSecond, credz, mycursor, mydb):
+    key = 2
+    while key != '1':
+        transactions = read_config(mycursor)
+        randomNumGen = random.randint(1, len(messageOfTheSecond))  # RNG, unscripted order
+        print(
+            f"\n{colours.BackgroundDarkGray}Random Line from HUMBLE.:{colours.ENDC} {colours.BackgroundLightMagenta}"
+            f"{messageOfTheSecond[randomNumGen]}{colours.ENDC}")  # pulls from the Dictionary
+        if transactions:
+            tra = f"{colours.Red}7 - Transactions{colours.ENDC}"
+        else:
+            tra = ""
+        print(
+            f"\n\n{colours.Red}1 - Exit{colours.ENDC}\n{colours.Green}2 - Make A Bill{colours.ENDC}\n"
+            f"{colours.LightYellow}3 - Create Master Bill & Sales Reports{colours.ENDC}\n{colours.Cyan}4 - SQL Client{colours.ENDC}\n"
+            f"{colours.LightGray}5 - Verifier{colours.ENDC}\n{colours.LightMagenta}6 - Configure Options{colours.ENDC}\n"
+            f"{tra}"
+        )
+        date = time.strftime('%c')
+        time_prompt = time.strftime('%I:%M %p')
+        key = input(
+            f"\n{colours.BackgroundLightGreen}[{date}]{colours.ENDC}-{colours.BackgroundLightCyan}[{time_prompt}]{colours.ENDC}\n"
+            f"{colours.BackgroundLightMagenta}SmilinPython>{colours.ENDC} ")
+        ncredz = ' '.join(credz).replace(' ', ',')
+        try:
+            if key == '1':
+                logging.info("Exiting Gracefully;")
+                os.system("cls")
+                sys.exit()
+            elif key == '2':
+                logging.info("Transferring to (connector.py)")
+                import connector
+                connector.init(ncredz, transactions)
+            elif key == '3':
+                logging.info("Transferring to (master-bill.py)")
+                import master_bill
+                master_bill.main()
+                input("(enter to continue...)")
+            elif key == '4':
+                logging.info("Transferring to (sql-client.py)")
+                import sql_client
+                sql_client.init(ncredz)
+            elif key == '5':
+                logging.info("Transferring to (verify.py)")
+                import verify
+                verify.init(ncredz)
+            elif key == '6':
+                conifguration_file()
+            elif key == '7' and transactions:
+                bank_transfer.interface(mycursor, mydb)
+                input("(enter to continue..)")
+            os.system('cls')
+        except ValueError:
+            raise errors.valueErrors("Entered A Non Integer During The Main Prompt")
 
 
 def init0():
