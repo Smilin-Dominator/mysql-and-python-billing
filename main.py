@@ -2,20 +2,27 @@
 # Devisha Padmaperuma!
 # Don't even think of stealing my code!
 
-import logging
-import os
-import random
-import sys
-import time
-import mysql.connector
-import rsa
-import base64
-import subprocess
+# File Imports
 from configuration import variables, commands, colours, errors, execheck
 from security import init5_security
 import bank_transfer
 import setup
 
+# Included Imports
+import base64
+import subprocess
+import logging
+import os
+import random
+import sys
+import time
+
+# Required Modules
+try:
+    import mysql.connector
+    import rsa
+except ModuleNotFoundError:
+    setup.main()
 
 def startup():
 
