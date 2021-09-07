@@ -2,23 +2,30 @@
 # Devisha Padmaperuma!
 # Don't even think of stealing my code!
 
-import logging
-import os
-import random
-import sys
-import time
-import mysql.connector
-import rsa
-import base64
-import subprocess
+# File Imports
 from configuration import variables, commands, colours, errors, execheck
 from security import init5_security
 import bank_transfer
 import setup
 
+# Included Imports
+import base64
+import subprocess
+import logging
+import os
+import random
+import sys
+import time
+
+# Required Modules
+try:
+    import mysql.connector
+    import rsa
+except ModuleNotFoundError:
+    setup.main()
+
 
 def startup():
-
     initial_time = time.time()
 
     messageOfTheSecond = {
@@ -103,6 +110,10 @@ def read_config(mycursor):
                 transactions = True
             else:
                 transactions = False
+            if config[3] == "vat=True":
+                vat = True
+            else:
+                vat = False
             break
         except FileNotFoundError as e:
             logging.warning(e)
@@ -112,13 +123,13 @@ def read_config(mycursor):
             logging.warning(e)
             print("[!] Not Enough Arguments!\n[*] Regenerating...")
             commands().conifguration_file()
-    return transactions
+    return [transactions, vat]
 
 
 def main(messageOfTheSecond, mycursor, mydb):
     key = 2
     while key != '1':
-        transactions = read_config(mycursor)
+        (transactions, vat) = read_config(mycursor)
         randomNumGen = random.randint(1, len(messageOfTheSecond))  # RNG, unscripted order
         print(
             f"\n{colours.BackgroundDarkGray}Random Line from HUMBLE.:{colours.ENDC} {colours.BackgroundLightMagenta}"
@@ -146,7 +157,7 @@ def main(messageOfTheSecond, mycursor, mydb):
             elif key == '2':
                 logging.info("Transferring to (connector.py)")
                 import connector
-                connector.main(transactions, mydb)
+                connector.main(transactions, mydb, vat)
             elif key == '3':
                 logging.info("Transferring to (master-bill.py)")
                 import master_bill
@@ -281,8 +292,8 @@ def init3():
     check = raw.decode().splitlines()
     if \
             check[1] == "Your branch is up to date with 'origin/main'." \
-            or check[1].startswith("Your branch is ahead of 'origin/main'") \
-            or check[1].startswith("fatal: not a git repository"):
+                    or check[1].startswith("Your branch is ahead of 'origin/main'") \
+                    or check[1].startswith("fatal: not a git repository"):
         print("[*] No Update Found, Continuing...")
     else:
         print("[*] Update Found... Updating...\n")

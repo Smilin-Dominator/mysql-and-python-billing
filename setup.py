@@ -1,17 +1,11 @@
 import sys
 import subprocess
 from configuration import commands
-from shred.shredders import FileShredder
 
 
 def main():
-    shredder = FileShredder()
     system = sys.platform
     print("[*] Initializing First Time Setup..")
-    input("[ Read The README.md File, Once Done, Hit Enter, It'll Be Shredded ]")
-    shredder.destroy('README.md', rew=500)
-    shredder.remove('README.md')
-    print("[*] Successfully Shredded README.md")
     commands().conifguration_file()
     print("[*] Initializing Environment Setup..")
     print(f"[*] OS: {system}\n")
