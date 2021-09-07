@@ -62,7 +62,7 @@ class printingBills(object):
         return tot
 
 
-def bill_write(ar, transfer):
+def bill_write(ar, transfer, vat):
     fileTime = str(time.strftime('%I.%M_%p'))  # eg: 07.10 PM
     customerNameFormat = customerName.replace(' ', '_')
     fileName = f"[BILL]-{customerNameFormat}-{fileTime}.txt"  # format of the filename
@@ -112,13 +112,15 @@ def bill_write(ar, transfer):
             print("[ Try Again, Its Either 0 or An Integer ]")
             logging.warning("Entered Incorrect Discount %")
             passOff = False
-    vatAmount = discountTotal * (15 / 100)
-    finalTotal = discountTotal + vatAmount
-    print(f"{colours.LightMagenta}Tax: Rs. {vatAmount}{colours.ENDC}")
+    if vat:
+        vatAmount = discountTotal * (15 / 100)
+        print(f"{colours.LightMagenta}Tax: Rs. {vatAmount}{colours.ENDC}")
+        fileOpen.write(f"\nTax : Rs. {vatAmount}")
+        finalTotal = discountTotal + vatAmount
+    else:
+        finalTotal = discountTotal
     print(f"{colours.LightGreen}Grand Total: Rs. {finalTotal}{colours.ENDC}")
-    logging.info(f"Tax: Rs. {vatAmount}")
     logging.info(f"Grand Total: Rs. {finalTotal}")
-    fileOpen.write(f"\nTax : Rs. {vatAmount}")
     fileOpen.write(f"\nGrand Total: Rs. {finalTotal}")
     passOff = False
     if not transfer:
@@ -304,7 +306,7 @@ def delete_from_list(ar):
 # -------------------------------------------- Main Code --------------------------------------------------#
 
 
-def main(transfer, mydb):
+def main(transfer, mydb, vat):
     global customerName
     customerName = startup()
     idInput = 69420666  # well, had to declare it as something -\_/-
@@ -313,7 +315,7 @@ def main(transfer, mydb):
         try:
             idInput = input(f"\n{colours.LightCyan}ID: {colours.ENDC}")  # ID As In The First Column
             if '' == idInput:  # if you just hit enter
-                bill_write(ar, transfer)
+                bill_write(ar, transfer, vat)
                 break
             elif idInput == 'Kill':  # had to add an emergency kill function :)
                 go = kill_this()

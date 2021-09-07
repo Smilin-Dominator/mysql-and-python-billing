@@ -90,6 +90,11 @@ class commands:
             options.write("\ntransactions_or_cash=True")
         else:
             options.write("\ntransactions_or_cash=False")
+        incheck = input("[*] Add VAT To Total? (y/n): ")
+        if incheck == 'y':
+            options.write("\nvat=True")
+        else:
+            options.write("\nvat=False")
         options.flush()
         options.close()
 

@@ -110,6 +110,10 @@ def read_config(mycursor):
                 transactions = True
             else:
                 transactions = False
+            if config[3] == "vat=True":
+                vat = True
+            else:
+                vat = False
             break
         except FileNotFoundError as e:
             logging.warning(e)
@@ -119,13 +123,13 @@ def read_config(mycursor):
             logging.warning(e)
             print("[!] Not Enough Arguments!\n[*] Regenerating...")
             commands().conifguration_file()
-    return transactions
+    return [transactions, vat]
 
 
 def main(messageOfTheSecond, mycursor, mydb):
     key = 2
     while key != '1':
-        transactions = read_config(mycursor)
+        (transactions, vat) = read_config(mycursor)
         randomNumGen = random.randint(1, len(messageOfTheSecond))  # RNG, unscripted order
         print(
             f"\n{colours.BackgroundDarkGray}Random Line from HUMBLE.:{colours.ENDC} {colours.BackgroundLightMagenta}"
@@ -153,7 +157,7 @@ def main(messageOfTheSecond, mycursor, mydb):
             elif key == '2':
                 logging.info("Transferring to (connector.py)")
                 import connector
-                connector.main(transactions, mydb)
+                connector.main(transactions, mydb, vat)
             elif key == '3':
                 logging.info("Transferring to (master-bill.py)")
                 import master_bill
