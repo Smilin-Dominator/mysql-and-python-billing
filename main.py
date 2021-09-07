@@ -24,8 +24,8 @@ try:
 except ModuleNotFoundError:
     setup.main()
 
-def startup():
 
+def startup():
     initial_time = time.time()
 
     messageOfTheSecond = {
@@ -288,8 +288,8 @@ def init3():
     check = raw.decode().splitlines()
     if \
             check[1] == "Your branch is up to date with 'origin/main'." \
-            or check[1].startswith("Your branch is ahead of 'origin/main'") \
-            or check[1].startswith("fatal: not a git repository"):
+                    or check[1].startswith("Your branch is ahead of 'origin/main'") \
+                    or check[1].startswith("fatal: not a git repository"):
         print("[*] No Update Found, Continuing...")
     else:
         print("[*] Update Found... Updating...\n")
