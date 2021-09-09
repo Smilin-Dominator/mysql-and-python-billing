@@ -144,8 +144,8 @@ Hope these scenarios helped you! I'll add more along with the new features that 
     - It covers the input, so it looks like you're not typing anything, but you are.
     - It'll then generate salts and hash it, and store it in (passwd.txt)
 - The Main Prompt:
+    - If you press 1, it'll stop the program.
     - If you press 2, it'll loop back to (connector.py)
-    - If you press 1, the program will stop and write all changes and the bills to the system.
     - If you press 3, it'll run  (master-bill.py) and get the total of all bills made today.
         - Don't worry about accidentally running it, it'll always rewrite the file, so run it as many
           times as you want.
@@ -155,6 +155,9 @@ Hope these scenarios helped you! I'll add more along with the new features that 
     - If you press 5, it'll take you to (verify.py) where you can verify your bills.
     - If you press 6, it'll allow you to edit your config file.
     - If you selected 'Bank Transfer Mode' there'll be a number 7, which will allow you to track who sent transfers and didn't.
+      - There's two functions, view transactions and edit transactions.
+      - In view, it displays all the transactions (If there are multiple under the same name, it'll display the time)
+      - In edit, it shows you the transactions, prompts you for a name, and you can edit if they've transfered or not.
 # Function List (sql-client.py)
 - Master Password: 
     - Enter the master password you set in (main.py)
@@ -195,4 +198,11 @@ Hope these scenarios helped you! I'll add more along with the new features that 
 - check_file_integrity
     - Set `check_file_integrity=True` if you want the program to check if the password and hash file have been tampered with **while they're not deleted**.
     - Set `check_file_integrity=False` if you don't want the program to check if the password and hash files have been tampered with while they're not deleted.
-    > Regardless Of What You Choose, If One Of The Two Aforementioned Files Are Absent, It'll Detect It And Recover.
+      > Regardless Of What You Choose, If One Of The Two Aforementioned Files Are Absent, It'll Detect It And Recover.
+- transactions
+    - Set this to true to use Transactions instead of cash.
+    - If selected, it'll display a 7th option in main.py
+    - This will allow you to modify who's transfered or not
+    - Even if you change it back to Cash, your progress with the transfers will not be affected.
+- vat
+    - Set to true to add 15% VAT to the bill, if false, it'll just show the grand total.
