@@ -324,7 +324,6 @@ def main(transfer, mydb, vat):
     while idInput != ' ':
         try:
             ar = array_funcs(ar.get())
-            b = ar.get()
             idInput = input(f"\n{colours.LightCyan}ID: {colours.ENDC}")  # ID As In The First Column
             if '' == idInput:  # if you just hit enter
                 bill_write(ar.get(), transfer, vat)
