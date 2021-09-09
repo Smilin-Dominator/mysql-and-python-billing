@@ -1,6 +1,7 @@
 import logging
 import os
 import sys
+import yaml
 
 
 def execheck():
@@ -70,31 +71,38 @@ class commands:
         os.system('cls')
 
     def conifguration_file(self):
-        options = open('./credentials/options.txt', 'w+')
+        options = open('./credentials/options.yml', 'w+')
         f = execheck()
+        ops = {
+            "check_for_updates": None,
+            "check_file_integrity": None,
+            "transactions": None,
+            "vat": None,
+        }
         if f:
-            options.write("check_for_updates=False")
+            ops["check_for_updates"] = False
         else:
             up = input("[*] Check For Updates On Startup? (y/n): ")
             if up == 'y':
-                options.write("check_for_updates=True")
+                ops["check_for_updates"] = True
             else:
-                options.write("check_for_updates=False")
+                ops["check_for_updates"] = False
         incheck = input("[*] Check Password Integrity On Startup? (y/n): ")
         if incheck == 'y':
-            options.write("\ncheck_file_integrity=True")
+            ops["check_file_integrity"] = True
         else:
-            options.write("\ncheck_file_integrity=False")
+            ops["check_file_integrity"] = False
         incheck = input("[*] Transaction Mode? (y/n): ")
         if incheck == 'y':
-            options.write("\ntransactions_or_cash=True")
+            ops["transactions"] = True
         else:
-            options.write("\ntransactions_or_cash=False")
+            ops["transactions"] = False
         incheck = input("[*] Add VAT To Total? (y/n): ")
         if incheck == 'y':
-            options.write("\nvat=True")
+            ops["vat"] = True
         else:
-            options.write("\nvat=False")
+            ops["vat"] = False
+        yaml.dump(ops, options)
         options.flush()
         options.close()
 

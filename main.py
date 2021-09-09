@@ -17,7 +17,7 @@ import random
 import sys
 import time
 
-# Required Modules
+# Modules Needed To Be Installed By Pip
 try:
     import mysql.connector
     import rsa
@@ -98,7 +98,7 @@ def read_config(mycursor):
     while True:
         try:
             # Third Phase - Checks For Updates
-            config = open('./credentials/options.txt', 'r').read().splitlines()
+            config = open('./credentials/options.yml', 'r').read().splitlines()
             if config[0] == 'check_for_updates=True':
                 init3()
             # Fourth Phase - Checks Integrity Of Credentials
