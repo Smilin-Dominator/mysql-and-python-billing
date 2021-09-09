@@ -220,6 +220,7 @@ class array_funcs(object):
                             )
                             ar = [tuple(entry) for entry in tempList]
                             self.ar = ar
+                            break
                         except Exception as e:
                             logging.error(e)
                 else:
