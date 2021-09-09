@@ -176,44 +176,6 @@ def kill_this():
 
 # ------------------------------------------ Array Related Functions ----------------------------------------------#
 
-
-def duplicate_check(ar, records):
-    quantity = int(input(f"{colours.LightYellow}Quantity: {colours.ENDC}"))
-    for row in records:
-        name = row[1]  # gets the element from the data
-        price = row[2]  # and its in a fixed format, which is what matters
-        print(f"\n{colours.LightGreen}Name  : {name}{colours.ENDC}")
-        print(f"{colours.LightGreen}Price : {price}{colours.ENDC}")
-        total = int(price) * quantity
-        if len(ar) > 0:
-            tempList = [list(item) for item in ar]  # converts into a list, since you cant change tuples
-            for i in range(len(tempList)):
-                checkName = tempList[i][0]
-                checkPrice = tempList[i][1]
-                if checkName == name and checkPrice == price:
-                    print(f"\n{colours.DarkGray}[!] Duplicate Detected, Updating Current Entry{colours.ENDC}")
-                    currentTotal = tempList[i][3]
-                    currentQuantity = tempList[i][2]
-                    newTotal = int(price) * quantity + currentTotal
-                    newQuantity = int(currentQuantity) + quantity
-                    try:
-                        tempList[i][3] = newTotal
-                        tempList[i][2] = newQuantity
-                        print(f"{colours.Green}[!] Success!{colours.ENDC}")
-                        logging.info(
-                            f"Updated: {checkName}, {checkPrice}\nSet Quantity {currentQuantity} => "
-                            f"{newQuantity}\nSet Total: {currentTotal} => {newTotal}"
-                        )
-                        ar = [tuple(entry) for entry in tempList]
-                        return ar
-                    except Exception as e:
-                        logging.error(e)
-            else:
-                return [name, price, quantity, total]
-        else:
-            return [name, price, quantity, total]
-
-
 def appending_to_ar(name, price, quantity, total):
     tuppence = (name, price, quantity, total)
     # and now its done.... (suspense)
@@ -223,84 +185,130 @@ def appending_to_ar(name, price, quantity, total):
     return tuppence
 
 
-def update_list(ar):
-    print(printingBills(ar, myFormat, 'none').print_bill_items())
-    theLoop = True
-    while theLoop:
-        try:
-            updateValue = input(f"{colours.Yellow}[*] What Would You Like To Update? (Name): {colours.ENDC}")
-            tempList = [list(tup) for tup in ar]
-            for i in range(len(tempList)):
-                up_name = tempList[i][0]
-                if updateValue == up_name:
-                    update_key = input(f"{colours.White}[+] Add Or Remove How Much? (+ amount/ - amount): {colours.ENDC}")
-                    update_key_check = (update_key.split(' '))
-                    upQuan = int(update_key_check[1])
-                    oldQuan = tempList[i][2]
-                    if update_key_check[0] == '+':
-                        newQuan = upQuan + oldQuan
-                        newTot = newQuan * tempList[i][1]
-                        tempList[i][2] = newQuan
-                        tempList[i][3] = newTot
-                        logging.info(
-                            f"Updated: {updateValue}, {ar[i][1]}\nSet Quantity {oldQuan} => "
-                            f"{newQuan}\nUpdated Total {tempList[i][3]} => {newTot}"
-                        )
-                        ar = [tuple(entry) for entry in tempList]
-                    elif update_key_check[0] == '-':
-                        newQuanCheck = oldQuan - upQuan
-                        if newQuanCheck > 0:
-                            newQuan = newQuanCheck
-                        else:
-                            print(f"{colours.Red}[ The Value Is Either Negative or 0, And Will Be Set To 1 ]")
-                            print(f"[ If Your Intention Was To Delete This, Use The 'del' Command Instead ]{colours.ENDC}")
-                            confirm = input(f"{colours.Yellow}[!] Proceed? (Y/N): {colours.ENDC}")
-                            if confirm == 'Y':
-                                logging.warning(f"Set {updateValue}, {ar[i][1]}'s Quantity to 1")
-                                newQuan = 1
-                            else:
-                                logging.warning(f"Didn't Change {updateValue}, {ar[i][1]}'s Quantity")
-                                newQuan = oldQuan
-                        newTot = newQuan * tempList[i][1]
-                        tempList[i][2] = newQuan
-                        tempList[i][3] = newTot
-                        logging.info(
-                            f"Updated: {updateValue}, {ar[i][1]}\nSet Quantity {oldQuan} => {newQuan}\n"
-                            f"Updated Total => {newTot}"
-                        )
-                    elif update_key_check[0] == 'exit':
-                        break
-                    print(f"{colours.LightGreen}[#] Success!{colours.ENDC}")
-                    break
-            return [tuple(entry) for entry in tempList]
-        except Exception as e:
-            logging.error(e)
-            theLoop = True
+class array_funcs(object):
 
+    def __init__(self, ar):
+        self.ar = ar
 
-def delete_from_list(ar):
-    print(printingBills(ar, myFormat, 'none').print_bill_items())
-    theLoop = True
-    while theLoop:
-        try:
-            delKey = input(f"{colours.Yellow}[!] The (Name) To Be Removed: {colours.ENDC}")
-            if delKey == 'abort':
-                print(f"{colours.LightRed}[!] Aborting...{colours.ENDC}")
-                break
+    def duplicate_check(self, records):
+        ar = self.ar
+        quantity = int(input(f"{colours.LightYellow}Quantity: {colours.ENDC}"))
+        for row in records:
+            name = row[1]  # gets the element from the data
+            price = row[2]  # and its in a fixed format, which is what matters
+            print(f"\n{colours.LightGreen}Name  : {name}{colours.ENDC}")
+            print(f"{colours.LightGreen}Price : {price}{colours.ENDC}")
+            total = int(price) * quantity
+            if len(ar) > 0:
+                tempList = [list(item) for item in ar]  # converts into a list, since you cant change tuples
+                for i in range(len(tempList)):
+                    checkName = tempList[i][0]
+                    checkPrice = tempList[i][1]
+                    if checkName == name and checkPrice == price:
+                        print(f"\n{colours.DarkGray}[!] Duplicate Detected, Updating Current Entry{colours.ENDC}")
+                        currentTotal = tempList[i][3]
+                        currentQuantity = tempList[i][2]
+                        newTotal = int(price) * quantity + currentTotal
+                        newQuantity = int(currentQuantity) + quantity
+                        try:
+                            tempList[i][3] = newTotal
+                            tempList[i][2] = newQuantity
+                            print(f"{colours.Green}[!] Success!{colours.ENDC}")
+                            logging.info(
+                                f"Updated: {checkName}, {checkPrice}\nSet Quantity {currentQuantity} => "
+                                f"{newQuantity}\nSet Total: {currentTotal} => {newTotal}"
+                            )
+                            ar = [tuple(entry) for entry in tempList]
+                            self.ar = ar
+                        except Exception as e:
+                            logging.error(e)
+                else:
+                    self.ar.append((name, price, quantity, total))
             else:
-                for i in range(len(ar)):
-                    if ar[i][0] == delKey:
-                        popTime = ar[i]
-                        ar.remove(popTime)
+                self.ar.append((name, price, quantity, total))
+
+    def update_list(self):
+        ar = self.ar
+        print(printingBills(ar, myFormat, 'none').print_bill_items())
+        theLoop = True
+        while theLoop:
+            try:
+                updateValue = input(f"{colours.Yellow}[*] What Would You Like To Update? (Name): {colours.ENDC}")
+                tempList = [list(tup) for tup in ar]
+                for i in range(len(tempList)):
+                    up_name = tempList[i][0]
+                    if updateValue == up_name:
+                        update_key = input(f"{colours.White}[+] Add Or Remove How Much? (+ amount/ - amount): {colours.ENDC}")
+                        update_key_check = (update_key.split(' '))
+                        upQuan = int(update_key_check[1])
+                        oldQuan = tempList[i][2]
+                        if update_key_check[0] == '+':
+                            newQuan = upQuan + oldQuan
+                            newTot = newQuan * tempList[i][1]
+                            tempList[i][2] = newQuan
+                            tempList[i][3] = newTot
+                            logging.info(
+                                f"Updated: {updateValue}, {ar[i][1]}\nSet Quantity {oldQuan} => "
+                                f"{newQuan}\nUpdated Total {tempList[i][3]} => {newTot}"
+                            )
+                            ar = [tuple(entry) for entry in tempList]
+                        elif update_key_check[0] == '-':
+                            newQuanCheck = oldQuan - upQuan
+                            if newQuanCheck > 0:
+                                newQuan = newQuanCheck
+                            else:
+                                print(f"{colours.Red}[ The Value Is Either Negative or 0, And Will Be Set To 1 ]")
+                                print(f"[ If Your Intention Was To Delete This, Use The 'del' Command Instead ]{colours.ENDC}")
+                                confirm = input(f"{colours.Yellow}[!] Proceed? (Y/N): {colours.ENDC}")
+                                if confirm == 'Y':
+                                    logging.warning(f"Set {updateValue}, {ar[i][1]}'s Quantity to 1")
+                                    newQuan = 1
+                                else:
+                                    logging.warning(f"Didn't Change {updateValue}, {ar[i][1]}'s Quantity")
+                                    newQuan = oldQuan
+                            newTot = newQuan * tempList[i][1]
+                            tempList[i][2] = newQuan
+                            tempList[i][3] = newTot
+                            logging.info(
+                                f"Updated: {updateValue}, {ar[i][1]}\nSet Quantity {oldQuan} => {newQuan}\n"
+                                f"Updated Total => {newTot}"
+                            )
+                        elif update_key_check[0] == 'exit':
+                            break
+                        print(f"{colours.LightGreen}[#] Success!{colours.ENDC}")
                         break
-                print(f"\n{colours.Green}[*] Success! Type  '--' in the ID prompt To See The Updated Version!{colours.ENDC}")
-                logging.info(f"Successfully Deleted Entry {delKey}")
-                theLoop = False
-        except Exception as e:
-            logging.error(e)
-            print(f"{colours.Red}[ Error Occurred, Please Retry ]{colours.ENDC}")
-            theLoop = True
-    return ar
+                self.ar = [tuple(entry) for entry in tempList]
+            except Exception as e:
+                logging.error(e)
+                theLoop = True
+
+    def delete_from_list(self):
+        ar = self.ar
+        print(printingBills(ar, myFormat, 'none').print_bill_items())
+        theLoop = True
+        while theLoop:
+            try:
+                delKey = input(f"{colours.Yellow}[!] The (Name) To Be Removed: {colours.ENDC}")
+                if delKey == 'abort':
+                    print(f"{colours.LightRed}[!] Aborting...{colours.ENDC}")
+                    break
+                else:
+                    for i in range(len(ar)):
+                        if ar[i][0] == delKey:
+                            popTime = ar[i]
+                            ar.remove(popTime)
+                            break
+                    print(f"\n{colours.Green}[*] Success! Type  '--' in the ID prompt To See The Updated Version!{colours.ENDC}")
+                    logging.info(f"Successfully Deleted Entry {delKey}")
+                    theLoop = False
+            except Exception as e:
+                logging.error(e)
+                print(f"{colours.Red}[ Error Occurred, Please Retry ]{colours.ENDC}")
+                theLoop = True
+        self.ar = ar
+
+    def get(self):
+        return self.ar
 
 
 # -------------------------------------------- Main Code --------------------------------------------------#
@@ -310,26 +318,28 @@ def main(transfer, mydb, vat):
     global customerName
     customerName = startup()
     idInput = 69420666  # well, had to declare it as something -\_/-
-    ar = []  # declared as empty, will get filled in the process
+    ar = array_funcs([])  # declared as empty, will get filled in the process
     while idInput != ' ':
         try:
+            ar = array_funcs(ar.get())
+            b = ar.get()
             idInput = input(f"\n{colours.LightCyan}ID: {colours.ENDC}")  # ID As In The First Column
             if '' == idInput:  # if you just hit enter
-                bill_write(ar, transfer, vat)
+                bill_write(ar.get(), transfer, vat)
                 break
             elif idInput == 'Kill':  # had to add an emergency kill function :)
                 go = kill_this()
                 if go:
                     break
             elif idInput == 'del':
-                ar = delete_from_list(ar)
+                ar.delete_from_list()
             elif idInput == '--':
-                print(printingBills(ar, myFormat, 'none').print_bill_items())
+                print(printingBills(ar.get(), myFormat, 'none').print_bill_items())
                 print(
-                    f"{colours.LightMagenta}Subtotal: {printingBills(ar, myFormat, 'none').print_total()}{colours.ENDC}"
+                    f"{colours.LightMagenta}Subtotal: {printingBills(ar.get(), myFormat, 'none').print_total()}{colours.ENDC}"
                 )
             elif idInput == 'update':
-                ar = update_list(ar)
+                ar.update_list()
             else:
                 proceed = int(idInput)
                 sql_select_Query = f"select * from paddigurlTest WHERE id = {proceed}"  # Sent To The Database
@@ -337,11 +347,7 @@ def main(transfer, mydb, vat):
                 cursor.execute(sql_select_Query)  # Executes
                 records = cursor.fetchall()  # Gets All The Outputs
                 if records:  # Basically proceeds if its not empty like []
-                    dup = duplicate_check(ar, records)
-                    if len(dup) == len(ar) and len(dup) != len(records):
-                        ar = dup
-                    else:
-                        ar.append(appending_to_ar(dup[0], dup[1], dup[2], dup[3]))
+                    ar.duplicate_check(records)
                 else:
                     print(
                         f"\n{colours.Red}Did You Enter The Right ID / Command?{colours.ENDC}")  # congratulations!
