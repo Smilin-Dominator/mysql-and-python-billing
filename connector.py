@@ -279,6 +279,7 @@ class array_funcs(object):
                         print(f"{colours.LightGreen}[#] Success!{colours.ENDC}")
                         break
                 self.ar = [tuple(entry) for entry in tempList]
+                break
             except Exception as e:
                 logging.error(e)
                 theLoop = True
