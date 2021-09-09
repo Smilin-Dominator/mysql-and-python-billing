@@ -96,7 +96,7 @@ def init5_security(mycursor, conf):
         read_pass_re = read_pass.read()
         read_pass_tup = tuple(read_pass_re.split(','))
         if read_pass_tup == (critical[0][0], critical[0][1], critical[0][2]):
-            print("[*] Password Check Successful.. Proceeding..")
+            logging.info("[*] Password Check Successful.. Proceeding..")
         else:
             print(integrityCheck('none', 'none', critical, mycursor).pass_write())
 
@@ -124,6 +124,6 @@ def init5_security(mycursor, conf):
                 split = tuple(scrape2[i].split(','))
                 hash_check_ar.append(split)
         if hash_check_ar == scrape:
-            print("[*] Hashes Match.. Proceeding...\n")
+            logging.info("[*] Hashes Match.. Proceeding...\n")
         else:
             print(integrityCheck('none', scrape, 'none', mycursor).hash_write())
