@@ -21,6 +21,7 @@ import time
 try:
     import mysql.connector
     import rsa
+    import yaml
 except ModuleNotFoundError:
     setup.main()
 
@@ -98,19 +99,19 @@ def read_config(mycursor):
     while True:
         try:
             # Third Phase - Checks For Updates
-            config = open('./credentials/options.yml', 'r').read().splitlines()
-            if config[0] == 'check_for_updates=True':
+            config = yaml.load(open('./credentials/options.yml', 'r'), yaml.FullLoader)
+            if config["check_for_updates"]:
                 init3()
             # Fourth Phase - Checks Integrity Of Credentials
-            if config[1] == 'check_file_integrity=True':
+            if config['check_file_integrity']:
                 init5(mycursor, True)
             else:
                 init5(mycursor, False)
-            if config[2] == "transactions_or_cash=True":
+            if config['transactions']:
                 transactions = True
             else:
                 transactions = False
-            if config[3] == "vat=True":
+            if config['vat']:
                 vat = True
             else:
                 vat = False

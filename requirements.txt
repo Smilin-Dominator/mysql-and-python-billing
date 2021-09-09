@@ -3,3 +3,4 @@ pandas~=1.2.4
 rsa~=4.7.2
 pyinstaller~=4.2
 flake8
+pyyaml
