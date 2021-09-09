@@ -13,7 +13,7 @@ BUF_SIZE = 65536
 
 
 def startup():
-    nameOfCustomer = input(f"{colours.White}Customer: {colours.ENDC}")  # Optional, if you're in a hurry, just leave blank
+    nameOfCustomer = input(f"{colours.White}Customer: {colours.ENDC}")  # Optional, if you're in a hurry, leave blank
     if not nameOfCustomer:  # ' ' => blank
         nameOfCustomer = '(Not Specified)'
     logging.info(f"\nSold the following to {nameOfCustomer}")  # you'll see this often, in case any bills go missing
@@ -31,7 +31,7 @@ varTime = time.strftime("%d_of_%B")
 
 class printingBills(object):
 
-    def __init__(self, ar, new_format, file):
+    def __init__(self, ar=None, new_format=None, file=None):
         self.ar = ar
         self.form = new_format
         self.formPrep = self.form.format('Name', 'Price (Rs.)', 'Quantity', 'Total (Rs.)')
@@ -69,7 +69,7 @@ def bill_write(ar, transfer, vat):
     filePath = os.path.join(f'./bills/{varTime}', fileName)  # adds it into the bills DIR
     fileOpen = open(filePath, 'w+')  # Opens the bill file for writing
 
-    print_the_values = printingBills(ar, myFormat, 'none')
+    print_the_values = printingBills(ar, myFormat)
     print(print_the_values.print_bill_items())
 
     fileOpen.write(f"{fileHeaderFormat.format(70 * '-')}")
@@ -82,7 +82,7 @@ def bill_write(ar, transfer, vat):
     write_the_values = printingBills(ar, myFormat, fileOpen)
     write_the_values.write_bill_items()
 
-    var_tot = printingBills(ar, myFormat, 'var').print_total()
+    var_tot = printingBills(ar, myFormat).print_total()
     print(f"{colours.Red}Subtotal: Rs. {var_tot}{colours.ENDC}")
     fileOpen.write(f'\n\nSubtotal: Rs. {str(var_tot)}')
     logging.info(f'Subtotal: Rs. {var_tot}')  # Three simultaneous actions here lol
@@ -176,15 +176,6 @@ def kill_this():
 
 # ------------------------------------------ Array Related Functions ----------------------------------------------#
 
-def appending_to_ar(name, price, quantity, total):
-    tuppence = (name, price, quantity, total)
-    # and now its done.... (suspense)
-    logging.info(  # have to have a backup:)
-        f'Sold {quantity} Of Item;\n\nName: {name}\nPrice: {price}\n\nbringing the total to Rs. {total}'
-    )
-    return tuppence
-
-
 class array_funcs(object):
 
     def __init__(self, ar):
@@ -230,7 +221,7 @@ class array_funcs(object):
 
     def update_list(self):
         ar = self.ar
-        print(printingBills(ar, myFormat, 'none').print_bill_items())
+        print(printingBills(ar, myFormat).print_bill_items())
         theLoop = True
         while theLoop:
             try:
@@ -286,7 +277,7 @@ class array_funcs(object):
 
     def delete_from_list(self):
         ar = self.ar
-        print(printingBills(ar, myFormat, 'none').print_bill_items())
+        print(printingBills(ar, myFormat).print_bill_items())
         theLoop = True
         while theLoop:
             try:
@@ -315,7 +306,6 @@ class array_funcs(object):
 
 # -------------------------------------------- Main Code --------------------------------------------------#
 
-
 def main(transfer, mydb, vat):
     global customerName
     customerName = startup()
@@ -335,9 +325,9 @@ def main(transfer, mydb, vat):
             elif idInput == 'del':
                 ar.delete_from_list()
             elif idInput == '--':
-                print(printingBills(ar.get(), myFormat, 'none').print_bill_items())
+                print(printingBills(ar.get(), myFormat).print_bill_items())
                 print(
-                    f"{colours.LightMagenta}Subtotal: {printingBills(ar.get(), myFormat, 'none').print_total()}{colours.ENDC}"
+                    f"{colours.LightMagenta}Subtotal: {printingBills(ar.get(), myFormat).print_total()}{colours.ENDC}"
                 )
             elif idInput == 'update':
                 ar.update_list()
