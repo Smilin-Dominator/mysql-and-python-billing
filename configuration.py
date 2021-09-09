@@ -78,6 +78,7 @@ class commands:
             "check_file_integrity": None,
             "transactions": None,
             "vat": None,
+            "discount": None
         }
         if f:
             ops["check_for_updates"] = False
@@ -102,6 +103,11 @@ class commands:
             ops["vat"] = True
         else:
             ops["vat"] = False
+        incheck = input("[*] Using Discounts? (y/n): ")
+        if incheck == 'y':
+            ops["discount"] = True
+        else:
+            ops["discount"] = False
         yaml.dump(ops, options)
         options.flush()
         options.close()

@@ -8,7 +8,6 @@ from configuration import colours, variables
 logging.basicConfig(filename='log.txt', format=variables.log_format, datefmt='[%Y-%m-%d] [%H:%M:%S]',
                     level=logging.DEBUG)
 
-
 BUF_SIZE = 65536
 
 
@@ -62,7 +61,7 @@ class printingBills(object):
         return tot
 
 
-def bill_write(ar, transfer, vat):
+def bill_write(ar, transfer, vat, discount):
     fileTime = str(time.strftime('%I.%M_%p'))  # eg: 07.10 PM
     customerNameFormat = customerName.replace(' ', '_')
     fileName = f"[BILL]-{customerNameFormat}-{fileTime}.txt"  # format of the filename
@@ -87,31 +86,44 @@ def bill_write(ar, transfer, vat):
     fileOpen.write(f'\n\nSubtotal: Rs. {str(var_tot)}')
     logging.info(f'Subtotal: Rs. {var_tot}')  # Three simultaneous actions here lol
 
-    passOff = False
-    while not passOff:
-        discountInput = float(input(f"{colours.LightYellow}Discount (%): {colours.ENDC}"))
-        if discountInput >= 0:
-            discountAmount = var_tot * (discountInput / 100)
-            discountSum = var_tot - discountAmount
-            if discountSum >= 0:
-                discountTotal = round(discountSum, 2)
-                print(f"{colours.LightGreen}Discount Amount: Rs. {round(discountAmount, 2)}{colours.ENDC}")
-                print(f"{colours.LightGray}Subtotal w/ Discount: Rs. {round(discountTotal, 2)}{colours.ENDC}")
-                fileOpen.write(f"\nDiscount: {discountInput}%")
-                fileOpen.write(f"\nDiscount Amount: Rs. {round(discountAmount, 2)}")
-                fileOpen.write(f"\nSubtotal w/ Discount: Rs. {round(discountTotal, 2)}")
-                logging.info(f"Discount: {discountInput}%")
-                logging.info(f"Discount Amount: Rs. {round(discountAmount, 2)}")
-                logging.info(f"Subtotal w/ Discount: Rs. {round(discountTotal, 2)}")
-                passOff = True
+    """
+    If discount is true, it'll show the discount interface
+    This also loops until the balance is greater than or equal to 0
+    If it's false, it sets the Discount Total to the First Total
+    
+    And then there's VAT. If you enable vat, it'll calculate 15% of the Discounted Total and add it
+    to the total.
+    """
+
+    if discount:
+        passOff = False
+        while not passOff:
+            discountInput = float(input(f"{colours.LightYellow}Discount (%): {colours.ENDC}"))
+            if discountInput >= 0:
+                discountAmount = var_tot * (discountInput / 100)
+                discountSum = var_tot - discountAmount
+                if discountSum >= 0:
+                    discountTotal = round(discountSum, 2)
+                    print(f"{colours.LightGreen}Discount Amount: Rs. {round(discountAmount, 2)}{colours.ENDC}")
+                    print(f"{colours.LightGray}Subtotal w/ Discount: Rs. {round(discountTotal, 2)}{colours.ENDC}")
+                    fileOpen.write(f"\nDiscount: {discountInput}%")
+                    fileOpen.write(f"\nDiscount Amount: Rs. {round(discountAmount, 2)}")
+                    fileOpen.write(f"\nSubtotal w/ Discount: Rs. {round(discountTotal, 2)}")
+                    logging.info(f"Discount: {discountInput}%")
+                    logging.info(f"Discount Amount: Rs. {round(discountAmount, 2)}")
+                    logging.info(f"Subtotal w/ Discount: Rs. {round(discountTotal, 2)}")
+                    passOff = True
+                else:
+                    print(colours.Red, "[ Try Again, The Discount Sum is Negative ]", colours.ENDC)
+                    logging.warning("Entered Incorrect Discount %")
+                    passOff = False
             else:
-                print(colours.Red, "[ Try Again, The Discount Sum is Negative ]", colours.ENDC)
+                print("[ Try Again, Its Either 0 or An Integer ]")
                 logging.warning("Entered Incorrect Discount %")
                 passOff = False
-        else:
-            print("[ Try Again, Its Either 0 or An Integer ]")
-            logging.warning("Entered Incorrect Discount %")
-            passOff = False
+    else:
+        discountTotal = var_tot
+
     if vat:
         vatAmount = discountTotal * (15 / 100)
         print(f"{colours.LightMagenta}Tax: Rs. {vatAmount}{colours.ENDC}")
@@ -119,10 +131,18 @@ def bill_write(ar, transfer, vat):
         finalTotal = discountTotal + vatAmount
     else:
         finalTotal = discountTotal
+
     print(f"{colours.LightGreen}Grand Total: Rs. {finalTotal}{colours.ENDC}")
     logging.info(f"Grand Total: Rs. {finalTotal}")
     fileOpen.write(f"\nGrand Total: Rs. {finalTotal}")
     passOff = False
+
+    """
+    In the following section, it says Transfer or not transfer.
+    If it's not transfer, it'll calculate the balance, and will loop until the balance is either 0 or negative.
+    In the transfer mode, you just select if they have or haven't transfered
+    """
+
     if not transfer:
         while not passOff:
             cashGiven = int(input(f'{colours.LightRed}Cash Given: Rs. {colours.ENDC}'))
@@ -230,7 +250,8 @@ class array_funcs(object):
                 for i in range(len(tempList)):
                     up_name = tempList[i][0]
                     if updateValue == up_name:
-                        update_key = input(f"{colours.White}[+] Add Or Remove How Much? (+ amount/ - amount): {colours.ENDC}")
+                        update_key = input(
+                            f"{colours.White}[+] Add Or Remove How Much? (+ amount/ - amount): {colours.ENDC}")
                         update_key_check = (update_key.split(' '))
                         upQuan = int(update_key_check[1])
                         oldQuan = tempList[i][2]
@@ -250,7 +271,8 @@ class array_funcs(object):
                                 newQuan = newQuanCheck
                             else:
                                 print(f"{colours.Red}[ The Value Is Either Negative or 0, And Will Be Set To 1 ]")
-                                print(f"[ If Your Intention Was To Delete This, Use The 'del' Command Instead ]{colours.ENDC}")
+                                print(
+                                    f"[ If Your Intention Was To Delete This, Use The 'del' Command Instead ]{colours.ENDC}")
                                 confirm = input(f"{colours.Yellow}[!] Proceed? (Y/N): {colours.ENDC}")
                                 if confirm == 'Y':
                                     logging.warning(f"Set {updateValue}, {ar[i][1]}'s Quantity to 1")
@@ -291,7 +313,8 @@ class array_funcs(object):
                             popTime = ar[i]
                             ar.remove(popTime)
                             break
-                    print(f"\n{colours.Green}[*] Success! Type  '--' in the ID prompt To See The Updated Version!{colours.ENDC}")
+                    print(
+                        f"\n{colours.Green}[*] Success! Type  '--' in the ID prompt To See The Updated Version!{colours.ENDC}")
                     logging.info(f"Successfully Deleted Entry {delKey}")
                     theLoop = False
             except Exception as e:
@@ -306,7 +329,7 @@ class array_funcs(object):
 
 # -------------------------------------------- Main Code --------------------------------------------------#
 
-def main(transfer, mydb, vat):
+def main(transfer, mydb, vat, discount):
     global customerName
     customerName = startup()
     idInput = 69420666  # well, had to declare it as something -\_/-
@@ -316,7 +339,7 @@ def main(transfer, mydb, vat):
             ar = array_funcs(ar.get())
             idInput = input(f"\n{colours.LightCyan}ID: {colours.ENDC}")  # ID As In The First Column
             if '' == idInput:  # if you just hit enter
-                bill_write(ar.get(), transfer, vat)
+                bill_write(ar.get(), transfer, vat, discount)
                 break
             elif idInput == 'Kill':  # had to add an emergency kill function :)
                 go = kill_this()

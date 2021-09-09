@@ -115,22 +115,26 @@ def read_config(mycursor):
                 vat = True
             else:
                 vat = False
+            if config['discount']:
+                discount = True
+            else:
+                discount = False
             break
         except FileNotFoundError as e:
             logging.warning(e)
             print("[!] Config File Not Found!\n[*] Generating...")
             commands().conifguration_file()
-        except IndexError as e:
-            logging.warning(e)
+        except KeyError as e:
+            logging.error(e)
             print("[!] Not Enough Arguments!\n[*] Regenerating...")
             commands().conifguration_file()
-    return [transactions, vat]
+    return [transactions, vat, discount]
 
 
 def main(messageOfTheSecond, mycursor, mydb):
     key = 2
     while key != '1':
-        (transactions, vat) = read_config(mycursor)
+        (transactions, vat, discount) = read_config(mycursor)
         randomNumGen = random.randint(1, len(messageOfTheSecond))  # RNG, unscripted order
         print(
             f"\n{colours.BackgroundDarkGray}Random Line from HUMBLE.:{colours.ENDC} {colours.BackgroundLightMagenta}"
@@ -158,7 +162,7 @@ def main(messageOfTheSecond, mycursor, mydb):
             elif key == '2':
                 logging.info("Transferring to (connector.py)")
                 import connector
-                connector.main(transactions, mydb, vat)
+                connector.main(transactions, mydb, vat, discount)
             elif key == '3':
                 logging.info("Transferring to (master-bill.py)")
                 import master_bill
