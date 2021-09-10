@@ -94,7 +94,7 @@ def bill_write(ar: list[[str, int, int]], transfer: bool, vat: bool, discount: b
     And then there's VAT. If you enable vat, it'll calculate 15% of the Discounted Total and add it
     to the total.
     """
-
+    discountTotal = var_tot
     if discount:
         passOff = False
         while not passOff:
@@ -121,8 +121,6 @@ def bill_write(ar: list[[str, int, int]], transfer: bool, vat: bool, discount: b
                 print("[ Try Again, Its Either 0 or An Integer ]")
                 logging.warning("Entered Incorrect Discount %")
                 passOff = False
-    else:
-        discountTotal = var_tot
 
     if vat:
         vatAmount = discountTotal * (15 / 100)
