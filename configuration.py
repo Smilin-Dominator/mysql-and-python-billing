@@ -1,6 +1,7 @@
 import logging
 import os
 import sys
+import yaml
 
 
 def execheck():
@@ -69,34 +70,111 @@ class commands:
         input("(enter to continue...)")
         os.system('cls')
 
-    def conifguration_file(self):
-        options = open('./credentials/options.txt', 'w+')
+    def write_conifguration_file(self):
+        options = open('./credentials/options.yml', 'w+')
         f = execheck()
+        ops = {
+            "check_for_updates": None,
+            "check_file_integrity": None,
+            "transactions": None,
+            "vat": None,
+            "discount": None
+        }
         if f:
-            options.write("check_for_updates=False")
+            ops["check_for_updates"] = False
         else:
             up = input("[*] Check For Updates On Startup? (y/n): ")
             if up == 'y':
-                options.write("check_for_updates=True")
+                ops["check_for_updates"] = True
             else:
-                options.write("check_for_updates=False")
+                ops["check_for_updates"] = False
         incheck = input("[*] Check Password Integrity On Startup? (y/n): ")
         if incheck == 'y':
-            options.write("\ncheck_file_integrity=True")
+            ops["check_file_integrity"] = True
         else:
-            options.write("\ncheck_file_integrity=False")
+            ops["check_file_integrity"] = False
         incheck = input("[*] Transaction Mode? (y/n): ")
         if incheck == 'y':
-            options.write("\ntransactions_or_cash=True")
+            ops["transactions"] = True
         else:
-            options.write("\ntransactions_or_cash=False")
+            ops["transactions"] = False
         incheck = input("[*] Add VAT To Total? (y/n): ")
         if incheck == 'y':
-            options.write("\nvat=True")
+            ops["vat"] = True
         else:
-            options.write("\nvat=False")
+            ops["vat"] = False
+        incheck = input("[*] Using Discounts? (y/n): ")
+        if incheck == 'y':
+            ops["discount"] = True
+        else:
+            ops["discount"] = False
+        yaml.dump(ops, options)
         options.flush()
         options.close()
+
+    def configuration_file_status(self, items):
+        return """
+            1) Check For Updates: %s
+            2) Check File Integrity: %s
+            3) Transaction Mode: %s
+            4) VAT Enabled: %s
+            5) Discount Enabled: %s
+            ...
+            99) Done
+        """ % (items["check_for_updates"], items["check_file_integrity"], items["transactions"], items["vat"], items["discount"])
+
+    def configuration_file_interface(self):
+
+        """
+        This Interface Activates Only If there are no errors
+        And You Clicked 6) on (main.py)
+
+        What makes this unique is that unlike the previous, it shows you the status of each one, and you just
+        have to toggle the options as True or False.
+
+        At the end, you'll see a for loop. That's part of an illusion used to print the same lines updated,
+        without going further down, basically Rewriting the input.
+        CURSOR_UP_ONE and ERASE_LINE are sequences I use to show the illusion.
+        """
+
+        CURSOR_UP_ONE = '\x1b[1A'
+        ERASE_LINE = '\x1b[2K'
+        dictionary = yaml.load(open("credentials/options.yml", "r"), yaml.FullLoader)
+        while True:
+            print(self.configuration_file_status(dictionary))
+            choice = input(f"{colours.Yellow}[*] What Would You Like To Update?: {colours.ENDC}")
+            if choice == "99":
+                yaml.dump(dictionary, open("credentials/options.yml", "w"))
+                break
+            elif choice == "1":
+                if dictionary["check_for_updates"]:
+                    dictionary["check_for_updates"] = False
+                else:
+                    dictionary["check_for_updates"] = True
+            elif choice == "2":
+                if dictionary["check_file_integrity"]:
+                    dictionary["check_file_integrity"] = False
+                else:
+                    dictionary["check_file_integrity"] = True
+            elif choice == "3":
+                if dictionary["transactions"]:
+                    dictionary["transactions"] = False
+                else:
+                    dictionary["transactions"] = True
+            elif choice == "4":
+                if dictionary["vat"]:
+                    dictionary["vat"] = False
+                else:
+                    dictionary["vat"] = True
+            elif choice == "5":
+                if dictionary["discount"]:
+                    dictionary["discount"] = False
+                else:
+                    dictionary["discount"] = True
+            for i in range(10):
+                sys.stdout.write(CURSOR_UP_ONE)
+                sys.stdout.write(ERASE_LINE)
+
 
 
 class colours:

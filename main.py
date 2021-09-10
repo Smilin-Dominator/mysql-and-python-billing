@@ -17,10 +17,11 @@ import random
 import sys
 import time
 
-# Required Modules
+# Modules Needed To Be Installed By Pip
 try:
     import mysql.connector
     import rsa
+    import yaml
 except ModuleNotFoundError:
     setup.main()
 
@@ -98,38 +99,42 @@ def read_config(mycursor):
     while True:
         try:
             # Third Phase - Checks For Updates
-            config = open('./credentials/options.txt', 'r').read().splitlines()
-            if config[0] == 'check_for_updates=True':
+            config = yaml.load(open('./credentials/options.yml', 'r'), yaml.FullLoader)
+            if config["check_for_updates"]:
                 init3()
             # Fourth Phase - Checks Integrity Of Credentials
-            if config[1] == 'check_file_integrity=True':
+            if config['check_file_integrity']:
                 init5(mycursor, True)
             else:
                 init5(mycursor, False)
-            if config[2] == "transactions_or_cash=True":
+            if config['transactions']:
                 transactions = True
             else:
                 transactions = False
-            if config[3] == "vat=True":
+            if config['vat']:
                 vat = True
             else:
                 vat = False
+            if config['discount']:
+                discount = True
+            else:
+                discount = False
             break
         except FileNotFoundError as e:
             logging.warning(e)
             print("[!] Config File Not Found!\n[*] Generating...")
-            commands().conifguration_file()
-        except IndexError as e:
-            logging.warning(e)
+            commands().write_conifguration_file()
+        except KeyError as e:
+            logging.error(e)
             print("[!] Not Enough Arguments!\n[*] Regenerating...")
-            commands().conifguration_file()
-    return [transactions, vat]
+            commands().write_conifguration_file()
+    return [transactions, vat, discount]
 
 
 def main(messageOfTheSecond, mycursor, mydb):
     key = 2
     while key != '1':
-        (transactions, vat) = read_config(mycursor)
+        (transactions, vat, discount) = read_config(mycursor)
         randomNumGen = random.randint(1, len(messageOfTheSecond))  # RNG, unscripted order
         print(
             f"\n{colours.BackgroundDarkGray}Random Line from HUMBLE.:{colours.ENDC} {colours.BackgroundLightMagenta}"
@@ -157,7 +162,7 @@ def main(messageOfTheSecond, mycursor, mydb):
             elif key == '2':
                 logging.info("Transferring to (connector.py)")
                 import connector
-                connector.main(transactions, mydb, vat)
+                connector.main(transactions, mydb, vat, discount)
             elif key == '3':
                 logging.info("Transferring to (master-bill.py)")
                 import master_bill
@@ -172,11 +177,11 @@ def main(messageOfTheSecond, mycursor, mydb):
                 import verify
                 verify.main(mydb, mycursor)
             elif key == '6':
-                commands().conifguration_file()
+                commands().configuration_file_interface()
             elif key == '7' and transactions:
                 bank_transfer.interface(mycursor, mydb)
                 input("(enter to continue..)")
-            os.system('cls')
+            os.system('clear')
         except ValueError:
             raise errors.valueErrors("Entered A Non Integer During The Main Prompt")
 
@@ -298,7 +303,7 @@ def init3():
     else:
         print("[*] Update Found... Updating...\n")
         print(subprocess.check_output(
-            'git pull https://Smilin-Dominator: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@github.com/Smilin-Dominator'
+            'git pull https://Smilin-Dominator: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@github.com/Smilin-Dominator'
             '/mysql-and-python-billing.git').decode())
         print("\n[*] Success!")
 
