@@ -123,11 +123,11 @@ def read_config(mycursor):
         except FileNotFoundError as e:
             logging.warning(e)
             print("[!] Config File Not Found!\n[*] Generating...")
-            commands().conifguration_file()
+            commands().write_conifguration_file()
         except KeyError as e:
             logging.error(e)
             print("[!] Not Enough Arguments!\n[*] Regenerating...")
-            commands().conifguration_file()
+            commands().write_conifguration_file()
     return [transactions, vat, discount]
 
 
@@ -177,11 +177,11 @@ def main(messageOfTheSecond, mycursor, mydb):
                 import verify
                 verify.main(mydb, mycursor)
             elif key == '6':
-                commands().conifguration_file()
+                commands().configuration_file_interface()
             elif key == '7' and transactions:
                 bank_transfer.interface(mycursor, mydb)
                 input("(enter to continue..)")
-            os.system('cls')
+            os.system('clear')
         except ValueError:
             raise errors.valueErrors("Entered A Non Integer During The Main Prompt")
 

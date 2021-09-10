@@ -70,7 +70,7 @@ class commands:
         input("(enter to continue...)")
         os.system('cls')
 
-    def conifguration_file(self):
+    def write_conifguration_file(self):
         options = open('./credentials/options.yml', 'w+')
         f = execheck()
         ops = {
@@ -111,6 +111,52 @@ class commands:
         yaml.dump(ops, options)
         options.flush()
         options.close()
+
+    def configuration_file_status(self, items):
+        return """
+            1) Check For Updates: %s
+            2) Check File Integrity: %s
+            3) Transaction Mode: %s
+            4) VAT Enabled: %s
+            5) Discount Enabled: %s
+            ...
+            99) Done
+        """ % (items["check_for_updates"], items["check_file_integrity"], items["transactions"], items["vat"], items["discount"])
+
+    def configuration_file_interface(self):
+        dictionary = yaml.load(open("credentials/options.yml", "r"), yaml.FullLoader)
+        while True:
+            print(self.configuration_file_status(dictionary))
+            choice = input(f"{colours.Yellow}[*] What Would You Like To Update?: {colours.ENDC}")
+            if choice == "99":
+                yaml.dump(dictionary, open("credentials/options.yml", "w"))
+                break
+            elif choice == "1":
+                if dictionary["check_for_updates"]:
+                    dictionary["check_for_updates"] = False
+                else:
+                    dictionary["check_for_updates"] = True
+            elif choice == "2":
+                if dictionary["check_file_integrity"]:
+                    dictionary["check_file_integrity"] = False
+                else:
+                    dictionary["check_file_integrity"] = True
+            elif choice == "3":
+                if dictionary["transactions"]:
+                    dictionary["transactions"] = False
+                else:
+                    dictionary["transactions"] = True
+            elif choice == "4":
+                if dictionary["vat"]:
+                    dictionary["vat"] = False
+                else:
+                    dictionary["vat"] = True
+            elif choice == "5":
+                if dictionary["discount"]:
+                    dictionary["discount"] = False
+                else:
+                    dictionary["discount"] = True
+
 
 
 class colours:
