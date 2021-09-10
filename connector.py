@@ -30,7 +30,7 @@ varTime = time.strftime("%d_of_%B")
 
 class printingBills(object):
 
-    def __init__(self, ar=None, new_format=None, file=None):
+    def __init__(self, ar: list[tuple[str, int, int]] = None, new_format: str = None, file=None):
         self.ar = ar
         self.form = new_format
         self.formPrep = self.form.format('Name', 'Price (Rs.)', 'Quantity', 'Total (Rs.)')
@@ -61,7 +61,7 @@ class printingBills(object):
         return tot
 
 
-def bill_write(ar, transfer, vat, discount):
+def bill_write(ar: list[[str, int, int]], transfer: bool, vat: bool, discount: bool):
     fileTime = str(time.strftime('%I.%M_%p'))  # eg: 07.10 PM
     customerNameFormat = customerName.replace(' ', '_')
     fileName = f"[BILL]-{customerNameFormat}-{fileTime}.txt"  # format of the filename
@@ -198,10 +198,10 @@ def kill_this():
 
 class array_funcs(object):
 
-    def __init__(self, ar):
+    def __init__(self, ar: list[tuple[str, int, int]]):
         self.ar = ar
 
-    def duplicate_check(self, records):
+    def duplicate_check(self, records: list[int, str, int]):
         ar = self.ar
         quantity = int(input(f"{colours.LightYellow}Quantity: {colours.ENDC}"))
         for row in records:

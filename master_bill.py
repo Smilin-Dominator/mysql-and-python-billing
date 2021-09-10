@@ -64,7 +64,7 @@ class master_bill(object):
         return append_tup
 
 
-def sales_reports(multiverse):
+def sales_reports(multiverse: list):
     total_ar = []
     split_week = [multiverse[i:i + 7] for i in range(0, len(multiverse), 7)]
     for i in range(len(split_week)):

@@ -7,7 +7,7 @@ logging.basicConfig(filename='log.txt', format=variables.log_format, datefmt='[%
                     level=logging.DEBUG)
 
 
-def hash_file(filepath):
+def hash_file(filepath: str):
     sha256 = hashlib.sha256()
     if os.path.exists(filepath):
         with open(filepath, 'r') as red:
