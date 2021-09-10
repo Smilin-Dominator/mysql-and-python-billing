@@ -303,7 +303,7 @@ def init3():
     else:
         print("[*] Update Found... Updating...\n")
         print(subprocess.check_output(
-            'git pull https://Smilin-Dominator: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@github.com/Smilin-Dominator'
+            'git pull https://Smilin-Dominator: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@github.com/Smilin-Dominator'
             '/mysql-and-python-billing.git').decode())
         print("\n[*] Success!")
 

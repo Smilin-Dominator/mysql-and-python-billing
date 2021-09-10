@@ -47,7 +47,7 @@
 - Running The .exe
     - <font size="6">Download The Latest (main.zip) From The GitHub Page
         **(Optional: Read README.md, its the manual)**
-    - Open Powershell and Type `./main.exe` And It Should Setup Everything</font>
+    - You can either open Powershell and Type `./main.exe` or just click the Icon And It Should Setup Everything</font>
 - Notes Common To Both
     - If you have a MySQL Server instance, don't create a docker container, but if you don't install [docker-compose](https://docs.docker.com/compose/install/) and then run the program.
 
@@ -153,7 +153,7 @@ Hope these scenarios helped you! I'll add more along with the new features that 
           If there's < 7 Days after the initial, It'll have no issue, it'll mention them.
     - If you press 4, it'll take you to (sql-client.py) where you can view and alter entries.
     - If you press 5, it'll take you to (verify.py) where you can verify your bills.
-    - If you press 6, it'll allow you to edit your config file.
+    - If you press 6, it'll take you to an interface, allowing you to modify your configuration.
     - If you selected 'Bank Transfer Mode' there'll be a number 7, which will allow you to track who sent transfers and didn't.
       - There's two functions, view transactions and edit transactions.
       - In view, it displays all the transactions (If there are multiple under the same name, it'll display the time)
@@ -191,13 +191,13 @@ Hope these scenarios helped you! I'll add more along with the new features that 
     - If they aren't it'll say '<file> Has Been Tampered'
   - If you press 'h', it'll hash all the new bills and store the hashes (skipping existing ones)
 
-# Configuration Options (./credentials/options.txt)
+# Configuration Options (./credentials/options.yml)
 - check_for_updates
-  - Set `check_for_updates=True` if you want the program to check for updates, and auto-update, each time you run (main.py)
-  - Set `check_for_updates=False` if you want the program to ignore the updates, so you can manually `git pull origin` whenever.
+  - Set to True if you want the program to check for updates, and auto-update, each time you run (main.py)
+  - Set to False if you want the program to ignore the updates, so you can manually `git pull origin` whenever.
 - check_file_integrity
-    - Set `check_file_integrity=True` if you want the program to check if the password and hash file have been tampered with **while they're not deleted**.
-    - Set `check_file_integrity=False` if you don't want the program to check if the password and hash files have been tampered with while they're not deleted.
+    - Set to True if you want the program to check if the password and hash file have been tampered with **while they're not deleted**.
+    - Set to False if you don't want the program to check if the password and hash files have been tampered with while they're not deleted.
       > Regardless Of What You Choose, If One Of The Two Aforementioned Files Are Absent, It'll Detect It And Recover.
 - transactions
     - Set this to true to use Transactions instead of cash.
@@ -206,3 +206,5 @@ Hope these scenarios helped you! I'll add more along with the new features that 
     - Even if you change it back to Cash, your progress with the transfers will not be affected.
 - vat
     - Set to true to add 15% VAT to the bill, if false, it'll just show the grand total.
+- discount
+    - Set to true to show a discount screen when making a bill

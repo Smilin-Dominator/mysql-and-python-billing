@@ -124,6 +124,21 @@ class commands:
         """ % (items["check_for_updates"], items["check_file_integrity"], items["transactions"], items["vat"], items["discount"])
 
     def configuration_file_interface(self):
+
+        """
+        This Interface Activates Only If there are no errors
+        And You Clicked 6) on (main.py)
+
+        What makes this unique is that unlike the previous, it shows you the status of each one, and you just
+        have to toggle the options as True or False.
+
+        At the end, you'll see a for loop. That's part of an illusion used to print the same lines updated,
+        without going further down, basically Rewriting the input.
+        CURSOR_UP_ONE and ERASE_LINE are sequences I use to show the illusion.
+        """
+
+        CURSOR_UP_ONE = '\x1b[1A'
+        ERASE_LINE = '\x1b[2K'
         dictionary = yaml.load(open("credentials/options.yml", "r"), yaml.FullLoader)
         while True:
             print(self.configuration_file_status(dictionary))
@@ -156,6 +171,9 @@ class commands:
                     dictionary["discount"] = False
                 else:
                     dictionary["discount"] = True
+            for i in range(10):
+                sys.stdout.write(CURSOR_UP_ONE)
+                sys.stdout.write(ERASE_LINE)
 
 
 
