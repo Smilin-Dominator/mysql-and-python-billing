@@ -82,7 +82,7 @@ def startup():
     mycursor = mydb.cursor()
     if len(credz) == 6:
         if credz[5] == 'y':
-            commands.sql_tables(mycursor, mydb)
+            commands().sql_tables(mycursor, mydb)
     else:
         os.system('cls')
 
@@ -308,7 +308,7 @@ def init3():
         print("\n[*] Success!")
 
 
-def init5(mycursor, conf):
+def init5(mycursor, conf: bool):
     check = os.path.exists('bills/')
     varTime = time.strftime("%d_of_%B")
     varPath = f'./bills/{varTime}'

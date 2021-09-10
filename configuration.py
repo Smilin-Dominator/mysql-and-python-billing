@@ -2,6 +2,7 @@ import logging
 import os
 import sys
 import yaml
+import mysql.connector
 
 
 def execheck():
@@ -38,7 +39,7 @@ services:
 
 class commands:
 
-    def sql_tables(mycursor, mydb):
+    def sql_tables(self, mycursor, mydb):
         print("[*] Creating Tables")
         print("[*] Creating 'paddigurlTest'")
         mycursor.execute("""
@@ -112,7 +113,7 @@ class commands:
         options.flush()
         options.close()
 
-    def configuration_file_status(self, items):
+    def configuration_file_status(self, items: dict):
         return """
             1) Check For Updates: %s
             2) Check File Integrity: %s
@@ -220,7 +221,7 @@ class errors(object):
 
     class dockerError(Exception):
 
-        def __init__(self, scenario, message):
+        def __init__(self, scenario: str, message: str):
             self.scenario = scenario
             self.message = message
             self.string = "[ Docker Error: %s ]\n[ Error Message: { %s } ]"
@@ -231,7 +232,7 @@ class errors(object):
 
     class mysqlConnectionError(Exception):
 
-        def __init__(self, scenario):
+        def __init__(self, scenario: str):
             self.scenario = scenario
             self.string = "[ MySQL Connection Error: %s ]"
             self.var = self.string % self.scenario
@@ -241,7 +242,7 @@ class errors(object):
 
     class valueErrors(Exception):
 
-        def __init__(self, scenario):
+        def __init__(self, scenario: str):
             self.scenario = scenario
             self.string = "[ Value Error: %s ]"
             self.var = self.string % self.scenario

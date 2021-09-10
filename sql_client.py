@@ -13,10 +13,7 @@ def auth(mydb):
     while badPass:
         passwd = getpass.getpass("Master Password: ")
         pass_read = open('./credentials/passwd.txt', 'r')
-        check_pass_file = pass_read.read().split(',')
-        salt1 = check_pass_file[0]
-        salt2 = check_pass_file[1]
-        hash_check = check_pass_file[2]
+        (salt1, salt2, hash_check) = pass_read.read().split(',')
         pass_check = salt1 + passwd + salt2
         pass_hash = hashlib.sha512(pass_check.encode()).hexdigest()
         if pass_hash == hash_check:

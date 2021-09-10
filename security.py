@@ -68,7 +68,7 @@ class integrityCheck(object):
         return "[*] Successfully Recovered The Hashes!\n"
 
 
-def init5_security(mycursor, conf):
+def init5_security(mycursor, conf: bool):
 
     checkPass = os.path.exists('./credentials/passwd.txt')
     checkHash = os.path.exists('./credentials/hashes.txt')

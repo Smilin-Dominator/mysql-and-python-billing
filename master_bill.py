@@ -15,7 +15,7 @@ master_bill_header = "{:^50}"
 
 class master_bill(object):
 
-    def __init__(self, var_path, bill, main_ar):
+    def __init__(self, var_path=None, bill=None, main_ar=None):
         self.var_path = var_path
         self.bill = bill
         self.main_ar = main_ar
@@ -64,7 +64,7 @@ class master_bill(object):
         return append_tup
 
 
-def sales_reports(multiverse):
+def sales_reports(multiverse: list):
     total_ar = []
     split_week = [multiverse[i:i + 7] for i in range(0, len(multiverse), 7)]
     for i in range(len(split_week)):
@@ -112,9 +112,9 @@ def main():
         ls_l = os.listdir(var_path)
         for bill in ls_l:
             if bill.startswith("[BILL]"):
-                to_write = master_bill(var_path, bill, 'none').bill_collect()
+                to_write = master_bill(var_path=var_path, bill=bill).bill_collect()
                 main_ar.append(to_write)
-        print(master_bill(var_path, 'none', main_ar).bill_write())
+        print(master_bill(var_path=var_path, main_ar=main_ar).bill_write())
         sales_reports(multiverse)
     else:
         for directory in multiverse:
@@ -122,9 +122,9 @@ def main():
             ls_l = os.listdir(var_path)
             for bill in ls_l:
                 if bill.startswith("[BILL]"):
-                    to_write = master_bill(var_path, bill, 'none').bill_collect()
+                    to_write = master_bill(var_path=var_path, bill=bill).bill_collect()
                     main_ar.append(to_write)
-            print(master_bill(var_path, 'none', main_ar).bill_write())
+            print(master_bill(var_path=var_path, main_ar=main_ar).bill_write())
             print("\n")
             main_ar = []
         sales_reports(multiverse)
