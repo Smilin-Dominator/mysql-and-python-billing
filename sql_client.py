@@ -29,11 +29,12 @@ help_string = f"""
         show all        -> shows all dolls
         show specific   -> allows you to set one condition
         show advanced   -> allows you to set multiple conditions
-        show custom     -> write your own query (for the paddigurlTest table only){colours.ENDC}
+        show custom     -> write your own search query (for the paddigurlTest table only){colours.ENDC}
         
     {colours.Cyan}Inserting Data:{colours.ENDC}{colours.Green}
         add             -> adds an item, prompts for Name and Price
-        add id          -> adds an item, prompts for ID, Name and Price{colours.ENDC}
+        add id          -> adds an item, prompts for ID, Name and Price
+        add multiple    -> adds items(s), prompts for Name and Price{colours.ENDC}
         
     {colours.Cyan}Modifying Data:{colours.ENDC}{colours.Green}
         update          -> Update the name and price of an item
@@ -56,6 +57,7 @@ class commands:
     select_not_equals = "SELECT * FROM %s WHERE %s != '%s';"
     select_all = "SELECT * FROM %s;"
     insert = "INSERT INTO %s(%s) VALUES(%s);"
+    insert_multiple = "INSERT INTO %s(%s) VALUES %s"
     update = "UPDATE %s SET %s = %s;"
     delete = "DELETE FROM %s WHERE %s = %s;"
 
@@ -152,9 +154,33 @@ def main(mydb):
 
         # -------------- Insert Data --------------------#
         elif command == "add":
-            pass
+            name = input(f"{colours.Green}[*] Name: {colours.ENDC}")
+            price = int(input(f"{colours.Yellow}[*] Price: {colours.ENDC}"))
+            mycursor.execute(commands.insert % ("paddigurlTest", "name, price", f"'{name}', {price}"))
+            mydb.commit()
+            print(f"{colours.LightGreen}[!] Success! Inserted {mycursor.rowcount} Row(s)!")
         elif command == "add id":
-            pass
+            id = int(input(f"{colours.Green}[*] ID: {colours.ENDC}"))
+            name = input(f"{colours.Green}[*] Name: {colours.ENDC}")
+            price = int(input(f"{colours.Yellow}[*] Price: {colours.ENDC}"))
+            mycursor.execute(commands.insert % ("paddigurlTest", "id, name, price", f"{id}, '{name}', {price}"))
+            mydb.commit()
+            print(f"{colours.LightGreen}[!] Success! Inserted {mycursor.rowcount} Row(s)!")
+        elif command == "add multiple":
+            values = ""
+            print(f"{colours.White}[*] Enter The Values Below (Ctrl+C when Done){colours.ENDC}")
+            while True:
+                try:
+                    name = input(f"{colours.Green}[*] Name: {colours.ENDC}")
+                    price = int(input(f"{colours.Yellow}[*] Price: {colours.ENDC}"))
+                    values += f"('{name}', {price}),"
+                except KeyboardInterrupt:
+                    values = values[:-1]
+                    values += ";"
+                    break
+            mycursor.execute(commands.insert_multiple % ("paddigurlTest", "name, price", f"{values}"))
+            mydb.commit()
+            print(f"{colours.LightGreen}[!] Success! Inserted {mycursor.rowcount} Row(s)!")
 
         # -------------- Modifying Data -------------------#
         elif command == "update":
