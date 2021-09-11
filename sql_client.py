@@ -30,104 +30,39 @@ help_string = "\nhelp --> displays this\nshow all --> selects all the dolls\nbye
               "item\nremove --> removes an item\nchange --> alters an item\nadd id --> adds item with ID\n custom -->" \
               "executes your custom query\n"
 
-command_legend = {
-    "help": help_string,
-    "show all": "SELECT * FROM paddigurlTest",
-    "bye": 'quit',
-    "add": "INSERT INTO paddigurlTest(name, price) ",
-    "add id": "INSERT INTO paddigurlTest(id, name, price) ",
-    "remove": 'DELETE FROM paddigurlTest WHERE id = ',
-    "change": "UPDATE paddigurlTest SET ",
-    "custom": "Enter Your Command:"
-}
+theformat = "{:<2}{:^40}{:>5}"
+
+
+class commands:
+    select = "SELECT * FROM %s WHERE %s = %s;"
+    select_all = "SELECT * FROM %s;"
+    insert = "INSERT INTO %s(%s) VALUES(%s);"
+    update = "UPDATE %s SET %s = %s;"
+    delete = "DELETE FROM %s WHERE %s = %s;"
+
+
+def print_items(items):
+    print(theformat.format("ID", "Name", "Price"))
+    for id, name, price in items:
+        print(theformat.format(id, name, price))
+
+
+def single_condition_get_items(cursor, table: str, condition: str = None, value: str = None):
+    if (condition is not None) and (value is not None):
+        cursor.execute(commands.select % (table, condition, value))
+    else:
+        cursor.execute(commands.select_all % table)
+    return cursor.fetchall()
 
 
 def main(mydb):
     mycursor = mydb.cursor()
-    getOut = False
-    while not getOut:
+    while True:
         command = input("\nSmilin_DB> ")
-        try:
-            command_check = command_legend[command]
-            if command_check.startswith("\nhelp -->"):
-                print(command_check)
-                logging.info("Requested Help")
-            elif command == 'bye':
-                print("See Ya!\n")
-                logging.info("Exited Gracefully;")
-                break
-            elif command == 'show all':
-                mycursor.execute(command_check)
-                scrape = mycursor.fetchall()
-                out_prep = pd.DataFrame(scrape, columns=['id', 'name', 'price'])
-                out = out_prep.to_string(index=False)
-                logging.info("Showed All Entries")
-                print(f"\n{out}\n")
-            elif command == "add":
-                name_to_add = input("\nName: ")
-                price_to_add = int(input("Price: "))
-                append_add = command_check + f"VALUES('{name_to_add}',{price_to_add})"
-                mycursor.execute(append_add)
-                mydb.commit()
-                print(mycursor.rowcount, "record inserted.")
-                logging.info(f"Added Entry;\nName: {name_to_add}\nPrice: {price_to_add}")
-            elif command == "remove":
-                id_of_removal = int(input("\nID: "))
-                mycursor.execute(command_legend["show all"])
-                get_all = mycursor.fetchall()
-                for i in range(len(get_all)):
-                    if get_all[i][0] == id_of_removal:
-                        logging.warning(
-                            f"Proceeding To Delete Item:\nID: {id_of_removal}\nName: {get_all[i][1]}\nPrice: "
-                            f"{get_all[i][2]}"
-                        )
-                        mycursor.execute(
-                            f"INSERT INTO paddigurlRemoved(id, name, price) VALUES({id_of_removal}, '{get_all[i][1]}', "
-                            f"{get_all[i][2]})"
-                        )
-                del_string = command_check + f"{id_of_removal};"
-                mycursor.execute(del_string)
-                mydb.commit()
-                print("Success!")
-                logging.info("Successfully Deleted It!")
-            elif command == "change":
-                id_of_change = int(input("ID: "))
-                mycursor.execute(command_legend["show all"])
-                get_all = mycursor.fetchall()
-                for i in range(len(get_all)):
-                    if get_all[i][0] == id_of_change:
-                        logging.warning(
-                            f"Proceeding To Delete Item:\nID: {id_of_change}\nName: {get_all[i][1]}\nPrice: "
-                            f"{get_all[i][2]}"
-                        )
-                        print(f"\nCurrent Name: {get_all[i][1]}\nCurrent Price: {get_all[i][2]}\n")
-                name_to_change = input("New Name: ")
-                price_to_change = int(input("New Price: "))
-                new_str = command_check + f"name = '{name_to_change}', price = {price_to_change} WHERE id = " \
-                                          f"{id_of_change};"
-                mycursor.execute(new_str)
-                mydb.commit()
-                print("Success!")
-            elif command == "add id":
-                id_to_add = int(input("ID: "))
-                name_to_add = input("Name: ")
-                price_to_add = int(input("Price: "))
-                append_add = command_check + f"VALUES({id_to_add}, '{name_to_add}', {price_to_add})"
-                mycursor.execute(append_add)
-                mydb.commit()
-                print(mycursor.rowcount, "record inserted.")
-                logging.info(f"Added Entry;\nID: {id_to_add}\nName: {name_to_add}\nPrice: {price_to_add}")
-            elif command == "custom":
-                print(command_check)
-                execute_order = input(r"")
-                mycursor.execute(execute_order)
-                if 'SELECT' in execute_order:
-                    it_vol2 = pd.DataFrame(mycursor.fetchall(), columns=['id', 'name', 'price'])
-                    print(it_vol2.to_string(index=False))
-                else:
-                    print("Successful!")
-                mydb.commit()
-        except Exception as e:
-            print("\nCorrect Command or Error?")
-            logging.error(e)
-            getOut = False
+        if command == "help":
+            print(help_string)
+        elif command == "show all":
+            rows = single_condition_get_items(mycursor, "paddigurlTest")
+            print_items(rows)
+        elif command == "bye":
+            break
