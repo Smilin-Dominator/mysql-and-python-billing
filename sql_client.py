@@ -10,13 +10,12 @@ logging.basicConfig(filename='log.txt', format=variables.log_format, datefmt='[%
 def auth(mydb):
     badPass = True
     while badPass:
-        passwd = getpass.getpass("Master Password: ")
+        passwd = getpass.getpass(f"{colours.Red}[*] Master Password: {colours.ENDC}")
         pass_read = open('./credentials/passwd.txt', 'r')
         (salt1, salt2, hash_check) = pass_read.read().split(',')
         pass_check = salt1 + passwd + salt2
         pass_hash = hashlib.sha512(pass_check.encode()).hexdigest()
         if pass_hash == hash_check:
-            print("Success!")
             pass_read.close()
             main(mydb)
             break
@@ -25,24 +24,24 @@ def auth(mydb):
             badPass = True
 
 
-help_string = """
-    Getting Data:
+help_string = f"""
+    {colours.Cyan}Getting Data:{colours.ENDC}{colours.Green}
         show all        -> shows all dolls
         show specific   -> allows you to set one condition
         show advanced   -> allows you to set multiple conditions
-        show custom     -> write your own query (for the paddigurlTest table only)
+        show custom     -> write your own query (for the paddigurlTest table only){colours.ENDC}
         
-    Inserting Data:
+    {colours.Cyan}Inserting Data:{colours.ENDC}{colours.Green}
         add             -> adds an item, prompts for Name and Price
-        add id          -> adds an item, prompts for ID, Name and Price
+        add id          -> adds an item, prompts for ID, Name and Price{colours.ENDC}
         
-    Modifying Data:
+    {colours.Cyan}Modifying Data:{colours.ENDC}{colours.Green}
         update          -> Update the name and price of an item
-        delete          -> removes an item from paddigurlTest and adds it to paddigurlRemoved
+        delete          -> removes an item from paddigurlTest and adds it to paddigurlRemoved{colours.ENDC}
     
-    Miscellaneous:
+    {colours.Cyan}Miscellaneous:{colours.ENDC}{colours.Green}
         help            -> displays this
-        bye             -> quit
+        bye             -> quit{colours.ENDC}
 """
 
 theformat = "{:<2}{:^40}{:>5}"
