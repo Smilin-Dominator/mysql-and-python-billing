@@ -2,7 +2,6 @@ import sys
 import subprocess
 import time
 import os
-import rsa
 import base64
 from configuration import commands, variables
 
@@ -19,7 +18,7 @@ def main():
     print("[*] Success! Resuming...")
 
 
-def sql(logging):
+def sql(logging, rsa):
     check_for_file = os.path.exists('./credentials/mysql.txt')
     if not check_for_file:
         print("[*] No MySQL Configuration File Detected, Enter The Details Below.")

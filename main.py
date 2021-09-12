@@ -9,7 +9,6 @@ import bank_transfer
 import setup
 
 # Included Imports
-import base64
 import subprocess
 import logging
 import os
@@ -204,7 +203,7 @@ def init1():
     keycheck2 = os.path.exists('./credentials/public.pem')
     if (not keycheck1) or (not keycheck2):
         key_security()
-    return setup.sql(logging)
+    return setup.sql(logging, rsa)
 
 
 def init3():

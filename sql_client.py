@@ -184,6 +184,20 @@ def main(mydb):
 
         # -------------- Modifying Data -------------------#
         elif command == "update":
-            pass
+            print(f"{colours.Yellow}(Ctrl+C To Abort){colours.ENDC}")
+            id = int(input(f"{colours.Green}[*] ID: {colours.ENDC}"))
+            matches = get_items(cursor=mycursor, query="SELECT * FROM paddigurlTest WHERE Name = %d;" % id)
+            if not matches:
+                print(f"{colours.Red}[!] No Matches!{colours.ENDC}")
+                break
+            else:
+                try:
+                    print_items(matches)
+                    new_name = input(f"{colours.Green}[*] New Name: {colours.ENDC}")
+                    new_price = int(input(f"{colours.Yellow}[*] New Price: {colours.ENDC}"))
+                    logging.warning("Changing ID: %d\nName: %s => %s\nPrice: %d => %d" % (id, matches[1], new_name, matches[2], new_price))
+                    print(f"{colours.Green}[*] Success!{colours.ENDC}")
+                except KeyboardInterrupt:
+                    break
         elif command == "delete":
             pass
