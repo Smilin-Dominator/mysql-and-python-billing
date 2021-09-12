@@ -1,5 +1,4 @@
 mysql-connector-python~=8.0.25
-pandas~=1.2.4
 rsa~=4.7.2
 pyinstaller~=4.2
 flake8
