@@ -4,7 +4,7 @@
 
 # File Imports
 from configuration import variables, commands, colours, errors, execheck
-from security import init5_security
+from security import init5_security, key_security
 import bank_transfer
 import setup
 
@@ -202,32 +202,8 @@ def init0():
 def init1():
     keycheck1 = os.path.exists('./credentials/private.pem')
     keycheck2 = os.path.exists('./credentials/public.pem')
-    if not keycheck1 or (not keycheck2):
-        with open('log.txt', 'r') as truth:
-            a = truth.read().splitlines()
-            for line in a:
-                if 'Binary_Data' in line:
-                    print("[*] Found Existing Public Key..")
-                    print("[*] Recovering..")
-                    b = line.split('Binary_Data:')
-                    pubkey = open('./credentials/public.pem', 'w+')
-                    out = ''.join(b[1]).replace("b'", "").replace("'", "")
-                    dec = base64.b64decode(out).decode()
-                    pubkey.write(dec)
-                    print("[*] Successfully Recovered Public Key!")
-                    pubkey.close()
-                elif "Binary-Data" in line:
-                    print("[*] Found Existing Private Key..")
-                    print("[*] Recovering...")
-                    b = line.split('Binary-Data:')
-                    privkey = open('./credentials/private.pem', 'w+')
-                    out = ''.join(b[1]).replace("b'", "").replace("'", "")
-                    dec = base64.b64decode(out).decode()
-                    privkey.write(dec)
-                    print("[*] Successfully Recovered Private Key!")
-                    privkey.close()
-            else:
-                print("[*] No Attempt Of Fraud, Continuing..")
+    if (not keycheck1) or (not keycheck2):
+        key_security()
     return setup.sql(logging)
 
 
