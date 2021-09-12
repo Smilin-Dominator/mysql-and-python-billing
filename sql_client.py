@@ -29,7 +29,7 @@ help_string = f"""
         show all        -> shows all dolls
         show specific   -> allows you to set one condition
         show advanced   -> allows you to set multiple conditions
-        show custom     -> write your own search query (for the paddigurlTest table only){colours.ENDC}
+        show custom     -> write your own search query (for the paddigurlTest and Removed table only){colours.ENDC}
         
     {colours.Cyan}Inserting Data:{colours.ENDC}{colours.Green}
         add             -> adds an item, prompts for Name and Price
@@ -184,20 +184,40 @@ def main(mydb):
 
         # -------------- Modifying Data -------------------#
         elif command == "update":
-            print(f"{colours.Yellow}(Ctrl+C To Abort){colours.ENDC}")
             id = int(input(f"{colours.Green}[*] ID: {colours.ENDC}"))
-            matches = get_items(cursor=mycursor, query="SELECT * FROM paddigurlTest WHERE Name = %d;" % id)
+            matches = get_items(cursor=mycursor, query="SELECT * FROM paddigurlTest WHERE ID = %d;" % id)
             if not matches:
                 print(f"{colours.Red}[!] No Matches!{colours.ENDC}")
                 break
             else:
                 try:
                     print_items(matches)
+                    print(f"{colours.Yellow}\n(Ctrl+C To Abort)\n{colours.ENDC}")
                     new_name = input(f"{colours.Green}[*] New Name: {colours.ENDC}")
                     new_price = int(input(f"{colours.Yellow}[*] New Price: {colours.ENDC}"))
-                    logging.warning("Changing ID: %d\nName: %s => %s\nPrice: %d => %d" % (id, matches[1], new_name, matches[2], new_price))
+                    logging.warning("Changing ID: %d\nName: %s => %s\nPrice: %d => %d" % (id, matches[0][1], new_name, matches[0][2], new_price))
+                    mycursor.execute("UPDATE paddigurlTest SET name = '%s', price = %d WHERE ID = %d;" % (new_name, new_price, id))
+                    mydb.commit()
                     print(f"{colours.Green}[*] Success!{colours.ENDC}")
                 except KeyboardInterrupt:
                     break
         elif command == "delete":
-            pass
+            id = int(input(f"{colours.Green}[*] ID: {colours.ENDC}"))
+            matches = get_items(cursor=mycursor, query="SELECT * FROM paddigurlTest WHERE ID = %d;" % id)
+            if not matches:
+                print(f"{colours.Red}[!] No Matches!{colours.ENDC}")
+                break
+            else:
+                try:
+                    print_items(matches)
+                    go = input(f"{colours.Yellow}\n[#] Proceed? (y/n): {colours.ENDC}")
+                    if go == "y":
+                        mycursor.execute("DELETE FROM paddigurlTest WHERE id = %d;" % id)
+                        logging.warning("Removed ID: %d\nName: %s\nPrice: %d" % (id, matches[0][1], matches[0][2]))
+                        mycursor.execute("INSERT INTO paddigurlRemoved(id, name, price) VALUES(%d, '%s', %d);" % (id, matches[0][1], matches[0][2]))
+                        mydb.commit()
+                        print(f"{colours.Green}[*] Success!{colours.ENDC}")
+                    else:
+                        break
+                except KeyboardInterrupt:
+                    break
