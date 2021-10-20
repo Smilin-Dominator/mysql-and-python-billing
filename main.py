@@ -25,7 +25,21 @@ except ModuleNotFoundError:
     setup.main()
 
 
-def startup():
+"""
+
+Startup
+
+It basically uses all the main functions (down below and in security),
+performs background checks such as for log.txt and credentials and ensures
+that everything is fine when starting.
+The most important service is connecting to the SQL Database and passing
+it as a parameter to all the functions that need it.
+
+"""
+ 
+def startup() -> None:
+
+    # Starts timing the boot
     initial_time = time.time()
 
     messageOfTheSecond = {
@@ -55,6 +69,7 @@ def startup():
     credz = init1()
 
     try:
+        # Connecting to the MariaDB Database
         mydb = mysql.connector.connect(
             auth_plugin='mysql_native_password',
             host=credz[0],
@@ -65,6 +80,7 @@ def startup():
         )
     except mysql.connector.Error:
         print("[*] MySQL Database Not Connecting")
+        # If the docker-compose.yml exists, the PC thinks that the server is a container.
         if os.path.exists('docker-compose.yml'):
             print("[*] (Realization) Docker Container, Attempting To Start It")
             check = subprocess.getoutput("docker start Maria")
@@ -79,6 +95,7 @@ def startup():
             raise errors.mysqlConnectionError("Couldn't Connect To Database..")
 
     mycursor = mydb.cursor()
+    # the 6th Option is during setup and is for Setting up tables
     if len(credz) == 6:
         if credz[5] == 'y':
             commands().sql_tables(mycursor, mydb)
@@ -93,6 +110,15 @@ def startup():
     # Final Phase - Main Program
     main(messageOfTheSecond, mycursor, mydb)
 
+"""
+
+Read Config
+
+It pretty much just does what its name says. It goes
+through the YAML file which holds all the configuration
+options.
+
+"""
 
 def read_config(mycursor):
     while True:
@@ -120,28 +146,46 @@ def read_config(mycursor):
                 discount = False
             break
         except FileNotFoundError as e:
+            # This triggers if its a first time setup or if the file is deleted
             logging.warning(e)
             print("[!] Config File Not Found!\n[*] Generating...")
             commands().write_conifguration_file()
         except KeyError as e:
+            # This triggers is there's a missing value, field, etc..
             logging.error(e)
             print("[!] Not Enough Arguments!\n[*] Regenerating...")
             commands().write_conifguration_file()
     return [transactions, vat, discount]
 
 
+"""
+
+Main
+
+Main takes your input and leads you to wherever you want to go.
+Instead of importing everything in the start (messy), I do lazy
+imports here, which in turn is cleaner and faster.
+
+"""
+
+
 def main(messageOfTheSecond, mycursor, mydb):
     key = 2
     while key != '1':
+        # Gets the values for these from the read config function above
         (transactions, vat, discount) = read_config(mycursor)
         randomNumGen = random.randint(1, len(messageOfTheSecond))  # RNG, unscripted order
         print(
             f"\n{colours.BackgroundDarkGray}Random Line from HUMBLE.:{colours.ENDC} {colours.BackgroundLightMagenta}"
-            f"{messageOfTheSecond[randomNumGen]}{colours.ENDC}")  # pulls from the Dictionary
+            f"{messageOfTheSecond[randomNumGen]}{colours.ENDC}"
+        )  # pulls from the Dictionary
         if transactions:
+            # If transactions mode is true, this will pop up and there will be a prompt for has or hasn't transferred 
             tra = f"{colours.Red}7 - Transactions{colours.ENDC}"
         else:
+            # If transactions if false, it just puts ""
             tra = ""
+        # The Main Options
         print(
             f"\n\n{colours.Red}1 - Exit{colours.ENDC}\n{colours.Green}2 - Make A Bill{colours.ENDC}\n"
             f"{colours.LightYellow}3 - Create Master Bill & Sales Reports{colours.ENDC}\n{colours.Cyan}4 - SQL Client{colours.ENDC}\n"
@@ -150,6 +194,7 @@ def main(messageOfTheSecond, mycursor, mydb):
         )
         date = time.strftime('%c')
         time_prompt = time.strftime('%I:%M %p')
+        # The main prompt
         key = input(
             f"\n{colours.BackgroundLightGreen}[{date}]{colours.ENDC}-{colours.BackgroundLightCyan}[{time_prompt}]{colours.ENDC}\n"
             f"{colours.BackgroundLightMagenta}SmilinPython>{colours.ENDC} ")
@@ -184,6 +229,17 @@ def main(messageOfTheSecond, mycursor, mydb):
         except ValueError:
             raise errors.valueErrors("Entered A Non Integer During The Main Prompt")
 
+"""
+
+Init0
+
+This checks if log.txt and the credentials directory exist.
+If its not an exe file (execheck) and log.txt isn't present it launches
+first time setup.
+If its an exe file and its the first time, it'll just make log.txt
+
+"""
+
 
 def init0():
     f = execheck()
@@ -198,12 +254,35 @@ def init0():
         os.system("touch log.txt")
 
 
+"""
+
+Init1
+
+The phase that gets the SQL credentials.
+If the keys aren't present it'll either be recovered (if deleted)
+or just generate new ones.
+Either way, it'll go to setup.sql() which will either decrypt your
+credentials (if there) or perform a first time setup
+
+"""
+
+
 def init1():
     keycheck1 = os.path.exists('./credentials/private.pem')
     keycheck2 = os.path.exists('./credentials/public.pem')
     if (not keycheck1) or (not keycheck2):
         key_security()
     return setup.sql(logging, rsa)
+
+
+"""
+
+Init3
+
+This phase is an optional phase that checks for updates from origin/main (git).
+The option to turn it off is "check_for_updates"
+
+"""
 
 
 def init3():
@@ -221,6 +300,20 @@ def init3():
             'git pull https://Smilin-Dominator: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@github.com/Smilin-Dominator'
             '/mysql-and-python-billing.git').decode())
         print("\n[*] Success!")
+
+
+"""
+
+init5
+
+This is the section i've spent the most time
+on, surprisingly. This and security.py used to be the same
+and the class was originally here, but I shifted them to another file
+conf is the config option used to pursue further checks. So basically
+it'll always check for missing directories and all. But if you enable
+the option, it'll check the contents of the files and check its integrity
+
+"""
 
 
 def init5(mycursor, conf: bool):
