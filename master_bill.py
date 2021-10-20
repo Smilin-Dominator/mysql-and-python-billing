@@ -1,5 +1,7 @@
+import logging
 import os
 import time
+import glob
 from pathlib import Path
 
 
@@ -64,6 +66,14 @@ class master_bill(object):
         return append_tup
 
 
+def delete_previous(start: str):
+    hits = glob.glob(f"./sales_reports/sales-report_from_{start}*")
+    logging.info(f"Found file(s) with start date \"{hits}\": {hits}")
+    for file in hits:
+        logging.warning(f"Removing file: {file}")
+        os.remove(file)
+
+
 def sales_reports(multiverse: list):
     total_ar = []
     split_week = [multiverse[i:i + 7] for i in range(0, len(multiverse), 7)]
@@ -71,6 +81,7 @@ def sales_reports(multiverse: list):
         start = split_week[i][0]
         end = split_week[i][len(split_week[i]) - 1]
         sales_file = f"sales-report_from_{start}_to_{end}.txt"
+        delete_previous(start)
         sales_report = open(f"./sales_reports/{sales_file}", 'w+')
         for directory in split_week[i]:
             newdir = Path.joinpath(Path.cwd(), 'bills', directory, 'master_bill.txt')
