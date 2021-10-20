@@ -23,7 +23,7 @@ def hash_file(filepath: str):
 
 # ---------Hash------------#
 
-def hash(mydb, mycursor):
+def make_hash(mydb, mycursor):
     hashwrite = open('./credentials/hashes.txt', 'a')
     read_hash = open("./credentials/hashes.txt", 'r')
     multiverse = os.listdir('bills')
@@ -107,5 +107,5 @@ def main(mydb, mycursor):
         verify(mycursor)
         input("(enter to continue...)")
     elif key == 'h':
-        hash(mydb, mycursor)
+        make_hash(mydb, mycursor)
         input("(enter to continue...)")
