@@ -40,6 +40,7 @@ class commands:
 
     from rich.console import Console
     from rich import print
+    from rich.prompt import Prompt
 
     console = Console()
 
@@ -57,11 +58,23 @@ class commands:
             self.print(f"[*] [{override}]{msg}[/{override}]")
         logging.warning(msg)
 
-    def input(self, prompt: str, override: str = None) -> str:
+    def info(self, msg: str, override: str = None) -> None:
         if override is not None:
-            return self.console.input(f"[{override}]{prompt}[/{override}]: ")
+            self.print(f"[*] [{override}]{msg}[/{override}]")
         else:
-            return self.console.input(f"{prompt}")
+            self.print(f"[*] {msg}")
+
+    def input(self, prompt: str, override: str = None, default = None) -> str:
+        if default is None:
+            if override is not None:
+                return self.Prompt.ask(f"[{override}]{prompt}[/{override}]")
+            else:
+                return self.Prompt.ask(f"{prompt}")
+        else:
+            if override is not None:
+                return self.Prompt.ask(f"[{override}]{prompt}[/{override}]", default=default)
+            else:
+                return self.Prompt.ask(f"{prompt}", default=default)
 
     def sql_tables(self, mycursor, mydb):
         print("[*] Creating Tables")
