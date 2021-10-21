@@ -2,6 +2,7 @@ import logging
 import os
 import sys
 import yaml
+import rich
 
 
 def execheck():
@@ -37,6 +38,20 @@ services:
 
 
 class commands:
+
+    console = rich.console.Console
+    print = console.print
+
+    def error(self, msg: str) -> None:
+        self.print(f"[white on red]{msg}")
+        logging.error(f"{msg}\nLocals: {locals()}")
+
+    def warning(self, msg: str) -> None:
+        self.print(f"[white on yellow]{msg}")
+        logging.warning(msg)
+
+    def input(self, prompt: str, override: str) -> str:
+        return self.console.input(f"[{override}]{prompt}[/{override}]: ")
 
     def sql_tables(self, mycursor, mydb):
         print("[*] Creating Tables")
