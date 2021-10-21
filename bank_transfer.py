@@ -1,5 +1,5 @@
 import os
-from configuration import errors, input, warning, error
+from configuration import errors, input, warning, error, print
 from verify import hash_file
 
 
@@ -36,7 +36,7 @@ def view_bank_transactions():
         print(f"[blue]\t%s[/blue]" % name)
     print(f"[red]Has Not Transfered:[/red]")
     for name in has_not:
-        print(f"[light blue]\t%s[/light blue]" % name)
+        print(f"[blue]\t%s[/blue]" % name)
     return [combined, files]
 
 

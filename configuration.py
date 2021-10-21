@@ -190,7 +190,7 @@ class commands:
         dictionary = yaml.load(open("credentials/options.yml", "r"), yaml.FullLoader)
         while True:
             print(self.configuration_file_status(dictionary))
-            choice = input(f"{colours.Yellow}[*] What Would You Like To Update?: {colours.ENDC}")
+            choice = input(f"What Would You Like To Update?", override="yellow")
             if choice == "99":
                 yaml.dump(dictionary, open("credentials/options.yml", "w"))
                 break
