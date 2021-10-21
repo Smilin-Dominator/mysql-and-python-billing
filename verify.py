@@ -43,8 +43,9 @@ def make_hash(mydb, mycursor):
                     break
             else:
                 hashwrite.write(f"\n{the_new},{filehash}")
-                mycursor.execute(
-                    f"INSERT INTO paddigurlHashes(filepath, hash, filecontents) VALUES('{the_new}', '{filehash}', '{open(the_new, 'r').read()}')")
+                query = "INSERT INTO paddigurlHashes(`filepath`, `hash`, `filecontents`) VALUES(%s, %s, %s)"
+                values = (the_new, filehash, open(the_new, 'r').read())
+                mycursor.execute(query, values)
                 info(f"Hashed {file} .. {filehash}", override="cyan")
                 logging.info(f"Hashed .. {file} .. {filehash}")
         mydb.commit()
