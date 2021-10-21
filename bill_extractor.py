@@ -27,7 +27,9 @@ class bill(object):
         # **Transferred Cash: <span style="color:magenta">False</span>**<br>
         t_line = self.lines[-1]
         if self.lines[-1].startswith("**Transferred"):
-            t_line = t_line.strip('**Transferred Cash: <span style="color:magenta">').strip('</span>**<br>')
+            t_line = t_line[48:]
+            t_line = t_line[:-13]
+            print(t_line)
             if t_line == "True":
                 return True
             else:
