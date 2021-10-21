@@ -2,6 +2,9 @@ import logging
 import os
 import sys
 import yaml
+from rich.console import Console
+from rich import print
+from rich.prompt import Prompt
 
 
 def execheck():
@@ -36,49 +39,55 @@ services:
     """
 
 
+# ------------- Text Funcs ----------------#
+
+console = Console(color_system="truecolor")
+
+
+def error(msg: str, override: str = None) -> None:
+    if override is None:
+        print(f"[*] [white on red]{msg}[/white on red]")
+    else:
+        print(f"[*] [{override}]{msg}[/{override}]")
+    logging.error(f"{msg}\nLocals: {locals()}")
+
+
+def warning(msg: str, override: str = None) -> None:
+    if override is None:
+        print(f"[*] [white on yellow]{msg}[/white on yellow]")
+    else:
+        print(f"[*] [{override}]{msg}[/{override}]")
+    logging.warning(msg)
+
+
+def info(msg: str, override: str = None) -> None:
+    if override is not None:
+        print(f"[*] [{override}]{msg}[/{override}]")
+    else:
+        print(f"[*] {msg}")
+
+
+def input(prompt: str, override: str = None, default=None) -> str:
+    if default is None:
+        if override is not None:
+            return Prompt.ask(f"[{override}]{prompt}[/{override}]")
+        else:
+            return Prompt.ask(f"{prompt}")
+    else:
+        if override is not None:
+            return Prompt.ask(f"[{override}]{prompt}[/{override}]", default=default)
+        else:
+            return Prompt.ask(f"{prompt}", default=default)
+
+
+# ------------------------------------------#
+
+
 class commands:
 
-    from rich.console import Console
-    from rich import print
-    from rich.prompt import Prompt
-
-    console = Console()
-
-    def error(self, msg: str, override:str = None) -> None:
-        if override is None:
-            self.print(f"[*] [white on red]{msg}[/white on red]")
-        else:
-            self.print(f"[*] [{override}]{msg}[/{override}]")
-        logging.error(f"{msg}\nLocals: {locals()}")
-
-    def warning(self, msg: str, override:str = None) -> None:
-        if override is None:
-            self.print(f"[*] [white on yellow]{msg}[/white on yellow]")
-        else:
-            self.print(f"[*] [{override}]{msg}[/{override}]")
-        logging.warning(msg)
-
-    def info(self, msg: str, override: str = None) -> None:
-        if override is not None:
-            self.print(f"[*] [{override}]{msg}[/{override}]")
-        else:
-            self.print(f"[*] {msg}")
-
-    def input(self, prompt: str, override: str = None, default = None) -> str:
-        if default is None:
-            if override is not None:
-                return self.Prompt.ask(f"[{override}]{prompt}[/{override}]")
-            else:
-                return self.Prompt.ask(f"{prompt}")
-        else:
-            if override is not None:
-                return self.Prompt.ask(f"[{override}]{prompt}[/{override}]", default=default)
-            else:
-                return self.Prompt.ask(f"{prompt}", default=default)
-
     def sql_tables(self, mycursor, mydb):
-        print("[*] Creating Tables")
-        print("[*] Creating 'paddigurlTest'")
+        info("Creating Tables")
+        info("Creating 'paddigurlTest'")
         mycursor.execute("""
             CREATE TABLE paddigurlTest (
                 id INT AUTO_INCREMENT PRIMARY KEY,
@@ -121,27 +130,27 @@ class commands:
         if f:
             ops["check_for_updates"] = False
         else:
-            up = self.input("Check For Updates On Startup? (y/n)", "bold blue")
+            up = input("Check For Updates On Startup? (y/n)", "bold blue")
             if up == 'y':
                 ops["check_for_updates"] = True
             else:
                 ops["check_for_updates"] = False
-        incheck = self.input("Check File Integrity On Startup? (y/n)", "bold blue")
+        incheck = input("Check File Integrity On Startup? (y/n)", "bold blue")
         if incheck == 'y':
             ops["check_file_integrity"] = True
         else:
             ops["check_file_integrity"] = False
-        incheck = self.input("Transaction Mode? (y/n)", "bold blue")
+        incheck = input("Transaction Mode? (y/n)", "bold blue")
         if incheck == 'y':
             ops["transactions"] = True
         else:
             ops["transactions"] = False
-        incheck = self.input("Add VAT To Total? (y/n)", "bold blue")
+        incheck = input("Add VAT To Total? (y/n)", "bold blue")
         if incheck == 'y':
             ops["vat"] = True
         else:
             ops["vat"] = False
-        incheck = self.input("Enable Discount? (y/n)", "bold blue")
+        incheck = input("Enable Discount? (y/n)", "bold blue")
         if incheck == 'y':
             ops["discount"] = True
         else:
@@ -159,7 +168,8 @@ class commands:
             5) Discount Enabled: %s
             ...
             99) Done
-        """ % (items["check_for_updates"], items["check_file_integrity"], items["transactions"], items["vat"], items["discount"])
+        """ % (items["check_for_updates"], items["check_file_integrity"], items["transactions"], items["vat"],
+               items["discount"])
 
     def configuration_file_interface(self):
 
@@ -214,7 +224,6 @@ class commands:
                 sys.stdout.write(ERASE_LINE)
 
 
-
 class colours:
     Default = "\033[39m"
     Black = "\033[30m"
@@ -255,7 +264,6 @@ class colours:
 
 
 class errors(object):
-
     class dockerError(Exception):
 
         def __init__(self, scenario: str, message: str):

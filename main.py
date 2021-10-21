@@ -3,7 +3,7 @@
 # Don't even think of stealing my code!
 
 # File Imports
-from configuration import variables, commands, colours, errors, execheck
+from configuration import variables, commands, colours, errors, execheck, print, info
 from security import init5_security, key_security
 import bank_transfer
 import setup
@@ -24,26 +24,19 @@ try:
 except ModuleNotFoundError:
     setup.main()
 
-
-# Rich
-console = commands.console
-print = commands.print
-com = commands()
-
-
-"""
-
-Startup
-
-It basically uses all the main functions (down below and in security),
-performs background checks such as for log.txt and credentials and ensures
-that everything is fine when starting.
-The most important service is connecting to the SQL Database and passing
-it as a parameter to all the functions that need it.
-
-"""
  
 def startup() -> None:
+    """
+
+    Startup
+
+    It basically uses all the main functions (down below and in security),
+    performs background checks such as for log.txt and credentials and ensures
+    that everything is fine when starting.
+    The most important service is connecting to the SQL Database and passing
+    it as a parameter to all the functions that need it.
+
+    """
 
     # Starts timing the boot
     initial_time = time.time()
@@ -256,7 +249,7 @@ def init0():
     check = os.path.exists('./credentials')
     if not check:
         os.mkdir('./credentials')
-        print('[*] Made Directory "./Credentials"..')
+        info('Made Directory "./Credentials"')
     if (not firstTime) and (not f):
         setup.main()
     elif not firstTime and f:
