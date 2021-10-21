@@ -158,8 +158,8 @@ def main(mydb):
             mydb.commit()
             print(f"[!] Success! Inserted {mycursor.rowcount} Row(s)!", override="spring_green2")
         elif command == "add id":
-            ID = int(input(f"[*] ID:", override="magenta"))
-            name = input(f"[*] Name:", override="misty_rose3")
+            ID = int(input(f"[*] ID", override="magenta"))
+            name = input(f"[*] Name", override="misty_rose3")
             price = int(input(f"[*] Price", override="yellow"))
             mycursor.execute(commands.insert % ("paddigurlTest", "id, name, price", f"{ID}, '{name}', {price}"))
             mydb.commit()
