@@ -3,10 +3,9 @@ import hashlib
 import logging
 import time
 import os
-from configuration import variables, input, print, info, warning, error, console
+from configuration import variables, input, print, info, warning, console
 from rich.table import Table
 from pytablewriter import MarkdownTableWriter
-import io
 
 logging.basicConfig(filename='log.txt', format=variables.log_format, datefmt='[%Y-%m-%d] [%H:%M:%S]',
                     level=logging.DEBUG)
@@ -41,7 +40,7 @@ class printingBills(object):
 
     def print_bill_items(self) -> None:
 
-        """table = Table(title="The Bill")
+        table = Table(title="The Bill")
 
         table.add_column("Name", style="magenta")
         table.add_column("Price", style="cyan")
@@ -50,7 +49,11 @@ class printingBills(object):
 
         for i in range(len(self.ar)):
             table.add_row(self.ar[i][0], str(self.ar[i][1]), str(self.ar[i][2]), str(self.ar[i][3]))
-        print(table)"""
+
+        table.add_row("", "", "", "")
+        table.add_row("Subtotal", "", "", str(self.print_total()))
+
+        console.print(table)
 
     def write_bill_items(self) -> None:
         table = MarkdownTableWriter(
@@ -80,7 +83,7 @@ def bill_write(ar: list, transfer: bool, vat: bool, discount: bool):
     fileOpen = open(filePath, 'w+')  # Opens the bill file for writing
 
     print_the_values = printingBills(ar, myFormat)
-    print(print_the_values.print_bill_items())
+    print_the_values.print_bill_items()
 
     fileOpen.write(f"{fileHeaderFormat.format(70 * '-')}")
     fileOpen.write(f"\n{fileHeaderFormat.format('Paddigurl Dolls')}")
@@ -93,7 +96,7 @@ def bill_write(ar: list, transfer: bool, vat: bool, discount: bool):
     write_the_values.write_bill_items()
 
     var_tot = printingBills(ar, myFormat).print_total()
-    info(f"Subtotal: Rs. {var_tot}", override='red')
+    print(f"Subtotal: Rs. {var_tot}", override='red')
     fileOpen.write(f'\n\n**Subtotal: <span style="color:orange">Rs. {str(var_tot)}</span>**<br>')
     logging.info(f'Subtotal: Rs. {var_tot}')  # Three simultaneous actions here lol
 
@@ -115,8 +118,8 @@ def bill_write(ar: list, transfer: bool, vat: bool, discount: bool):
                 discountSum = var_tot - discountAmount
                 if discountSum >= 0:
                     discountTotal = round(discountSum, 2)
-                    info(f"Discount Amount: Rs. {round(discountAmount, 2)}", override='green')
-                    info(f"Subtotal w/ Discount: Rs. {round(discountTotal, 2)}", override='black')
+                    print(f"Discount Amount: Rs. {round(discountAmount, 2)}", override='green')
+                    print(f"Subtotal w/ Discount: Rs. {round(discountTotal, 2)}", override='black')
                     fileOpen.write(f"\n**Discount: <span style='color:orange'>{discountInput}%</span>**<br>")
                     fileOpen.write(f"\n**Discount Amount: Rs. <span style='color:red'>{round(discountAmount, 2)}</span>**<br>")
                     fileOpen.write(f"\n**Subtotal w/ Discount: Rs. <span style='color:magenta'>{round(discountTotal, 2)}</span>**<br>")
@@ -135,13 +138,13 @@ def bill_write(ar: list, transfer: bool, vat: bool, discount: bool):
 
     if vat:
         vatAmount = discountTotal * (15 / 100)
-        info(f"Tax: Rs. {vatAmount}", override='magenta')
+        print(f"Tax: Rs. {vatAmount}", override='magenta')
         fileOpen.write(f"**\nTax : Rs. <span style='color:cyan'>{vatAmount}</span>**<br>")
         finalTotal = discountTotal + vatAmount
     else:
         finalTotal = discountTotal
 
-    info(f"Grand Total: Rs. {finalTotal}", override="green")
+    print(f"Grand Total: Rs. {finalTotal}", override="green")
     logging.info(f"Grand Total: Rs. {finalTotal}")
     fileOpen.write(f"\n**Grand Total: <span style='color:yellow'>Rs. {finalTotal}</span>**<br>")
     passOff = False
@@ -163,14 +166,14 @@ def bill_write(ar: list, transfer: bool, vat: bool, discount: bool):
             elif bal == 0:
                 logging.info(f'Cash Given: Rs. {cashGiven}')
                 fileOpen.write(f'\n\n**Cash Given: Rs. <span style="color:orange">{cashGiven}</span>**<br>')
-                info('\nNo Balance!', override='green')
+                print('\nNo Balance!', override='green')
                 logging.info('No Balance')
                 fileOpen.write(f'**\nBalance: <span style="color:red">No Balance!</span>**<br>')
                 break  # passes if its not
             elif bal > 0:
                 logging.info(f'Cash Given: Rs. {cashGiven}')
                 fileOpen.write(f'\n\n**Cash Given: Rs. <span style="color:orange">{cashGiven}</span>**<br>')
-                info(f'Balance: Rs. {bal}', override="green")
+                print(f'Balance: Rs. {bal}', override="green")
                 logging.info(f'Balance: Rs. {str(bal)}\n')
                 fileOpen.write(f'**\nBalance: <span style="color:red">Rs. {bal}</span>**<br>')
                 break
@@ -226,7 +229,7 @@ class array_funcs(object):
                     checkName = tempList[i][0]
                     checkPrice = tempList[i][1]
                     if checkName == name and checkPrice == price:
-                        info(f"\n[!] Duplicate Detected, Updating Current Entry", override="black")
+                        info(f"\nDuplicate Detected, Updating Current Entry", override="teal")
                         currentTotal = tempList[i][3]
                         currentQuantity = tempList[i][2]
                         newTotal = int(price) * quantity + currentTotal
@@ -325,7 +328,7 @@ class array_funcs(object):
                             ar.remove(popTime)
                             break
                     info(
-                        f"\nSuccess! Type  '--' in the ID prompt To See The Updated Version!", override="green"
+                        f"Success! Type  '--' in the ID prompt To See The Updated Version!", override="green"
                     )
                     logging.info(f"Successfully Deleted Entry {delKey}")
                     theLoop = False
@@ -361,9 +364,6 @@ def main(transfer, mydb, vat, discount):
                 ar.delete_from_list()
             elif idInput == '--':
                 printingBills(ar.get(), myFormat).print_bill_items()
-                print(
-                    f"Subtotal: {printingBills(ar.get(), myFormat).print_total()}", override="bright_magenta"
-                )
             elif idInput == 'update':
                 ar.update_list()
             else:
