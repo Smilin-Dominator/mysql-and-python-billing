@@ -6,7 +6,7 @@ import getpass
 import base64
 import random
 import string
-from configuration import variables
+from configuration import variables, warning, info
 
 logging.basicConfig(filename='log.txt', format=variables.log_format, datefmt='[%Y-%m-%d] [%H:%M:%S]',
                     level=logging.DEBUG)
@@ -35,7 +35,7 @@ class integrityCheck(object):
                         critical_ar = (salt1, salt2, hashed_pw)
                         critical.append(critical_ar)
                     else:
-                        print("[*] Authenticity Not Recognized.. Reset log.txt and passwd.txt, Data Might've been "
+                        warning("Authenticity Not Recognized.. Reset log.txt and passwd.txt, Data Might've been "
                               "breached")
                         sys.exit(66)
             except Exception as e:
@@ -43,14 +43,14 @@ class integrityCheck(object):
         return critical
 
     def pass_write(self):
-        print("[*] Password File Tampered, Restoring...")
+        warning("Password File Tampered, Restoring...")
         logging.critical("Password File Tampered, Restoring...")
         pas = open('./credentials/passwd.txt', 'w+')
         pas.write(f"{self.password_array[0][0]},{self.password_array[0][1]},{self.password_array[0][2]}")
         pas.flush()
         pas.close()
         logging.info("Successfully Recovered Password!")
-        return "[*] Successfully Recovered Password!"
+        return "Successfully Recovered Password!"
 
     def hash_check(self):
         self.mycursor.execute("SELECT filepath, hash FROM paddigurlHashes;")
@@ -58,7 +58,7 @@ class integrityCheck(object):
         return grape
 
     def hash_write(self):
-        print("[*] Hashes Have Been Tampered With, Restoring Previous Hashes...")
+        warning("Hashes Have Been Tampered With, Restoring Previous Hashes...")
         logging.critical("Hashes Have Been Tampered With, Restoring Previous Hashes...")
         write_hash = open("./credentials/hashes.txt", 'w')
         for i in range(len(self.scraped_content)):
@@ -66,7 +66,7 @@ class integrityCheck(object):
         write_hash.flush()
         write_hash.close()
         logging.info("Successfully Recovered The Hashes!")
-        return "[*] Successfully Recovered The Hashes!\n"
+        return "Successfully Recovered The Hashes!\n"
 
 
 def init5_security(mycursor, conf: bool):
@@ -77,8 +77,8 @@ def init5_security(mycursor, conf: bool):
     if not checkPass:
         critical = integrityCheck(check_log='./log.txt', mycursor=mycursor).pass_check()
         if not critical:
-            print("[*] No Password Set.. Creating File..")
-            pas_enter = getpass.getpass("[*] Enter Password: ")
+            warning("No Password Set.. Creating File..")
+            pas_enter = getpass.getpass("[red]Enter Password:[/red] ")
             pas = open('./credentials/passwd.txt', 'w+')
             salt1 = ''.join(random.choices(string.ascii_letters + string.hexdigits, k=95))
             salt2 = ''.join(random.choices(string.digits + string.octdigits, k=95))
@@ -87,9 +87,9 @@ def init5_security(mycursor, conf: bool):
             signature = hashlib.md5("McDonalds_Im_Loving_It".encode()).hexdigest()
             logging.info(f"Systemdump--Ignore--These\n{signature}\n{salt1}\n{salt2}\n{hashpass}")
             pas.write(f'{salt1},{salt2},{hashpass}')
-            print("[*] Success!")
+            info("Success!", "green")
         else:
-            print(integrityCheck(password_array=critical, mycursor=mycursor).pass_write())
+            info(integrityCheck(password_array=critical, mycursor=mycursor).pass_write(), "green")
 
     if checkPass and conf:
         critical = integrityCheck(check_log="./log.txt", mycursor=mycursor).pass_check()
@@ -102,11 +102,11 @@ def init5_security(mycursor, conf: bool):
             print(integrityCheck(password_array=critical, mycursor=mycursor).pass_write())
 
     if not checkHash:
-        print("[*] No Hash File Found...")
+        warning("No Hash File Found...")
         scrape = integrityCheck(mycursor=mycursor).hash_check()
         if not scrape:
-            print("[*] No Attempt Of Espionage...")
-            print("[*] Proceeding To Make File....")
+            info("No Attempt Of Espionage...", "green")
+            info("Proceeding To Make File....", "bold green")
             write_hi = open('./credentials/hashes.txt', 'w')
             write_hi.write('\n')
             write_hi.close()
@@ -127,7 +127,7 @@ def init5_security(mycursor, conf: bool):
         if hash_check_ar == scrape:
             logging.info("[*] Hashes Match.. Proceeding...\n")
         else:
-            print(integrityCheck(hash_array=scrape, mycursor=mycursor).hash_write())
+            info(integrityCheck(hash_array=scrape, mycursor=mycursor).hash_write(), "green")
 
 
 def key_security():
@@ -135,24 +135,24 @@ def key_security():
         a = truth.read().splitlines()
         for line in a:
             if 'Binary_Data' in line:
-                print("[*] Found Existing Public Key..")
-                print("[*] Recovering..")
+                info("Found Existing Public Key..")
+                info("Recovering..")
                 b = line.split('Binary_Data:')
                 pubkey = open('./credentials/public.pem', 'w+')
                 out = ''.join(b[1]).replace("b'", "").replace("'", "")
                 dec = base64.b64decode(out).decode()
                 pubkey.write(dec)
-                print("[*] Successfully Recovered Public Key!")
+                info("Successfully Recovered Public Key!", "green")
                 pubkey.close()
             elif "Binary-Data" in line:
-                print("[*] Found Existing Private Key..")
-                print("[*] Recovering...")
+                info("Found Existing Private Key..")
+                info("Recovering...")
                 b = line.split('Binary-Data:')
                 privkey = open('./credentials/private.pem', 'w+')
                 out = ''.join(b[1]).replace("b'", "").replace("'", "")
                 dec = base64.b64decode(out).decode()
                 privkey.write(dec)
-                print("[*] Successfully Recovered Private Key!")
+                info("Successfully Recovered Private Key!", "green")
                 privkey.close()
         else:
-            print("[*] No Attempt Of Fraud, Continuing..")
+            info("No Attempt Of Fraud, Continuing..")

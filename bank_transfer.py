@@ -1,6 +1,7 @@
 import os
-from configuration import colours, errors
+from configuration import errors, input, warning, error, print
 from verify import hash_file
+from bill_extractor import bill
 
 
 def view_bank_transactions():
@@ -12,40 +13,41 @@ def view_bank_transactions():
     dir_prefix = "./bills/%s"
     for d in os.listdir("./bills/"):
         for file in os.listdir(dir_prefix % d):
-            with open(file_prefix % (d, file), "r") as f:
-                a = f.read().splitlines()
-                has_or_not = a[len(a) - 1]
-                if has_or_not.startswith("Transfered Cash: "):
-                    has_or_not = ''.join(has_or_not.split("Transfered Cash: "))
-                    name = ''.join(a[6].split("Customer: "))
-                    time = ''.join(a[5].split("Time: "))
-                    if has_or_not == "True":
+            if file.endswith(".md"):
+                with open(file_prefix % (d, file), "r") as f:
+                    b = bill(f)
+                    has_or_not = b.transferred()
+                    name = b.customer()
+                    time = b.time()
+                    if has_or_not:
                         files.append(file_prefix % (d, file))
                         if name in combined:
                             name = name + " - " + time
                         has.append(name)
                         combined.append(name)
-                    else:
+                    elif not has_or_not:
                         files.append(file_prefix % (d, file))
                         if name in combined:
                             name = name + " - " + time
                         has_not.append(name)
                         combined.append(name)
-    print(f"{colours.LightGreen}Transfered:{colours.ENDC}")
+                    elif has_or_not is None:
+                        pass
+    print(f"[green]Transferred:[/green]")
     for name in has:
-        print(f"{colours.LightBlue}\t%s{colours.ENDC}" % name)
-    print(f"{colours.Red}Has Not Transfered:{colours.ENDC}")
+        print(f"[blue]\t%s[/blue]" % name)
+    print(f"[red]Has Not Transferred:[/red]")
     for name in has_not:
-        print(f"{colours.LightBlue}\t%s{colours.ENDC}" % name)
+        print(f"[blue]\t%s[/blue]" % name)
     return [combined, files]
 
 
 def edit_bank_transactions(mycursor, mydb):
     names, files = view_bank_transactions()
     try:
-        name = input(f"{colours.White}[!] Which Transaction Would You Like To Change (name): {colours.ENDC}")
+        name = input(f"Which Transaction Would You Like To Change (name)", "white")
         if name in names:
-            choice = int(input(f"{colours.Green}[+] Has Transferred or Hasn't Transfered? (1/2): {colours.ENDC}"))
+            choice = int(input(f"Has Transferred or Hasn't Transfered? (1/2)", "green"))
             if choice == 1:
                 choice = "True"
             else:
@@ -55,14 +57,15 @@ def edit_bank_transactions(mycursor, mydb):
             with open(file, "r") as fil:
                 con = fil.read().splitlines()
                 con.pop()
-                con.append(f"Transfered Cash: {choice}")
+                con.append(f'**Transferred Cash: <span style="color:magenta">{choice}</span>**<br>')
             with open(file, "w") as fil:
                 fil.write("\n".join(con))
                 fil.close()
             new_hash = hash_file(file)
             new_contents = "\n".join(con)
-            string = "UPDATE `paddigurlHashes` SET hash = \"%s\", filecontents = \"%s\" WHERE filepath = \"%s\"" % (new_hash, new_contents, file)
-            mycursor.execute(string)
+            string = "UPDATE `paddigurlHashes` SET `hash` = %s, `filecontents` = %s WHERE `filepath` = %s"
+            values = [new_hash, new_contents, file]
+            mycursor.execute(string, values)
             mydb.commit()
             with open("credentials/hashes.txt", "r") as r:
                 lines = r.read().splitlines()
@@ -75,14 +78,14 @@ def edit_bank_transactions(mycursor, mydb):
             with open("credentials/hashes.txt", "w") as w:
                 w.write("\n".join(lines))
         else:
-            print(f"{colours.Yellow}[*] Invalid Name!{colours.ENDC}")
+            warning(f"Invalid Name!")
     except KeyboardInterrupt:
-        print(f"{colours.Red}[*] Successfully Aborted!{colours.ENDC}")
+        error(f"Successfully Aborted!")
 
 
 def interface(mycursor, mydb):
     try:
-        choice = int(input(f"{colours.Yellow}[*] View Transactions or Edit Transactions? (1/2): "))
+        choice = int(input(f"View Transactions or Edit Transactions? (1/2)", "yellow"))
         if choice == 1:
             view_bank_transactions()
         else:

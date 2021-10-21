@@ -3,7 +3,9 @@ import hashlib
 import logging
 import time
 import os
-from configuration import colours, variables
+from configuration import variables, input, print, info, warning, console
+from rich.table import Table
+from pytablewriter import MarkdownTableWriter
 
 logging.basicConfig(filename='log.txt', format=variables.log_format, datefmt='[%Y-%m-%d] [%H:%M:%S]',
                     level=logging.DEBUG)
@@ -12,7 +14,7 @@ BUF_SIZE = 65536
 
 
 def startup():
-    nameOfCustomer = input(f"{colours.White}Customer: {colours.ENDC}")  # Optional, if you're in a hurry, leave blank
+    nameOfCustomer = input(f"Customer", override="white")  # Optional, if you're in a hurry, leave blank
     if not nameOfCustomer:  # ' ' => blank
         nameOfCustomer = '(Not Specified)'
     logging.info(f"\nSold the following to {nameOfCustomer}")  # you'll see this often, in case any bills go missing
@@ -36,21 +38,33 @@ class printingBills(object):
         self.formPrep = self.form.format('Name', 'Price (Rs.)', 'Quantity', 'Total (Rs.)')
         self.file = file
 
-    def print_bill_items(self):
-        print(f'\n{self.formPrep}')
-        for i in range(len(self.ar)):
-            final = self.form.format(self.ar[i][0], self.ar[i][1], self.ar[i][2], self.ar[i][3])
-            print(colours.LightCyan, final, colours.ENDC)
-        return ''
+    def print_bill_items(self) -> None:
 
-    def write_bill_items(self):
-        self.file.write(f'\n{self.formPrep}')
-        for i in range(len(self.ar)):
-            final = self.form.format(self.ar[i][0], self.ar[i][1], self.ar[i][2], self.ar[i][3])
-            self.file.write(f'\n{final}')
-        return ''
+        table = Table()
 
-    def print_total(self):
+        table.add_column("Name", style="magenta")
+        table.add_column("Price", style="cyan")
+        table.add_column("Quantity", style="green")
+        table.add_column("Total", style="red")
+
+        for i in range(len(self.ar)):
+            table.add_row(self.ar[i][0], str(self.ar[i][1]), str(self.ar[i][2]), str(self.ar[i][3]))
+
+        table.add_row("", "", "", "")
+        table.add_row("Subtotal", "", "", str(self.print_total()))
+
+        console.print(table)
+
+    def write_bill_items(self) -> None:
+        table = MarkdownTableWriter(
+            headers=["Name", "Price", "Quantity", "Total"],
+            value_matrix=self.ar
+        )
+        self.file.write("\n")
+        table.stream = self.file
+        table.write_table()
+
+    def print_total(self) -> int:
         tot = 0
         price_unchained = []  # blank array, like the earlier one
         for i in range(len(self.ar)):
@@ -64,26 +78,26 @@ class printingBills(object):
 def bill_write(ar: list, transfer: bool, vat: bool, discount: bool):
     fileTime = str(time.strftime('%I.%M_%p'))  # eg: 07.10 PM
     customerNameFormat = customerName.replace(' ', '_')
-    fileName = f"[BILL]-{customerNameFormat}-{fileTime}.txt"  # format of the filename
+    fileName = f"[BILL]-{customerNameFormat}-{fileTime}.md"  # format of the filename
     filePath = os.path.join(f'./bills/{varTime}', fileName)  # adds it into the bills DIR
     fileOpen = open(filePath, 'w+')  # Opens the bill file for writing
 
     print_the_values = printingBills(ar, myFormat)
-    print(print_the_values.print_bill_items())
+    print_the_values.print_bill_items()
 
     fileOpen.write(f"{fileHeaderFormat.format(70 * '-')}")
-    fileOpen.write(f"\n{fileHeaderFormat.format('Paddigurl Dolls - 0777710090')}")
+    fileOpen.write(f"\n{fileHeaderFormat.format('Paddigurl Dolls')}")
     fileOpen.write(f"\n{fileHeaderFormat.format(70 * '-')}")
-    fileOpen.write(f'\n\nDate: {str(time.strftime("%d/%m/%Y"))}')  # eg: 02/05/2021
-    fileOpen.write(f'\nTime: {str(fileTime.replace("_", " "))}')  # uses the variable set earlier
-    fileOpen.write(f'\nCustomer: {customerName.replace("_", " ")}\n')
+    fileOpen.write(f'\n\n**Date: <span style="color:blue">{str(time.strftime("%d/%m/%Y"))}</span>**<br>')  # eg: 02/05/2021
+    fileOpen.write(f'\n**Time: <span style="color:red">{str(fileTime.replace("_", " "))}</span>**<br>')  # uses the variable set earlier
+    fileOpen.write(f'\n**Customer: <span style="color:green">{customerName.replace("_", " ")}</span>**<br>\n')
 
     write_the_values = printingBills(ar, myFormat, fileOpen)
     write_the_values.write_bill_items()
 
     var_tot = printingBills(ar, myFormat).print_total()
-    print(f"{colours.Red}Subtotal: Rs. {var_tot}{colours.ENDC}")
-    fileOpen.write(f'\n\nSubtotal: Rs. {str(var_tot)}')
+    print(f"Subtotal: Rs. {var_tot}", override='red')
+    fileOpen.write(f'\n\n**Subtotal: <span style="color:orange">Rs. {str(var_tot)}</span>**<br>')
     logging.info(f'Subtotal: Rs. {var_tot}')  # Three simultaneous actions here lol
 
     """
@@ -98,41 +112,41 @@ def bill_write(ar: list, transfer: bool, vat: bool, discount: bool):
     if discount:
         passOff = False
         while not passOff:
-            discountInput = float(input(f"{colours.LightYellow}Discount (%): {colours.ENDC}"))
+            discountInput = float(input(f"Discount (%)", override="yellow"))
             if discountInput >= 0:
                 discountAmount = var_tot * (discountInput / 100)
                 discountSum = var_tot - discountAmount
                 if discountSum >= 0:
                     discountTotal = round(discountSum, 2)
-                    print(f"{colours.LightGreen}Discount Amount: Rs. {round(discountAmount, 2)}{colours.ENDC}")
-                    print(f"{colours.LightGray}Subtotal w/ Discount: Rs. {round(discountTotal, 2)}{colours.ENDC}")
-                    fileOpen.write(f"\nDiscount: {discountInput}%")
-                    fileOpen.write(f"\nDiscount Amount: Rs. {round(discountAmount, 2)}")
-                    fileOpen.write(f"\nSubtotal w/ Discount: Rs. {round(discountTotal, 2)}")
+                    print(f"Discount Amount: Rs. {round(discountAmount, 2)}", override='green')
+                    print(f"Subtotal w/ Discount: Rs. {round(discountTotal, 2)}", override='teal')
+                    fileOpen.write(f"\n**Discount: <span style='color:orange'>{discountInput}%</span>**<br>")
+                    fileOpen.write(f"\n**Discount Amount: Rs. <span style='color:red'>{round(discountAmount, 2)}</span>**<br>")
+                    fileOpen.write(f"\n**Subtotal w/ Discount: Rs. <span style='color:magenta'>{round(discountTotal, 2)}</span>**<br>")
                     logging.info(f"Discount: {discountInput}%")
                     logging.info(f"Discount Amount: Rs. {round(discountAmount, 2)}")
                     logging.info(f"Subtotal w/ Discount: Rs. {round(discountTotal, 2)}")
                     passOff = True
                 else:
-                    print(colours.Red, "[ Try Again, The Discount Sum is Negative ]", colours.ENDC)
+                    warning("[ Try Again, The Discount Sum is Negative ]", override="red")
                     logging.warning("Entered Incorrect Discount %")
                     passOff = False
             else:
-                print("[ Try Again, Its Either 0 or An Integer ]")
+                warning("[ Try Again, Its Either 0 or An Integer ]", override="red")
                 logging.warning("Entered Incorrect Discount %")
                 passOff = False
 
     if vat:
         vatAmount = discountTotal * (15 / 100)
-        print(f"{colours.LightMagenta}Tax: Rs. {vatAmount}{colours.ENDC}")
-        fileOpen.write(f"\nTax : Rs. {vatAmount}")
+        print(f"Tax: Rs. {vatAmount}", override='magenta')
+        fileOpen.write(f"\n**Tax : Rs. <span style='color:cyan'>{vatAmount}</span>**<br>")
         finalTotal = discountTotal + vatAmount
     else:
         finalTotal = discountTotal
 
-    print(f"{colours.LightGreen}Grand Total: Rs. {finalTotal}{colours.ENDC}")
+    print(f"Grand Total: Rs. {finalTotal}", override="green")
     logging.info(f"Grand Total: Rs. {finalTotal}")
-    fileOpen.write(f"\nGrand Total: Rs. {finalTotal}")
+    fileOpen.write(f"\n**Grand Total: <span style='color:yellow'>Rs. {finalTotal}</span>**<br>")
     passOff = False
 
     """
@@ -143,33 +157,34 @@ def bill_write(ar: list, transfer: bool, vat: bool, discount: bool):
 
     if not transfer:
         while not passOff:
-            cashGiven = int(input(f'{colours.LightRed}Cash Given: Rs. {colours.ENDC}'))
+            cashGiven = int(input(f'Cash Given (Rs.)', override="green"))
             bal = int(cashGiven - finalTotal)
             if bal < 0:  # loops if its a negative number!
-                print(colours.Red, "Negative Value, Something's Off, Retry",
-                      colours.ENDC)  # something's **really** off (why doesnt MD work?)
+                warning("Negative Value, Something's Off, Retry", override="red")  # something's **really** off (why doesnt MD work?)
                 logging.warning('Negative Balance')
                 passOff = False
             elif bal == 0:
                 logging.info(f'Cash Given: Rs. {cashGiven}')
-                fileOpen.write(f'\n\nCash Given: Rs. {cashGiven}')
-                print(colours.Green, '\nNo Balance!', colours.ENDC)
+                fileOpen.write(f'\n**Cash Given: Rs. <span style="color:orange">{cashGiven}</span>**<br>')
+                print('\nNo Balance!', override='green')
                 logging.info('No Balance')
-                fileOpen.write(f'\nNo Balance!')
+                fileOpen.write(f'\n**Balance: <span style="color:red">No Balance!</span>**<br>')
                 break  # passes if its not
             elif bal > 0:
                 logging.info(f'Cash Given: Rs. {cashGiven}')
-                fileOpen.write(f'\nCash Given: Rs. {cashGiven}')
-                print(f'{colours.Green}Balance: Rs. {bal}{colours.ENDC}')
+                fileOpen.write(f'\n**Cash Given: Rs. <span style="color:orange">{cashGiven}</span>**<br>')
+                print(f'Balance: Rs. {bal}', override="green")
                 logging.info(f'Balance: Rs. {str(bal)}\n')
-                fileOpen.write(f'\nBalance: Rs. {bal}')
+                fileOpen.write(f'\n**Balance: <span style="color:red">Rs. {bal}</span>**<br>')
                 break
     else:
-        hasOrHasnt = input(f'{colours.LightRed}Has Transfered (y/n): {colours.ENDC}')
+        hasOrHasnt = input(f'Has Transfered (y/n)', override="red")
         if hasOrHasnt == "y":
-            fileOpen.write(f'\nTransfered Cash: True')
+            fileOpen.write(f'\n**Transfered Cash: <span style="color:magenta">True</span>**<br>')
         else:
-            fileOpen.write(f'\nTransfered Cash: False')
+            fileOpen.write(f'\n**Transfered Cash: <span style="color:magenta">False</span>**<br>')
+    fileOpen.flush()
+    fileOpen.close()
     input("\n(enter) to proceed...")
 
 
@@ -177,7 +192,7 @@ def bill_write(ar: list, transfer: bool, vat: bool, discount: bool):
 
 
 def kill_this():
-    killPass = str(getpass.getpass("Enter Password: "))
+    killPass = str(getpass.getpass("[*] Enter Password: "))
     pass_read = open('./credentials/passwd.txt', 'r')
     check_pass_file = pass_read.read().split(',')
     salt1 = check_pass_file[0]
@@ -201,12 +216,12 @@ class array_funcs(object):
 
     def duplicate_check(self, records: list[int, str, int]):
         ar = self.ar
-        quantity = int(input(f"{colours.LightYellow}Quantity: {colours.ENDC}"))
+        quantity = int(input(f"Quantity", override="yellow"))
         for row in records:
             name = row[1]  # gets the element from the data
             price = row[2]  # and its in a fixed format, which is what matters
-            print(f"\n{colours.LightGreen}Name  : {name}{colours.ENDC}")
-            print(f"{colours.LightGreen}Price : {price}{colours.ENDC}")
+            print(f"\nName  : {name}", override="light_steel_blue1")
+            print(f"Price : {price}", override="light_steel_blue1")
             total = int(price) * quantity
             if len(ar) > 0:
                 tempList = [list(item) for item in ar]  # converts into a list, since you cant change tuples
@@ -214,7 +229,7 @@ class array_funcs(object):
                     checkName = tempList[i][0]
                     checkPrice = tempList[i][1]
                     if checkName == name and checkPrice == price:
-                        print(f"\n{colours.DarkGray}[!] Duplicate Detected, Updating Current Entry{colours.ENDC}")
+                        info(f"\nDuplicate Detected, Updating Current Entry", override="teal")
                         currentTotal = tempList[i][3]
                         currentQuantity = tempList[i][2]
                         newTotal = int(price) * quantity + currentTotal
@@ -222,7 +237,7 @@ class array_funcs(object):
                         try:
                             tempList[i][3] = newTotal
                             tempList[i][2] = newQuantity
-                            print(f"{colours.Green}[!] Success!{colours.ENDC}")
+                            info(f"Success!", override="green_yellow")
                             logging.info(
                                 f"Updated: {checkName}, {checkPrice}\nSet Quantity {currentQuantity} => "
                                 f"{newQuantity}\nSet Total: {currentTotal} => {newTotal}"
@@ -243,13 +258,14 @@ class array_funcs(object):
         theLoop = True
         while theLoop:
             try:
-                updateValue = input(f"{colours.Yellow}[*] What Would You Like To Update? (Name): {colours.ENDC}")
+                updateValue = input(f"What Would You Like To Update? (Name)", override="dark_olive_green2")
                 tempList = [list(tup) for tup in ar]
                 for i in range(len(tempList)):
                     up_name = tempList[i][0]
                     if updateValue == up_name:
                         update_key = input(
-                            f"{colours.White}[+] Add Or Remove How Much? (+ amount/ - amount): {colours.ENDC}")
+                            f"Add Or Remove How Much? (+ amount/ - amount)", override="white"
+                        )
                         update_key_check = (update_key.split(' '))
                         upQuan = int(update_key_check[1])
                         oldQuan = tempList[i][2]
@@ -268,10 +284,10 @@ class array_funcs(object):
                             if newQuanCheck > 0:
                                 newQuan = newQuanCheck
                             else:
-                                print(f"{colours.Red}[ The Value Is Either Negative or 0, And Will Be Set To 1 ]")
-                                print(
-                                    f"[ If Your Intention Was To Delete This, Use The 'del' Command Instead ]{colours.ENDC}")
-                                confirm = input(f"{colours.Yellow}[!] Proceed? (Y/N): {colours.ENDC}")
+                                warning(f"[ The Value Is Either Negative or 0, And Will Be Set To 1 ]\n"
+                                        f"[ If Your Intention Was To Delete This, Use The 'del' Command Instead ]"
+                                        , override="red")
+                                confirm = input(f"Proceed? (Y/N)", override="yellow")
                                 if confirm == 'Y':
                                     logging.warning(f"Set {updateValue}, {ar[i][1]}'s Quantity to 1")
                                     newQuan = 1
@@ -287,7 +303,7 @@ class array_funcs(object):
                             )
                         elif update_key_check[0] == 'exit':
                             break
-                        print(f"{colours.LightGreen}[#] Success!{colours.ENDC}")
+                        info(f"Success!", override="honeydew2")
                         break
                 self.ar = [tuple(entry) for entry in tempList]
                 break
@@ -301,9 +317,9 @@ class array_funcs(object):
         theLoop = True
         while theLoop:
             try:
-                delKey = input(f"{colours.Yellow}[!] The (Name) To Be Removed: {colours.ENDC}")
+                delKey = input(f"The (Name) To Be Removed", override="red")
                 if delKey == 'abort':
-                    print(f"{colours.LightRed}[!] Aborting...{colours.ENDC}")
+                    warning(f"[!] Aborting...", override="light_salmon3")
                     break
                 else:
                     for i in range(len(ar)):
@@ -311,13 +327,14 @@ class array_funcs(object):
                             popTime = ar[i]
                             ar.remove(popTime)
                             break
-                    print(
-                        f"\n{colours.Green}[*] Success! Type  '--' in the ID prompt To See The Updated Version!{colours.ENDC}")
+                    info(
+                        f"Success! Type  '--' in the ID prompt To See The Updated Version!", override="green"
+                    )
                     logging.info(f"Successfully Deleted Entry {delKey}")
                     theLoop = False
             except Exception as e:
                 logging.error(e)
-                print(f"{colours.Red}[ Error Occurred, Please Retry ]{colours.ENDC}")
+                info(f"[ Error Occurred, Please Retry ]", override="red")
                 theLoop = True
         self.ar = ar
 
@@ -335,7 +352,7 @@ def main(transfer, mydb, vat, discount):
     while idInput != ' ':
         try:
             ar = array_funcs(ar.get())
-            idInput = input(f"\n{colours.LightCyan}ID: {colours.ENDC}")  # ID As In The First Column
+            idInput = input(f"\nID", override="light_cyan3")  # ID As In The First Column
             if '' == idInput:  # if you just hit enter
                 bill_write(ar.get(), transfer, vat, discount)
                 break
@@ -346,10 +363,7 @@ def main(transfer, mydb, vat, discount):
             elif idInput == 'del':
                 ar.delete_from_list()
             elif idInput == '--':
-                print(printingBills(ar.get(), myFormat).print_bill_items())
-                print(
-                    f"{colours.LightMagenta}Subtotal: {printingBills(ar.get(), myFormat).print_total()}{colours.ENDC}"
-                )
+                printingBills(ar.get(), myFormat).print_bill_items()
             elif idInput == 'update':
                 ar.update_list()
             else:
@@ -361,8 +375,8 @@ def main(transfer, mydb, vat, discount):
                 if records:  # Basically proceeds if its not empty like []
                     ar.duplicate_check(records)
                 else:
-                    print(
-                        f"\n{colours.Red}Did You Enter The Right ID / Command?{colours.ENDC}")  # congratulations!
+                    warning(
+                        f"\nDid You Enter The Right ID / Command?", override="red")  # congratulations!
                     # you're a failure!
                     logging.warning(f"Entered Wrong ID / CMD: {idInput}")
         except Exception as rim:

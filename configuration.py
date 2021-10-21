@@ -36,11 +36,65 @@ services:
     """
 
 
+# ------------- Text Funcs ----------------#
+
+from rich.console import Console
+from rich.prompt import Prompt
+
+console = Console(color_system="256")
+
+
+def print(prompt, override: str = None) -> None:
+    if override is not None:
+        console.print(f"[{override}]{prompt}[/{override}]")
+    else:
+        console.print(f"{prompt}")
+
+
+def error(msg: str, override: str = None) -> None:
+    if override is None:
+        print(f"[white on red][@] {msg}[/white on red]")
+    else:
+        print(f"[{override}][@] {msg}[/{override}]")
+    logging.error(f"{msg}\nLocals: {locals()}")
+
+
+def warning(msg: str, override: str = None) -> None:
+    if override is None:
+        print(f"[white on yellow][!] {msg}[/white on yellow]")
+    else:
+        print(f"[{override}][!] {msg}[/{override}]")
+    logging.warning(msg)
+
+
+def info(msg: str, override: str = None) -> None:
+    if override is not None:
+        print(f"[{override}][?] {msg}[/{override}]")
+    else:
+        print(f"[?] {msg}")
+
+
+def input(prompt: str, override: str = None, default=None) -> str:
+    if default is None:
+        if override is not None:
+            return Prompt.ask(f"[{override}]{prompt}[/{override}]")
+        else:
+            return Prompt.ask(f"{prompt}")
+    else:
+        if override is not None:
+            return Prompt.ask(f"[{override}]{prompt}[/{override}]", default=default)
+        else:
+            return Prompt.ask(f"{prompt}", default=default)
+
+
+# ------------------------------------------#
+
+
 class commands:
 
     def sql_tables(self, mycursor, mydb):
-        print("[*] Creating Tables")
-        print("[*] Creating 'paddigurlTest'")
+        info("Creating Tables")
+        info("Creating 'paddigurlTest'")
         mycursor.execute("""
             CREATE TABLE paddigurlTest (
                 id INT AUTO_INCREMENT PRIMARY KEY,
@@ -83,27 +137,27 @@ class commands:
         if f:
             ops["check_for_updates"] = False
         else:
-            up = input("[*] Check For Updates On Startup? (y/n): ")
+            up = input("Check For Updates On Startup? (y/n)", "bold blue")
             if up == 'y':
                 ops["check_for_updates"] = True
             else:
                 ops["check_for_updates"] = False
-        incheck = input("[*] Check Password Integrity On Startup? (y/n): ")
+        incheck = input("Check File Integrity On Startup? (y/n)", "bold blue")
         if incheck == 'y':
             ops["check_file_integrity"] = True
         else:
             ops["check_file_integrity"] = False
-        incheck = input("[*] Transaction Mode? (y/n): ")
+        incheck = input("Transaction Mode? (y/n)", "bold blue")
         if incheck == 'y':
             ops["transactions"] = True
         else:
             ops["transactions"] = False
-        incheck = input("[*] Add VAT To Total? (y/n): ")
+        incheck = input("Add VAT To Total? (y/n)", "bold blue")
         if incheck == 'y':
             ops["vat"] = True
         else:
             ops["vat"] = False
-        incheck = input("[*] Using Discounts? (y/n): ")
+        incheck = input("Enable Discount? (y/n)", "bold blue")
         if incheck == 'y':
             ops["discount"] = True
         else:
@@ -121,7 +175,8 @@ class commands:
             5) Discount Enabled: %s
             ...
             99) Done
-        """ % (items["check_for_updates"], items["check_file_integrity"], items["transactions"], items["vat"], items["discount"])
+        """ % (items["check_for_updates"], items["check_file_integrity"], items["transactions"], items["vat"],
+               items["discount"])
 
     def configuration_file_interface(self):
 
@@ -142,7 +197,7 @@ class commands:
         dictionary = yaml.load(open("credentials/options.yml", "r"), yaml.FullLoader)
         while True:
             print(self.configuration_file_status(dictionary))
-            choice = input(f"{colours.Yellow}[*] What Would You Like To Update?: {colours.ENDC}")
+            choice = input(f"What Would You Like To Update?", override="yellow")
             if choice == "99":
                 yaml.dump(dictionary, open("credentials/options.yml", "w"))
                 break
@@ -176,48 +231,7 @@ class commands:
                 sys.stdout.write(ERASE_LINE)
 
 
-
-class colours:
-    Default = "\033[39m"
-    Black = "\033[30m"
-    Red = "\033[31m"
-    Green = "\033[32m"
-    Yellow = "\033[33m"
-    Blue = "\033[34m"
-    Magenta = "\033[35m"
-    Cyan = "\033[36m"
-    LightGray = "\033[37m"
-    DarkGray = "\033[90m"
-    LightRed = "\033[91m"
-    LightGreen = "\033[92m"
-    LightYellow = "\033[93m"
-    LightBlue = "\033[94m"
-    LightMagenta = "\033[95m"
-    LightCyan = "\033[96m"
-    White = "\033[97m"
-    ENDC = '\033[0m'
-
-    BackgroundDefault = "\033[49m"
-    BackgroundBlack = "\033[40m"
-    BackgroundRed = "\033[41m"
-    BackgroundGreen = "\033[42m"
-    BackgroundYellow = "\033[43m"
-    BackgroundBlue = "\033[44m"
-    BackgroundMagenta = "\033[45m"
-    BackgroundCyan = "\033[46m"
-    BackgroundLightGray = "\033[47m"
-    BackgroundDarkGray = "\033[100m"
-    BackgroundLightRed = "\033[101m"
-    BackgroundLightGreen = "\033[102m"
-    BackgroundLightYellow = "\033[103m"
-    BackgroundLightBlue = "\033[104m"
-    BackgroundLightMagenta = "\033[105m"
-    BackgroundLightCyan = "\033[106m"
-    BackgroundWhite = "\033[107m"
-
-
 class errors(object):
-
     class dockerError(Exception):
 
         def __init__(self, scenario: str, message: str):
