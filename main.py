@@ -3,7 +3,7 @@
 # Don't even think of stealing my code!
 
 # File Imports
-from configuration import variables, commands, colours, errors, execheck, print, info
+from configuration import variables, commands, errors, execheck, print, info
 from security import init5_security, key_security
 import bank_transfer
 import setup
@@ -101,7 +101,7 @@ def startup() -> None:
     else:
         os.system('cls')
 
-    print(colours.BackgroundCyan, "Welcome! If Something Doesn't Seem Right, Check The Logs!", colours.ENDC, end="\n")
+    print("[white on cyan]Welcome! If Something Doesn't Seem Right, Check The Logs![/white on cyan]\n")
 
     # Logs Boot Time Taken
     logging.info("Booting Up Took: %f Seconds" % (time.time() - initial_time))
@@ -175,28 +175,29 @@ def main(messageOfTheSecond, mycursor, mydb):
         (transactions, vat, discount) = read_config(mycursor)
         randomNumGen = random.randint(1, len(messageOfTheSecond))  # RNG, unscripted order
         print(
-            f"\n{colours.BackgroundDarkGray}Random Line from HUMBLE.:{colours.ENDC} {colours.BackgroundLightMagenta}"
-            f"{messageOfTheSecond[randomNumGen]}{colours.ENDC}"
+            f"\n[white on black]Random Line from HUMBLE.:[/white on black][white on magenta]"
+            f"{messageOfTheSecond[randomNumGen]}[/white on magenta]"
         )  # pulls from the Dictionary
         if transactions:
             # If transactions mode is true, this will pop up and there will be a prompt for has or hasn't transferred 
-            tra = f"{colours.Red}7 - Transactions{colours.ENDC}"
+            tra = f"[red]7 - Transactions[/red]"
         else:
             # If transactions if false, it just puts ""
             tra = ""
         # The Main Options
         print(
-            f"\n\n{colours.Red}1 - Exit{colours.ENDC}\n{colours.Green}2 - Make A Bill{colours.ENDC}\n"
-            f"{colours.LightYellow}3 - Create Master Bill & Sales Reports{colours.ENDC}\n{colours.Cyan}4 - SQL Client{colours.ENDC}\n"
-            f"{colours.LightGray}5 - Verifier{colours.ENDC}\n{colours.LightMagenta}6 - Configure Options{colours.ENDC}\n"
+            f"\n\n[red]1 - Exit\n[/red][green]2 - Make A Bill\n[/green]"
+            f"[yellow]3 - Create Master Bill & Sales Reports[/yellow]\n[cyan]4 - SQL Client\n[/cyan]"
+            f"[black]5 - Verifier[/black]\n[magenta]6 - Configure Options\n[/magenta]"
             f"{tra}"
         )
         date = time.strftime('%c')
         time_prompt = time.strftime('%I:%M %p')
         # The main prompt
         key = input(
-            f"\n{colours.BackgroundLightGreen}[{date}]{colours.ENDC}-{colours.BackgroundLightCyan}[{time_prompt}]{colours.ENDC}\n"
-            f"{colours.BackgroundLightMagenta}SmilinPython>{colours.ENDC} ")
+            f"\n[white on light green][{date}][/white on light green]-[white on light cyan][{time_prompt}][/white on light cyan]\n"
+            f"[white on light magenta]SmilinPython>[/white on light magenta]"
+        )
         try:
             if key == '1':
                 logging.info("Exiting Gracefully;")
