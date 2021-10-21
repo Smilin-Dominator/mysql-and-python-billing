@@ -57,8 +57,11 @@ class commands:
             self.print(f"[*] [{override}]{msg}[/{override}]")
         logging.warning(msg)
 
-    def input(self, prompt: str, override: str) -> str:
-        return self.console.input(f"[{override}]{prompt}[/{override}]: ")
+    def input(self, prompt: str, override: str = None) -> str:
+        if override is not None:
+            return self.console.input(f"[{override}]{prompt}[/{override}]: ")
+        else:
+            return self.console.input(f"{prompt}")
 
     def sql_tables(self, mycursor, mydb):
         print("[*] Creating Tables")
@@ -105,27 +108,27 @@ class commands:
         if f:
             ops["check_for_updates"] = False
         else:
-            up = input("[*] Check For Updates On Startup? (y/n): ")
+            up = self.input("Check For Updates On Startup? (y/n)", "bold blue")
             if up == 'y':
                 ops["check_for_updates"] = True
             else:
                 ops["check_for_updates"] = False
-        incheck = input("[*] Check Password Integrity On Startup? (y/n): ")
+        incheck = self.input("Check File Integrity On Startup? (y/n)", "bold blue")
         if incheck == 'y':
             ops["check_file_integrity"] = True
         else:
             ops["check_file_integrity"] = False
-        incheck = input("[*] Transaction Mode? (y/n): ")
+        incheck = self.input("Transaction Mode? (y/n)", "bold blue")
         if incheck == 'y':
             ops["transactions"] = True
         else:
             ops["transactions"] = False
-        incheck = input("[*] Add VAT To Total? (y/n): ")
+        incheck = self.input("Add VAT To Total? (y/n)", "bold blue")
         if incheck == 'y':
             ops["vat"] = True
         else:
             ops["vat"] = False
-        incheck = input("[*] Using Discounts? (y/n): ")
+        incheck = self.input("Enable Discount? (y/n)", "bold blue")
         if incheck == 'y':
             ops["discount"] = True
         else:
