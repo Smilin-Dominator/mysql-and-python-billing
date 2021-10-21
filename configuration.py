@@ -2,7 +2,6 @@ import logging
 import os
 import sys
 import yaml
-import rich
 
 
 def execheck():
@@ -39,15 +38,23 @@ services:
 
 class commands:
 
-    console = rich.console.Console
-    print = console.print
+    from rich.console import Console
+    from rich import print
 
-    def error(self, msg: str) -> None:
-        self.print(f"[white on red]{msg}")
+    console = Console()
+
+    def error(self, msg: str, override:str = None) -> None:
+        if override is None:
+            self.print(f"[*] [white on red]{msg}[/white on red]")
+        else:
+            self.print(f"[*] [{override}]{msg}[/{override}]")
         logging.error(f"{msg}\nLocals: {locals()}")
 
-    def warning(self, msg: str) -> None:
-        self.print(f"[white on yellow]{msg}")
+    def warning(self, msg: str, override:str = None) -> None:
+        if override is None:
+            self.print(f"[*] [white on yellow]{msg}[/white on yellow]")
+        else:
+            self.print(f"[*] [{override}]{msg}[/{override}]")
         logging.warning(msg)
 
     def input(self, prompt: str, override: str) -> str:

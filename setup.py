@@ -1,21 +1,26 @@
-import sys
 import subprocess
 import time
 import os
 import base64
 from configuration import commands, variables
 
+console = commands.console
+print = commands.print
+com = commands()
+
 
 def main():
-    system = sys.platform
-    print("[*] Initializing First Time Setup..")
+    print("[bold green]Welcome to my Program! Setting Up Config File")
     commands().write_conifguration_file()
-    print("[*] Initializing Environment Setup..")
-    print(f"[*] OS: {system}\n")
-    subprocess.call("pip3 install -r requirements.txt", shell=True)
-    print("\n[*] Making Log.txt\n")
-    subprocess.call("touch log.txt", shell=True)
-    print("[*] Success! Resuming...")
+    with console.status("[bold green]Initializing..") as _:
+        _ if subprocess.run("pip3 install -r requirements.txt", stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL, shell=True).returncode == 0 else com.error(msg="While Installing Pip Packages")
+        console.log("Environment Setup Complete")
+        time.sleep(3)
+        subprocess.call("touch log.txt", shell=True, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+        time.sleep(3)
+        console.log("Created Log.txt")
+        time.sleep(3)
+        console.log("All Tasks Successful!")
 
 
 def sql(logging, rsa):

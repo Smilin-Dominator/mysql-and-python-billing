@@ -25,6 +25,12 @@ except ModuleNotFoundError:
     setup.main()
 
 
+# Rich
+console = commands.console
+print = commands.print
+com = commands()
+
+
 """
 
 Startup
