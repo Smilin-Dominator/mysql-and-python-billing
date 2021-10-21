@@ -66,11 +66,11 @@ def print_items(items):
     print("\n")
     print(theformat.format(f"{colours.LightRed}ID{colours.ENDC}", f"{colours.LightMagenta}Name{colours.ENDC}",
                            f"{colours.LightGray}Price{colours.ENDC}"))
-    for id, name, price in items:
-        id = f"{colours.Red}{id}{colours.ENDC}"
+    for ID, name, price in items:
+        ID = f"{colours.Red}{ID}{colours.ENDC}"
         name = f"{colours.Yellow}{name}{colours.ENDC}"
         price = f"{colours.Green}{price}{colours.ENDC}"
-        print(theformat.format(id, name, price))
+        print(theformat.format(ID, name, price))
 
 
 """
@@ -160,10 +160,10 @@ def main(mydb):
             mydb.commit()
             print(f"{colours.LightGreen}[!] Success! Inserted {mycursor.rowcount} Row(s)!")
         elif command == "add id":
-            id = int(input(f"{colours.Green}[*] ID: {colours.ENDC}"))
+            ID = int(input(f"{colours.Green}[*] ID: {colours.ENDC}"))
             name = input(f"{colours.Green}[*] Name: {colours.ENDC}")
             price = int(input(f"{colours.Yellow}[*] Price: {colours.ENDC}"))
-            mycursor.execute(commands.insert % ("paddigurlTest", "id, name, price", f"{id}, '{name}', {price}"))
+            mycursor.execute(commands.insert % ("paddigurlTest", "id, name, price", f"{ID}, '{name}', {price}"))
             mydb.commit()
             print(f"{colours.LightGreen}[!] Success! Inserted {mycursor.rowcount} Row(s)!")
         elif command == "add multiple":
@@ -184,8 +184,8 @@ def main(mydb):
 
         # -------------- Modifying Data -------------------#
         elif command == "update":
-            id = int(input(f"{colours.Green}[*] ID: {colours.ENDC}"))
-            matches = get_items(cursor=mycursor, query="SELECT * FROM paddigurlTest WHERE ID = %d;" % id)
+            ID = int(input(f"{colours.Green}[*] ID: {colours.ENDC}"))
+            matches = get_items(cursor=mycursor, query="SELECT * FROM paddigurlTest WHERE ID = %d;" % ID)
             if not matches:
                 print(f"{colours.Red}[!] No Matches!{colours.ENDC}")
                 break
@@ -195,15 +195,15 @@ def main(mydb):
                     print(f"{colours.Yellow}\n(Ctrl+C To Abort)\n{colours.ENDC}")
                     new_name = input(f"{colours.Green}[*] New Name: {colours.ENDC}")
                     new_price = int(input(f"{colours.Yellow}[*] New Price: {colours.ENDC}"))
-                    logging.warning("Changing ID: %d\nName: %s => %s\nPrice: %d => %d" % (id, matches[0][1], new_name, matches[0][2], new_price))
-                    mycursor.execute("UPDATE paddigurlTest SET name = '%s', price = %d WHERE ID = %d;" % (new_name, new_price, id))
+                    logging.warning("Changing ID: %d\nName: %s => %s\nPrice: %d => %d" % (ID, matches[0][1], new_name, matches[0][2], new_price))
+                    mycursor.execute("UPDATE paddigurlTest SET name = '%s', price = %d WHERE ID = %d;" % (new_name, new_price, ID))
                     mydb.commit()
                     print(f"{colours.Green}[*] Success!{colours.ENDC}")
                 except KeyboardInterrupt:
                     break
         elif command == "delete":
-            id = int(input(f"{colours.Green}[*] ID: {colours.ENDC}"))
-            matches = get_items(cursor=mycursor, query="SELECT * FROM paddigurlTest WHERE ID = %d;" % id)
+            ID = int(input(f"{colours.Green}[*] ID: {colours.ENDC}"))
+            matches = get_items(cursor=mycursor, query="SELECT * FROM paddigurlTest WHERE ID = %d;" % ID)
             if not matches:
                 print(f"{colours.Red}[!] No Matches!{colours.ENDC}")
                 break
@@ -212,9 +212,9 @@ def main(mydb):
                     print_items(matches)
                     go = input(f"{colours.Yellow}\n[#] Proceed? (y/n): {colours.ENDC}")
                     if go == "y":
-                        mycursor.execute("DELETE FROM paddigurlTest WHERE id = %d;" % id)
-                        logging.warning("Removed ID: %d\nName: %s\nPrice: %d" % (id, matches[0][1], matches[0][2]))
-                        mycursor.execute("INSERT INTO paddigurlRemoved(id, name, price) VALUES(%d, '%s', %d);" % (id, matches[0][1], matches[0][2]))
+                        mycursor.execute("DELETE FROM paddigurlTest WHERE id = %d;" % ID)
+                        logging.warning("Removed ID: %d\nName: %s\nPrice: %d" % (ID, matches[0][1], matches[0][2]))
+                        mycursor.execute("INSERT INTO paddigurlRemoved(id, name, price) VALUES(%d, '%s', %d);" % (ID, matches[0][1], matches[0][2]))
                         mydb.commit()
                         print(f"{colours.Green}[*] Success!{colours.ENDC}")
                     else:

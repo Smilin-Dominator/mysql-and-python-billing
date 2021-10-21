@@ -61,7 +61,7 @@ class printingBills(object):
         return tot
 
 
-def bill_write(ar: list[[str, int, int]], transfer: bool, vat: bool, discount: bool):
+def bill_write(ar: list, transfer: bool, vat: bool, discount: bool):
     fileTime = str(time.strftime('%I.%M_%p'))  # eg: 07.10 PM
     customerNameFormat = customerName.replace(' ', '_')
     fileName = f"[BILL]-{customerNameFormat}-{fileTime}.txt"  # format of the filename
