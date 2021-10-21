@@ -40,7 +40,7 @@ class printingBills(object):
 
     def print_bill_items(self) -> None:
 
-        table = Table(title="The Bill")
+        table = Table()
 
         table.add_column("Name", style="magenta")
         table.add_column("Price", style="cyan")

@@ -53,25 +53,25 @@ def print(prompt, override: str = None) -> None:
 
 def error(msg: str, override: str = None) -> None:
     if override is None:
-        print(f"[*] [white on red]{msg}[/white on red]")
+        print(f"[white on red][@] {msg}[/white on red]")
     else:
-        print(f"[*] [{override}]{msg}[/{override}]")
+        print(f"[{override}][@] {msg}[/{override}]")
     logging.error(f"{msg}\nLocals: {locals()}")
 
 
 def warning(msg: str, override: str = None) -> None:
     if override is None:
-        print(f"[*] [white on yellow]{msg}[/white on yellow]")
+        print(f"[white on yellow][!] {msg}[/white on yellow]")
     else:
-        print(f"[*] [{override}]{msg}[/{override}]")
+        print(f"[{override}][!] {msg}[/{override}]")
     logging.warning(msg)
 
 
 def info(msg: str, override: str = None) -> None:
     if override is not None:
-        print(f"[*] [{override}]{msg}[/{override}]")
+        print(f"[{override}][?] {msg}[/{override}]")
     else:
-        print(f"[*] {msg}")
+        print(f"[?] {msg}")
 
 
 def input(prompt: str, override: str = None, default=None) -> str:
