@@ -1,6 +1,7 @@
 import os
 from configuration import errors, input, warning, error, print
 from verify import hash_file
+from bill_extractor import bill
 
 
 def view_bank_transactions():
@@ -12,29 +13,30 @@ def view_bank_transactions():
     dir_prefix = "./bills/%s"
     for d in os.listdir("./bills/"):
         for file in os.listdir(dir_prefix % d):
-            with open(file_prefix % (d, file), "r") as f:
-                a = f.read().splitlines()
-                has_or_not = a[len(a) - 1]
-                if has_or_not.startswith("Transfered Cash: "):
-                    has_or_not = ''.join(has_or_not.split("Transfered Cash: "))
-                    name = ''.join(a[6].split("Customer: "))
-                    time = ''.join(a[5].split("Time: "))
-                    if has_or_not == "True":
+            if file.endswith(".md"):
+                with open(file_prefix % (d, file), "r") as f:
+                    b = bill(f)
+                    has_or_not = b.transferred()
+                    name = b.customer()
+                    time = b.time()
+                    if has_or_not:
                         files.append(file_prefix % (d, file))
                         if name in combined:
                             name = name + " - " + time
                         has.append(name)
                         combined.append(name)
-                    else:
+                    elif not has_or_not:
                         files.append(file_prefix % (d, file))
                         if name in combined:
                             name = name + " - " + time
                         has_not.append(name)
                         combined.append(name)
-    print(f"[green]Transfered:[/green]")
+                    elif has_or_not is None:
+                        pass
+    print(f"[green]Transferred:[/green]")
     for name in has:
         print(f"[blue]\t%s[/blue]" % name)
-    print(f"[red]Has Not Transfered:[/red]")
+    print(f"[red]Has Not Transferred:[/red]")
     for name in has_not:
         print(f"[blue]\t%s[/blue]" % name)
     return [combined, files]
@@ -55,7 +57,7 @@ def edit_bank_transactions(mycursor, mydb):
             with open(file, "r") as fil:
                 con = fil.read().splitlines()
                 con.pop()
-                con.append(f"Transfered Cash: {choice}")
+                con.append(f'**Transferred Cash: <span style="color:magenta">{choice}</span>**<br>')
             with open(file, "w") as fil:
                 fil.write("\n".join(con))
                 fil.close()
