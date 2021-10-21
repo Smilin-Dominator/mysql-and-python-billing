@@ -3,11 +3,10 @@ import hashlib
 import logging
 import time
 import os
-
-import rich
-
 from configuration import variables, input, print, info, warning, error, console
 from rich.table import Table
+from pytablewriter import MarkdownTableWriter
+import io
 
 logging.basicConfig(filename='log.txt', format=variables.log_format, datefmt='[%Y-%m-%d] [%H:%M:%S]',
                     level=logging.DEBUG)
@@ -42,7 +41,7 @@ class printingBills(object):
 
     def print_bill_items(self) -> None:
 
-        table = Table(title="The Bill")
+        """table = Table(title="The Bill")
 
         table.add_column("Name", style="magenta")
         table.add_column("Price", style="cyan")
@@ -51,13 +50,16 @@ class printingBills(object):
 
         for i in range(len(self.ar)):
             table.add_row(self.ar[i][0], str(self.ar[i][1]), str(self.ar[i][2]), str(self.ar[i][3]))
-        print(table)
+        print(table)"""
 
     def write_bill_items(self) -> None:
-        self.file.write(f'\n{self.formPrep}')
-        for i in range(len(self.ar)):
-            final = self.form.format(self.ar[i][0], self.ar[i][1], self.ar[i][2], self.ar[i][3])
-            self.file.write(f'\n{final}')
+        table = MarkdownTableWriter(
+            headers=["Name", "Price", "Quantity", "Total"],
+            value_matrix=self.ar
+        )
+        self.file.write("\n")
+        table.stream = self.file
+        table.write_table()
 
     def print_total(self) -> int:
         tot = 0
@@ -73,7 +75,7 @@ class printingBills(object):
 def bill_write(ar: list, transfer: bool, vat: bool, discount: bool):
     fileTime = str(time.strftime('%I.%M_%p'))  # eg: 07.10 PM
     customerNameFormat = customerName.replace(' ', '_')
-    fileName = f"[BILL]-{customerNameFormat}-{fileTime}.txt"  # format of the filename
+    fileName = f"[BILL]-{customerNameFormat}-{fileTime}.md"  # format of the filename
     filePath = os.path.join(f'./bills/{varTime}', fileName)  # adds it into the bills DIR
     fileOpen = open(filePath, 'w+')  # Opens the bill file for writing
 
@@ -81,18 +83,18 @@ def bill_write(ar: list, transfer: bool, vat: bool, discount: bool):
     print(print_the_values.print_bill_items())
 
     fileOpen.write(f"{fileHeaderFormat.format(70 * '-')}")
-    fileOpen.write(f"\n{fileHeaderFormat.format('Paddigurl Dolls - 0777710090')}")
+    fileOpen.write(f"\n{fileHeaderFormat.format('Paddigurl Dolls')}")
     fileOpen.write(f"\n{fileHeaderFormat.format(70 * '-')}")
-    fileOpen.write(f'\n\nDate: {str(time.strftime("%d/%m/%Y"))}')  # eg: 02/05/2021
-    fileOpen.write(f'\nTime: {str(fileTime.replace("_", " "))}')  # uses the variable set earlier
-    fileOpen.write(f'\nCustomer: {customerName.replace("_", " ")}\n')
+    fileOpen.write(f'\n\n**Date: <span style="color:blue">{str(time.strftime("%d/%m/%Y"))}</span>**<br>')  # eg: 02/05/2021
+    fileOpen.write(f'\n**Time: <span style="color:red">{str(fileTime.replace("_", " "))}</span>**<br>')  # uses the variable set earlier
+    fileOpen.write(f'\n**Customer: <span style="color:green">{customerName.replace("_", " ")}</span>**<br>\n')
 
     write_the_values = printingBills(ar, myFormat, fileOpen)
     write_the_values.write_bill_items()
 
     var_tot = printingBills(ar, myFormat).print_total()
     info(f"Subtotal: Rs. {var_tot}", override='red')
-    fileOpen.write(f'\n\nSubtotal: Rs. {str(var_tot)}')
+    fileOpen.write(f'\n\n**Subtotal: <span style="color:orange">Rs. {str(var_tot)}</span>**<br>')
     logging.info(f'Subtotal: Rs. {var_tot}')  # Three simultaneous actions here lol
 
     """
@@ -115,9 +117,9 @@ def bill_write(ar: list, transfer: bool, vat: bool, discount: bool):
                     discountTotal = round(discountSum, 2)
                     info(f"Discount Amount: Rs. {round(discountAmount, 2)}", override='green')
                     info(f"Subtotal w/ Discount: Rs. {round(discountTotal, 2)}", override='black')
-                    fileOpen.write(f"\nDiscount: {discountInput}%")
-                    fileOpen.write(f"\nDiscount Amount: Rs. {round(discountAmount, 2)}")
-                    fileOpen.write(f"\nSubtotal w/ Discount: Rs. {round(discountTotal, 2)}")
+                    fileOpen.write(f"\n**Discount: <span style='color:orange'>{discountInput}%</span>**<br>")
+                    fileOpen.write(f"\n**Discount Amount: Rs. <span style='color:red'>{round(discountAmount, 2)}</span>**<br>")
+                    fileOpen.write(f"\n**Subtotal w/ Discount: Rs. <span style='color:magenta'>{round(discountTotal, 2)}</span>**<br>")
                     logging.info(f"Discount: {discountInput}%")
                     logging.info(f"Discount Amount: Rs. {round(discountAmount, 2)}")
                     logging.info(f"Subtotal w/ Discount: Rs. {round(discountTotal, 2)}")
@@ -134,14 +136,14 @@ def bill_write(ar: list, transfer: bool, vat: bool, discount: bool):
     if vat:
         vatAmount = discountTotal * (15 / 100)
         info(f"Tax: Rs. {vatAmount}", override='magenta')
-        fileOpen.write(f"\nTax : Rs. {vatAmount}")
+        fileOpen.write(f"**\nTax : Rs. <span style='color:cyan'>{vatAmount}</span>**<br>")
         finalTotal = discountTotal + vatAmount
     else:
         finalTotal = discountTotal
 
     info(f"Grand Total: Rs. {finalTotal}", override="green")
     logging.info(f"Grand Total: Rs. {finalTotal}")
-    fileOpen.write(f"\nGrand Total: Rs. {finalTotal}")
+    fileOpen.write(f"\n**Grand Total: <span style='color:yellow'>Rs. {finalTotal}</span>**<br>")
     passOff = False
 
     """
@@ -160,24 +162,26 @@ def bill_write(ar: list, transfer: bool, vat: bool, discount: bool):
                 passOff = False
             elif bal == 0:
                 logging.info(f'Cash Given: Rs. {cashGiven}')
-                fileOpen.write(f'\n\nCash Given: Rs. {cashGiven}')
+                fileOpen.write(f'\n\n**Cash Given: Rs. <span style="color:orange">{cashGiven}</span>**<br>')
                 info('\nNo Balance!', override='green')
                 logging.info('No Balance')
-                fileOpen.write(f'\nNo Balance!')
+                fileOpen.write(f'**\nBalance: <span style="color:red">No Balance!</span>**<br>')
                 break  # passes if its not
             elif bal > 0:
                 logging.info(f'Cash Given: Rs. {cashGiven}')
-                fileOpen.write(f'\nCash Given: Rs. {cashGiven}')
+                fileOpen.write(f'\n\n**Cash Given: Rs. <span style="color:orange">{cashGiven}</span>**<br>')
                 info(f'Balance: Rs. {bal}', override="green")
                 logging.info(f'Balance: Rs. {str(bal)}\n')
-                fileOpen.write(f'\nBalance: Rs. {bal}')
+                fileOpen.write(f'**\nBalance: <span style="color:red">Rs. {bal}</span>**<br>')
                 break
     else:
         hasOrHasnt = input(f'Has Transfered (y/n)', override="red")
         if hasOrHasnt == "y":
-            fileOpen.write(f'\nTransfered Cash: True')
+            fileOpen.write(f'\n**Transfered Cash: <span style="color:magenta">True</span>**<br>')
         else:
-            fileOpen.write(f'\nTransfered Cash: False')
+            fileOpen.write(f'\n**Transfered Cash: <span style="color:magenta">False</span>**<br>')
+    fileOpen.flush()
+    fileOpen.close()
     input("\n(enter) to proceed...")
 
 
