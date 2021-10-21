@@ -53,15 +53,13 @@ class master_bill(object):
         temp_path = os.path.join(self.var_path + '/' + self.bill)
         temp_file = open(temp_path, 'r')
         temp_read = temp_file.read().splitlines()
-        grand_total_raw = [e for e in temp_read if e.startswith('Grand Total: Rs.')]
-        grand_total_prep = ' '.join(grand_total_raw)
-        grand_total_rebuild = grand_total_prep.split(' ')
-        grand_total = float(grand_total_rebuild[3])
-        name_raw = [e for e in temp_read if e.startswith('Customer: ')]
-        name_prep = ' '.join(name_raw)
-        name_rebuild = name_prep.split(' ')
-        name_almost = name_rebuild[1:]
-        name = ' '.join(name_almost)
+
+        grand_total = " ".join([e for e in temp_read if e.startswith('**Grand Total:')])
+        grand_total = grand_total.strip("**Grand Total: <span style='color:yellow'>").strip("</span>**<br>")[3:]
+
+        name = " ".join([e for e in temp_read if e.startswith('**Customer')])
+        name = name.strip('**Customer: <span style="color:green">').strip('</span>**<br>')
+
         append_tup = (name, grand_total)
         return append_tup
 
