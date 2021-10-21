@@ -61,8 +61,9 @@ def edit_bank_transactions(mycursor, mydb):
                 fil.close()
             new_hash = hash_file(file)
             new_contents = "\n".join(con)
-            string = "UPDATE `paddigurlHashes` SET hash = \"%s\", filecontents = \"%s\" WHERE filepath = \"%s\"" % (new_hash, new_contents, file)
-            mycursor.execute(string)
+            string = "UPDATE `paddigurlHashes` SET `hash` = %s, `filecontents` = %s WHERE `filepath` = %s"
+            values = [new_hash, new_contents, file]
+            mycursor.execute(string, values)
             mydb.commit()
             with open("credentials/hashes.txt", "r") as r:
                 lines = r.read().splitlines()
