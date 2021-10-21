@@ -2,9 +2,6 @@ import logging
 import os
 import sys
 import yaml
-from rich.console import Console
-from rich import print
-from rich.prompt import Prompt
 
 
 def execheck():
@@ -41,7 +38,17 @@ services:
 
 # ------------- Text Funcs ----------------#
 
-console = Console(color_system="truecolor")
+from rich.console import Console
+from rich.prompt import Prompt
+
+console = Console(color_system="256")
+
+
+def print(prompt, override: str = None) -> None:
+    if override is not None:
+        console.print(f"[{override}]{prompt}[/{override}]")
+    else:
+        console.print(f"{prompt}")
 
 
 def error(msg: str, override: str = None) -> None:
