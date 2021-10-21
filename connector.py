@@ -139,7 +139,7 @@ def bill_write(ar: list, transfer: bool, vat: bool, discount: bool):
     if vat:
         vatAmount = discountTotal * (15 / 100)
         print(f"Tax: Rs. {vatAmount}", override='magenta')
-        fileOpen.write(f"**\nTax : Rs. <span style='color:cyan'>{vatAmount}</span>**<br>")
+        fileOpen.write(f"\n**Tax : Rs. <span style='color:cyan'>{vatAmount}</span>**<br>")
         finalTotal = discountTotal + vatAmount
     else:
         finalTotal = discountTotal
@@ -165,17 +165,17 @@ def bill_write(ar: list, transfer: bool, vat: bool, discount: bool):
                 passOff = False
             elif bal == 0:
                 logging.info(f'Cash Given: Rs. {cashGiven}')
-                fileOpen.write(f'\n\n**Cash Given: Rs. <span style="color:orange">{cashGiven}</span>**<br>')
+                fileOpen.write(f'\n**Cash Given: Rs. <span style="color:orange">{cashGiven}</span>**<br>')
                 print('\nNo Balance!', override='green')
                 logging.info('No Balance')
-                fileOpen.write(f'**\nBalance: <span style="color:red">No Balance!</span>**<br>')
+                fileOpen.write(f'\n**Balance: <span style="color:red">No Balance!</span>**<br>')
                 break  # passes if its not
             elif bal > 0:
                 logging.info(f'Cash Given: Rs. {cashGiven}')
-                fileOpen.write(f'\n\n**Cash Given: Rs. <span style="color:orange">{cashGiven}</span>**<br>')
+                fileOpen.write(f'\n**Cash Given: Rs. <span style="color:orange">{cashGiven}</span>**<br>')
                 print(f'Balance: Rs. {bal}', override="green")
                 logging.info(f'Balance: Rs. {str(bal)}\n')
-                fileOpen.write(f'**\nBalance: <span style="color:red">Rs. {bal}</span>**<br>')
+                fileOpen.write(f'\n**Balance: <span style="color:red">Rs. {bal}</span>**<br>')
                 break
     else:
         hasOrHasnt = input(f'Has Transfered (y/n)', override="red")
