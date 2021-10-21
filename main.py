@@ -234,7 +234,7 @@ def main(messageOfTheSecond, mycursor, mydb):
 Init0
 
 This checks if log.txt and the credentials directory exist.
-If its not an exe file (execheck) and log.txt isn't present it launches
+If its not an exe file (execheck) and log.txt is empty it launches
 first time setup.
 If its an exe file and its the first time, it'll just make log.txt
 
@@ -243,12 +243,15 @@ If its an exe file and its the first time, it'll just make log.txt
 
 def init0():
     f = execheck()
-    firstTime = os.path.exists('./log.txt')
+    try:
+        firstTime = sum(1 for _ in open('log.txt')) == 1 or 0
+    except FileNotFoundError:
+        firstTime = True
     check = os.path.exists('./credentials')
     if not check:
         os.mkdir('./credentials')
         print('[*] Made Directory "./Credentials"..')
-    if not firstTime and not f:
+    if (not firstTime) and (not f):
         setup.main()
     elif not firstTime and f:
         os.system("touch log.txt")
