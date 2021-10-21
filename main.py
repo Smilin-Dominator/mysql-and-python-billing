@@ -109,17 +109,18 @@ def startup() -> None:
     # Final Phase - Main Program
     main(messageOfTheSecond, mycursor, mydb)
 
-"""
-
-Read Config
-
-It pretty much just does what its name says. It goes
-through the YAML file which holds all the configuration
-options.
-
-"""
 
 def read_config(mycursor):
+    """
+
+    Read Config
+
+    It pretty much just does what its name says. It goes
+    through the YAML file which holds all the configuration
+    options.
+
+    """
+
     while True:
         try:
             # Third Phase - Checks For Updates
@@ -157,18 +158,17 @@ def read_config(mycursor):
     return [transactions, vat, discount]
 
 
-"""
-
-Main
-
-Main takes your input and leads you to wherever you want to go.
-Instead of importing everything in the start (messy), I do lazy
-imports here, which in turn is cleaner and faster.
-
-"""
-
-
 def main(messageOfTheSecond, mycursor, mydb):
+    """
+
+    Main
+
+    Main takes your input and leads you to wherever you want to go.
+    Instead of importing everything in the start (messy), I do lazy
+    imports here, which in turn is cleaner and faster.
+
+    """
+
     key = 2
     while key != '1':
         # Gets the values for these from the read config function above
@@ -228,19 +228,19 @@ def main(messageOfTheSecond, mycursor, mydb):
         except ValueError:
             raise errors.valueErrors("Entered A Non Integer During The Main Prompt")
 
-"""
-
-Init0
-
-This checks if log.txt and the credentials directory exist.
-If its not an exe file (execheck) and log.txt is empty it launches
-first time setup.
-If its an exe file and its the first time, it'll just make log.txt
-
-"""
-
 
 def init0():
+    """
+
+    Init0
+
+    This checks if log.txt and the credentials directory exist.
+    If its not an exe file (execheck) and log.txt is empty it launches
+    first time setup.
+    If its an exe file and its the first time, it'll just make log.txt
+
+    """
+
     f = execheck()
     try:
         firstTime = sum(1 for _ in open('log.txt')) == 1 or 0
@@ -256,20 +256,19 @@ def init0():
         os.system("touch log.txt")
 
 
-"""
-
-Init1
-
-The phase that gets the SQL credentials.
-If the keys aren't present it'll either be recovered (if deleted)
-or just generate new ones.
-Either way, it'll go to setup.sql() which will either decrypt your
-credentials (if there) or perform a first time setup
-
-"""
-
-
 def init1():
+    """
+
+    Init1
+
+    The phase that gets the SQL credentials.
+    If the keys aren't present it'll either be recovered (if deleted)
+    or just generate new ones.
+    Either way, it'll go to setup.sql() which will either decrypt your
+    credentials (if there) or perform a first time setup
+
+    """
+
     keycheck1 = os.path.exists('./credentials/private.pem')
     keycheck2 = os.path.exists('./credentials/public.pem')
     if (not keycheck1) or (not keycheck2):
@@ -277,17 +276,15 @@ def init1():
     return setup.sql(logging, rsa)
 
 
-"""
-
-Init3
-
-This phase is an optional phase that checks for updates from origin/main (git).
-The option to turn it off is "check_for_updates"
-
-"""
-
-
 def init3():
+    """
+
+    Init3
+
+    This phase is an optional phase that checks for updates from origin/main (git).
+    The option to turn it off is "check_for_updates"
+
+    """
     subprocess.run('git fetch', stdout=subprocess.DEVNULL)
     raw = subprocess.check_output('git status')
     check = raw.decode().splitlines()
@@ -304,21 +301,20 @@ def init3():
         print("\n[*] Success!")
 
 
-"""
-
-init5
-
-This is the section i've spent the most time
-on, surprisingly. This and security.py used to be the same
-and the class was originally here, but I shifted them to another file
-conf is the config option used to pursue further checks. So basically
-it'll always check for missing directories and all. But if you enable
-the option, it'll check the contents of the files and check its integrity
-
-"""
-
-
 def init5(mycursor, conf: bool):
+    """
+
+    init5
+
+    This is the section i've spent the most time
+    on, surprisingly. This and security.py used to be the same
+    and the class was originally here, but I shifted them to another file
+    conf is the config option used to pursue further checks. So basically
+    it'll always check for missing directories and all. But if you enable
+    the option, it'll check the contents of the files and check its integrity
+
+    """
+
     check = os.path.exists('bills/')
     varTime = time.strftime("%d_of_%B")
     varPath = f'./bills/{varTime}'
