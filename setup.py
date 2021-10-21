@@ -2,7 +2,7 @@ import subprocess
 import time
 import os
 import base64
-from configuration import commands, variables, console, print, info, input, warning, error
+from configuration import commands, variables, console, print, input, warning, error
 
 
 def main():
