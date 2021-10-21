@@ -1,5 +1,5 @@
 import os
-from configuration import colours, errors
+from configuration import errors, input, warning, error
 from verify import hash_file
 
 
@@ -31,21 +31,21 @@ def view_bank_transactions():
                             name = name + " - " + time
                         has_not.append(name)
                         combined.append(name)
-    print(f"{colours.LightGreen}Transfered:{colours.ENDC}")
+    print(f"[green]Transfered:[/green]")
     for name in has:
-        print(f"{colours.LightBlue}\t%s{colours.ENDC}" % name)
-    print(f"{colours.Red}Has Not Transfered:{colours.ENDC}")
+        print(f"[blue]\t%s[/blue]" % name)
+    print(f"[red]Has Not Transfered:[/red]")
     for name in has_not:
-        print(f"{colours.LightBlue}\t%s{colours.ENDC}" % name)
+        print(f"[light blue]\t%s[/light blue]" % name)
     return [combined, files]
 
 
 def edit_bank_transactions(mycursor, mydb):
     names, files = view_bank_transactions()
     try:
-        name = input(f"{colours.White}[!] Which Transaction Would You Like To Change (name): {colours.ENDC}")
+        name = input(f"Which Transaction Would You Like To Change (name)", "white")
         if name in names:
-            choice = int(input(f"{colours.Green}[+] Has Transferred or Hasn't Transfered? (1/2): {colours.ENDC}"))
+            choice = int(input(f"Has Transferred or Hasn't Transfered? (1/2)", "green"))
             if choice == 1:
                 choice = "True"
             else:
@@ -75,14 +75,14 @@ def edit_bank_transactions(mycursor, mydb):
             with open("credentials/hashes.txt", "w") as w:
                 w.write("\n".join(lines))
         else:
-            print(f"{colours.Yellow}[*] Invalid Name!{colours.ENDC}")
+            warning(f"Invalid Name!")
     except KeyboardInterrupt:
-        print(f"{colours.Red}[*] Successfully Aborted!{colours.ENDC}")
+        error(f"Successfully Aborted!")
 
 
 def interface(mycursor, mydb):
     try:
-        choice = int(input(f"{colours.Yellow}[*] View Transactions or Edit Transactions? (1/2): "))
+        choice = int(input(f"View Transactions or Edit Transactions? (1/2)", "yellow"))
         if choice == 1:
             view_bank_transactions()
         else:
