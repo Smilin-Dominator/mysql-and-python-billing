@@ -29,7 +29,6 @@ class bill(object):
         if self.lines[-1].startswith("**Transferred"):
             t_line = t_line[48:]
             t_line = t_line[:-13]
-            print(t_line)
             if t_line == "True":
                 return True
             else:
