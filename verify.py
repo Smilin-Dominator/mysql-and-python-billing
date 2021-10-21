@@ -1,7 +1,7 @@
 import hashlib
 import logging
 import os
-from configuration import variables, colours
+from configuration import variables, input, info, error, warning
 
 logging.basicConfig(filename='log.txt', format=variables.log_format, datefmt='[%Y-%m-%d] [%H:%M:%S]',
                     level=logging.DEBUG)
@@ -36,16 +36,16 @@ def make_hash(mydb, mycursor):
             filehash = hash_file(the_new)
             for data in read_the_file:
                 if the_new.endswith('master_bill.txt'):
-                    print(f"{colours.Blue}[*] Skipping Master Bill..{colours.ENDC}")
+                    info("Skipping Master Bill..")
                     break
                 if filehash in data:
-                    print(f"{colours.LightCyan}[*] Skipping Adding Existing Entry....{colours.ENDC}")
+                    info("Skipping Adding Existing Entry....")
                     break
             else:
                 hashwrite.write(f"\n{the_new},{filehash}")
                 mycursor.execute(
                     f"INSERT INTO paddigurlHashes(filepath, hash, filecontents) VALUES('{the_new}', '{filehash}', '{open(the_new, 'r').read()}')")
-                print(f"{colours.Blue}[*] Hashed {file} .. {filehash}{colours.ENDC}")
+                info(f"Hashed {file} .. {filehash}", override="cyan")
                 logging.info(f"Hashed .. {file} .. {filehash}")
         mydb.commit()
 
@@ -61,12 +61,12 @@ def verify(mycursor):
             hashest = hash_file(zee[0])
             if hashest:
                 if str(hashest) == str(zee[1]):
-                    print(f"{colours.Green}[*] File {zee[0]} Is Safe{colours.ENDC}")
+                    info(f"File {zee[0]} Is Safe", "green")
                     logging.info(f"{zee[0]} Is Safe")
                 else:
-                    print(f"{colours.BackgroundRed}[*] File {zee[0]} Has Been Tampered{colours.ENDC}")
+                    error(f"File {zee[0]} Has Been Tampered")
                     logging.critical(f"File {zee[0]} Has Been Tampered")
-                    print(f"{colours.LightBlue}[*] Recovering Data...{colours.ENDC}")
+                    info(f"Recovering Data...")
                     mycursor.execute(f"SELECT filecontents FROM paddigurlHashes WHERE `hash` = '{str(zee[1])}';")
                     attempted_recovery = mycursor.fetchall()
                     recovered = ''.join(attempted_recovery[0])
@@ -75,12 +75,12 @@ def verify(mycursor):
                     recover_write.flush()
                     recover_write.close()
                     logging.info("Successful Recovery...")
-                    print(f"{colours.Green}[*] Success...{colours.ENDC}")
+                    info(f"Success...", "green")
             else:
-                print(f"{colours.Red}[*] File {zee[0]} Has Been Deleted....{colours.ENDC}")
+                error(f"File {zee[0]} Has Been Deleted....", override="red")
                 dir_check = zee[0].split("[BILL]")
                 if not os.path.exists(dir_check[0]):
-                    print(f"{colours.BackgroundRed}[*] Entire Directory Deleted... Restoring{colours.ENDC}")
+                    error(f"Entire Directory Deleted... Restoring..")
                     os.mkdir(dir_check[0])
                 logging.critical(f"File {zee[0]} Has Been Deleted")
                 mycursor.execute(f"SELECT filecontents FROM paddigurlHashes WHERE `hash` = '{str(zee[1])}';")
@@ -91,9 +91,9 @@ def verify(mycursor):
                 recover_write.flush()
                 recover_write.close()
                 logging.info("Successful Recovery...")
-                print(
-                    f"{colours.DarkGray}[*] Attempting Recovery....{colours.ENDC}\n{colours.Green}"
-                    f"[*] Success...{colours.ENDC}"
+                info(
+                    f"[white on black][*] Attempting Recovery....\n[/white on black]"
+                    f"[green][*] Success...[/green]"
                 )
         except Exception as e:
             logging.error(e)
