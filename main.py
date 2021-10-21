@@ -3,7 +3,7 @@
 # Don't even think of stealing my code!
 
 # File Imports
-from configuration import variables, commands, errors, execheck, print, info
+from configuration import variables, commands, errors, execheck, print, info, input
 from security import init5_security, key_security
 import bank_transfer
 import setup
@@ -124,6 +124,8 @@ def read_config(mycursor):
     while True:
         try:
             # Third Phase - Checks For Updates
+            if sum(1 for _ in open('./credentials/options.yml')) < 5:
+                commands().write_conifguration_file()
             config = yaml.load(open('./credentials/options.yml', 'r'), yaml.FullLoader)
             if config["check_for_updates"]:
                 init3()
@@ -175,7 +177,7 @@ def main(messageOfTheSecond, mycursor, mydb):
         (transactions, vat, discount) = read_config(mycursor)
         randomNumGen = random.randint(1, len(messageOfTheSecond))  # RNG, unscripted order
         print(
-            f"\n[white on black]Random Line from HUMBLE.:[/white on black][white on magenta]"
+            f"\n[white on black]Random Line from HUMBLE.:[/white on black] [white on magenta]"
             f"{messageOfTheSecond[randomNumGen]}[/white on magenta]"
         )  # pulls from the Dictionary
         if transactions:
@@ -195,8 +197,8 @@ def main(messageOfTheSecond, mycursor, mydb):
         time_prompt = time.strftime('%I:%M %p')
         # The main prompt
         key = input(
-            f"\n[white on light green][{date}][/white on light green]-[white on light cyan][{time_prompt}][/white on light cyan]\n"
-            f"[white on light magenta]SmilinPython>[/white on light magenta]"
+            f"\n[white on green][{date}][/white on green]-[white on cyan][{time_prompt}][/white on cyan]\n"
+            f"[white on magenta]SmilinPython>[/white on magenta]"
         )
         try:
             if key == '1':
@@ -244,16 +246,16 @@ def init0():
 
     f = execheck()
     try:
-        firstTime = sum(1 for _ in open('log.txt')) == 1 or 0
+        firstTime = sum(1 for _ in open('log.txt')) == 0
     except FileNotFoundError:
         firstTime = True
     check = os.path.exists('./credentials')
     if not check:
         os.mkdir('./credentials')
         info('Made Directory "./Credentials"')
-    if (not firstTime) and (not f):
+    if firstTime and (not f):
         setup.main()
-    elif not firstTime and f:
+    elif firstTime and f:
         os.system("touch log.txt")
 
 
