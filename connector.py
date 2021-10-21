@@ -112,14 +112,14 @@ def bill_write(ar: list, transfer: bool, vat: bool, discount: bool):
     if discount:
         passOff = False
         while not passOff:
-            discountInput = float(input(f"Discount (%): ", override="yellow"))
+            discountInput = float(input(f"Discount (%)", override="yellow"))
             if discountInput >= 0:
                 discountAmount = var_tot * (discountInput / 100)
                 discountSum = var_tot - discountAmount
                 if discountSum >= 0:
                     discountTotal = round(discountSum, 2)
                     print(f"Discount Amount: Rs. {round(discountAmount, 2)}", override='green')
-                    print(f"Subtotal w/ Discount: Rs. {round(discountTotal, 2)}", override='black')
+                    print(f"Subtotal w/ Discount: Rs. {round(discountTotal, 2)}", override='teal')
                     fileOpen.write(f"\n**Discount: <span style='color:orange'>{discountInput}%</span>**<br>")
                     fileOpen.write(f"\n**Discount Amount: Rs. <span style='color:red'>{round(discountAmount, 2)}</span>**<br>")
                     fileOpen.write(f"\n**Subtotal w/ Discount: Rs. <span style='color:magenta'>{round(discountTotal, 2)}</span>**<br>")
@@ -157,7 +157,7 @@ def bill_write(ar: list, transfer: bool, vat: bool, discount: bool):
 
     if not transfer:
         while not passOff:
-            cashGiven = int(input(f'Cash Given', override="green"))
+            cashGiven = int(input(f'Cash Given (Rs.)', override="green"))
             bal = int(cashGiven - finalTotal)
             if bal < 0:  # loops if its a negative number!
                 warning("Negative Value, Something's Off, Retry", override="red")  # something's **really** off (why doesnt MD work?)
