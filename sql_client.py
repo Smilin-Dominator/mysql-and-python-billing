@@ -1,7 +1,8 @@
 import getpass
 import logging
 import hashlib
-from configuration import variables, colours
+from configuration import variables, print, input, info, console
+from rich.table import Table
 
 logging.basicConfig(filename='log.txt', format=variables.log_format, datefmt='[%Y-%m-%d] [%H:%M:%S]',
                     level=logging.DEBUG)
@@ -10,7 +11,7 @@ logging.basicConfig(filename='log.txt', format=variables.log_format, datefmt='[%
 def auth(mydb):
     badPass = True
     while badPass:
-        passwd = getpass.getpass(f"{colours.Red}[*] Master Password: {colours.ENDC}")
+        passwd = getpass.getpass(f"[*] Master Password: ")
         pass_read = open('./credentials/passwd.txt', 'r')
         (salt1, salt2, hash_check) = pass_read.read().split(',')
         pass_check = salt1 + passwd + salt2
@@ -25,24 +26,24 @@ def auth(mydb):
 
 
 help_string = f"""
-    {colours.Cyan}Getting Data:{colours.ENDC}{colours.Green}
+    [cyan]Getting Data:[/cyan][green]
         show all        -> shows all dolls
         show specific   -> allows you to set one condition
         show advanced   -> allows you to set multiple conditions
-        show custom     -> write your own search query (for the paddigurlTest and Removed table only){colours.ENDC}
+        show custom     -> write your own search query (for the paddigurlTest and Removed table only)[/green]
         
-    {colours.Cyan}Inserting Data:{colours.ENDC}{colours.Green}
+    [cyan]Inserting Data:[/cyan][green]
         add             -> adds an item, prompts for Name and Price
         add id          -> adds an item, prompts for ID, Name and Price
-        add multiple    -> adds items(s), prompts for Name and Price{colours.ENDC}
+        add multiple    -> adds items(s), prompts for Name and Price[/green]
         
-    {colours.Cyan}Modifying Data:{colours.ENDC}{colours.Green}
+    [cyan]Modifying Data:[/cyan][green]
         update          -> Update the name and price of an item
-        delete          -> removes an item from paddigurlTest and adds it to paddigurlRemoved{colours.ENDC}
+        delete          -> removes an item from paddigurlTest and adds it to paddigurlRemoved[/green]
     
-    {colours.Cyan}Miscellaneous:{colours.ENDC}{colours.Green}
+    [cyan]Miscellaneous:[/cyan][green]
         help            -> displays this
-        bye             -> quit{colours.ENDC}
+        bye             -> quit[/green]
 """
 
 theformat = "{:<2}{:^40}{:>5}"
@@ -63,15 +64,13 @@ class commands:
 
 
 def print_items(items):
-    print("\n")
-    print(theformat.format(f"{colours.LightRed}ID{colours.ENDC}", f"{colours.LightMagenta}Name{colours.ENDC}",
-                           f"{colours.LightGray}Price{colours.ENDC}"))
+    table = Table()
+    table.add_column("ID", style="cornsilk1")
+    table.add_column("Name", style="light_cyan1")
+    table.add_column("Price", style="cyan1")
     for ID, name, price in items:
-        ID = f"{colours.Red}{ID}{colours.ENDC}"
-        name = f"{colours.Yellow}{name}{colours.ENDC}"
-        price = f"{colours.Green}{price}{colours.ENDC}"
-        print(theformat.format(ID, name, price))
-
+        table.add_row(str(ID), name, str(price))
+    console.print(table)
 
 """
 Get Items. This is the single most Jam-Packed function in this file.
@@ -109,7 +108,7 @@ def get_items(cursor, table: str = None, operation: str = None, condition: str =
 def main(mydb):
     mycursor = mydb.cursor()
     while True:
-        command = input(f"\n{colours.LightRed}Smilin_DB> {colours.ENDC}")
+        command = input(f"\n[deep_pink4]Smilin_DB> [/deep_pink4]")
 
         # -------- Miscellaneous -----------#
         if command == "help":
@@ -122,57 +121,56 @@ def main(mydb):
             rows = get_items(cursor=mycursor, table="paddigurlTest")
             print_items(rows)
         elif command == "show specific":
-            field = input(f"{colours.Cyan}[*] Field: {colours.ENDC}")
-            operator = input(f"{colours.Red}[*] Operator (>, =, <, !=, <=, >=): {colours.ENDC}")
-            value = input(f"{colours.Yellow}[*] Value: {colours.ENDC}")
+            field = input(f"[*] Field", override="cyan")
+            operator = input(f"[*] Operator (>, =, <, !=, <=, >=)", override="red")
+            value = input(f"[*] Value", override="yellow")
             print_items(
                 get_items(cursor=mycursor, table="paddigurlTest", operation=operator, condition=field, value=value)
             )
         elif command == "show advanced":
             query = "SELECT * FROM paddigurlTest WHERE "
-            print(
-                f"{colours.LightGreen}[*] Enter The Fields And Their Values (When Done Select ';' as Seperator){colours.ENDC}")
+            info("Enter The Fields And Their Values (When Done Select ';' as Seperator)", override="green_yellow")
             i = 0
             while True:
                 try:
-                    field = input(f"{colours.Cyan}[*] Field {i + 1}: {colours.ENDC}")
-                    operator = input(f"{colours.Red}[*] Operator (>, =, <, !=, <=, >=): {colours.ENDC}")
-                    value = input(f"{colours.Yellow}[*] Value: {colours.ENDC}")
-                    seperator = input(f"{colours.White}[*] Seperator (NOT, AND, OR, ;): {colours.ENDC}")
+                    field = input(f"[*] Field {i + 1}", override="cyan")
+                    operator = input(f"[*] Operator (>, =, <, !=, <=, >=)", override="red")
+                    value = input(f"[*] Value", override="cyan")
+                    separator = input(f"[*] Seperator (NOT, AND, OR, ;)", override="white")
                     i += 1
-                    if seperator == ";":
+                    if separator == ";":
                         query += f"`{field}` {operator} '{value}';"
                         break
                     else:
-                        query += f"`{field}` {operator} '{value}' {seperator} "
+                        query += f"`{field}` {operator} '{value}' {separator} "
                 except KeyboardInterrupt:
                     break
             print_items(get_items(cursor=mycursor, query=query))
         elif command == "show custom":
-            query = input(f"{colours.Cyan}[*] Query: {colours.ENDC}")
+            query = input(f"[*] Query: ", override="cyan")
             print_items(get_items(cursor=mycursor, query=query))
 
         # -------------- Insert Data --------------------#
         elif command == "add":
-            name = input(f"{colours.Green}[*] Name: {colours.ENDC}")
-            price = int(input(f"{colours.Yellow}[*] Price: {colours.ENDC}"))
+            name = input(f"[*] Name", override="green")
+            price = int(input(f"[*] Price", override="yellow"))
             mycursor.execute(commands.insert % ("paddigurlTest", "name, price", f"'{name}', {price}"))
             mydb.commit()
-            print(f"{colours.LightGreen}[!] Success! Inserted {mycursor.rowcount} Row(s)!")
+            print(f"[!] Success! Inserted {mycursor.rowcount} Row(s)!", override="spring_green2")
         elif command == "add id":
-            ID = int(input(f"{colours.Green}[*] ID: {colours.ENDC}"))
-            name = input(f"{colours.Green}[*] Name: {colours.ENDC}")
-            price = int(input(f"{colours.Yellow}[*] Price: {colours.ENDC}"))
+            ID = int(input(f"[*] ID:", override="magenta"))
+            name = input(f"[*] Name:", override="misty_rose3")
+            price = int(input(f"[*] Price", override="yellow"))
             mycursor.execute(commands.insert % ("paddigurlTest", "id, name, price", f"{ID}, '{name}', {price}"))
             mydb.commit()
-            print(f"{colours.LightGreen}[!] Success! Inserted {mycursor.rowcount} Row(s)!")
+            print(f"[!] Success! Inserted {mycursor.rowcount} Row(s)!", override="bright_green")
         elif command == "add multiple":
             values = ""
-            print(f"{colours.White}[*] Enter The Values Below (Ctrl+C when Done){colours.ENDC}")
+            print(f"[*] Enter The Values Below (Ctrl+C when Done)", override="white")
             while True:
                 try:
-                    name = input(f"{colours.Green}[*] Name: {colours.ENDC}")
-                    price = int(input(f"{colours.Yellow}[*] Price: {colours.ENDC}"))
+                    name = input(f"[*] Name", override="pale_turquoise4")
+                    price = int(input(f"[*] Price", override="steel_blue"))
                     values += f"('{name}', {price}),"
                 except KeyboardInterrupt:
                     values = values[:-1]
@@ -180,43 +178,43 @@ def main(mydb):
                     break
             mycursor.execute(commands.insert_multiple % ("paddigurlTest", "name, price", f"{values}"))
             mydb.commit()
-            print(f"{colours.LightGreen}[!] Success! Inserted {mycursor.rowcount} Row(s)!")
+            print(f"[!] Success! Inserted {mycursor.rowcount} Row(s)!", override="green")
 
         # -------------- Modifying Data -------------------#
         elif command == "update":
-            ID = int(input(f"{colours.Green}[*] ID: {colours.ENDC}"))
+            ID = int(input(f"[*] ID", override="green"))
             matches = get_items(cursor=mycursor, query="SELECT * FROM paddigurlTest WHERE ID = %d;" % ID)
             if not matches:
-                print(f"{colours.Red}[!] No Matches!{colours.ENDC}")
+                print(f"[!] No Matches!", override="red")
                 break
             else:
                 try:
                     print_items(matches)
-                    print(f"{colours.Yellow}\n(Ctrl+C To Abort)\n{colours.ENDC}")
-                    new_name = input(f"{colours.Green}[*] New Name: {colours.ENDC}")
-                    new_price = int(input(f"{colours.Yellow}[*] New Price: {colours.ENDC}"))
+                    print(f"\n(Ctrl+C To Abort)\n", override="red")
+                    new_name = input(f"[*] New Name", override="green")
+                    new_price = int(input(f"[*] New Price", override="yellow"))
                     logging.warning("Changing ID: %d\nName: %s => %s\nPrice: %d => %d" % (ID, matches[0][1], new_name, matches[0][2], new_price))
                     mycursor.execute("UPDATE paddigurlTest SET name = '%s', price = %d WHERE ID = %d;" % (new_name, new_price, ID))
                     mydb.commit()
-                    print(f"{colours.Green}[*] Success!{colours.ENDC}")
+                    print(f"[*] Success!", override="green")
                 except KeyboardInterrupt:
                     break
         elif command == "delete":
-            ID = int(input(f"{colours.Green}[*] ID: {colours.ENDC}"))
+            ID = int(input(f"[*] ID", override="green"))
             matches = get_items(cursor=mycursor, query="SELECT * FROM paddigurlTest WHERE ID = %d;" % ID)
             if not matches:
-                print(f"{colours.Red}[!] No Matches!{colours.ENDC}")
+                print(f"[!] No Matches!", override="red")
                 break
             else:
                 try:
                     print_items(matches)
-                    go = input(f"{colours.Yellow}\n[#] Proceed? (y/n): {colours.ENDC}")
+                    go = input("\n[#] Proceed? (y/n)", override="yellow")
                     if go == "y":
                         mycursor.execute("DELETE FROM paddigurlTest WHERE id = %d;" % ID)
                         logging.warning("Removed ID: %d\nName: %s\nPrice: %d" % (ID, matches[0][1], matches[0][2]))
                         mycursor.execute("INSERT INTO paddigurlRemoved(id, name, price) VALUES(%d, '%s', %d);" % (ID, matches[0][1], matches[0][2]))
                         mydb.commit()
-                        print(f"{colours.Green}[*] Success!{colours.ENDC}")
+                        print(f"[*] Success!", override="green")
                     else:
                         break
                 except KeyboardInterrupt:
