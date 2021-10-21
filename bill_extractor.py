@@ -1,6 +1,6 @@
 class bill(object):
 
-    def __init__(self, stream: io.TextIOWrapper):
+    def __init__(self, stream):
         self.file = stream
         self.lines = self.file.read().splitlines()
 
@@ -19,9 +19,18 @@ class bill(object):
         return name[38:]
 
     def grand_total(self) -> str:
+        # **Grand Total: <span style='color:yellow'>Rs. 12200</span>**<br>
         grand_total = " ".join([e for e in self.lines if e.startswith('**Grand Total:')])
         return grand_total.strip("**Grand Total: <span style='color:yellow'>").strip("</span>**<br>")[3:]
 
-    def name(self) -> str:
-        name = " ".join([e for e in self.lines if e.startswith('**Customer')])
-        return name.strip('**Customer: <span style="color:green">').strip('</span>**<br>')
+    def transferred(self) -> bool or None:
+        # **Transferred Cash: <span style="color:magenta">False</span>**<br>
+        t_line = self.lines[-1]
+        if self.lines[-1].startswith("**Transferred"):
+            t_line = t_line.strip('**Transferred Cash: <span style="color:magenta">').strip('</span>**<br>')
+            if t_line == "True":
+                return True
+            else:
+                return False
+        else:
+            return None
