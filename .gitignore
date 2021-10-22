@@ -5,7 +5,6 @@ log.txt
 bills
 !requirements.txt
 !README.md
-*.md
 *.pem
 credentials/
 /.idea/
