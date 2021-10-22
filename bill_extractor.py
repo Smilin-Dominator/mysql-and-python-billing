@@ -6,11 +6,13 @@ class bill(object):
 
     def date(self) -> str:
         # **Date: <span style="color:blue">21/10/2021</span>**<br>
-        pass
+        date = self.lines[4]
+        return date[33:-13]
 
     def time(self) -> str:
         # **Time: <span style="color:red">09.42 PM</span>**<br>
-        pass
+        time = self.lines[5]
+        return time[32:-13]
 
     def customer(self) -> str:
         # **Customer: <span style="color:green">Barney Stinson</span>**<br>
