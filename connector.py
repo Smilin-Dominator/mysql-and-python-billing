@@ -22,7 +22,6 @@ def startup():
     # logs are the go-to place
 
 
-myFormat = "{:<25}{:<15}{:<15}{:<15}"  # format for the .format() :)
 fileHeaderFormat = "{:^70}"  # headers
 varTime = time.strftime("%d_of_%B")
 
@@ -32,10 +31,8 @@ varTime = time.strftime("%d_of_%B")
 
 class printingBills(object):
 
-    def __init__(self, ar: list[tuple[str, int, int]] = None, new_format: str = None, file=None):
+    def __init__(self, ar: list[tuple[str, int, int]] = None, file = None):
         self.ar = ar
-        self.form = new_format
-        self.formPrep = self.form.format('Name', 'Price (Rs.)', 'Quantity', 'Total (Rs.)')
         self.file = file
 
     def print_bill_items(self) -> None:
@@ -82,7 +79,7 @@ def bill_write(ar: list, transfer: bool, vat: bool, discount: bool):
     filePath = os.path.join(f'./bills/{varTime}', fileName)  # adds it into the bills DIR
     fileOpen = open(filePath, 'w+')  # Opens the bill file for writing
 
-    print_the_values = printingBills(ar, myFormat)
+    print_the_values = printingBills(ar)
     print_the_values.print_bill_items()
 
     fileOpen.write(f"{fileHeaderFormat.format(70 * '-')}")
@@ -92,10 +89,10 @@ def bill_write(ar: list, transfer: bool, vat: bool, discount: bool):
     fileOpen.write(f'\n**Time: <span style="color:red">{str(fileTime.replace("_", " "))}</span>**<br>')  # uses the variable set earlier
     fileOpen.write(f'\n**Customer: <span style="color:green">{customerName.replace("_", " ")}</span>**<br>\n')
 
-    write_the_values = printingBills(ar, myFormat, fileOpen)
+    write_the_values = printingBills(ar, fileOpen)
     write_the_values.write_bill_items()
 
-    var_tot = printingBills(ar, myFormat).print_total()
+    var_tot = printingBills(ar).print_total()
     print(f"Subtotal: Rs. {var_tot}", override='red')
     fileOpen.write(f'\n\n**Subtotal: <span style="color:orange">Rs. {str(var_tot)}</span>**<br>')
     logging.info(f'Subtotal: Rs. {var_tot}')  # Three simultaneous actions here lol
@@ -254,7 +251,7 @@ class array_funcs(object):
 
     def update_list(self):
         ar = self.ar
-        printingBills(ar, myFormat).print_bill_items()
+        printingBills(ar).print_bill_items()
         theLoop = True
         while theLoop:
             try:
@@ -313,7 +310,7 @@ class array_funcs(object):
 
     def delete_from_list(self):
         ar = self.ar
-        printingBills(ar, myFormat).print_bill_items()
+        printingBills(ar).print_bill_items()
         theLoop = True
         while theLoop:
             try:
@@ -363,7 +360,7 @@ def main(transfer, mydb, vat, discount):
             elif idInput == 'del':
                 ar.delete_from_list()
             elif idInput == '--':
-                printingBills(ar.get(), myFormat).print_bill_items()
+                printingBills(ar.get()).print_bill_items()
             elif idInput == 'update':
                 ar.update_list()
             else:
