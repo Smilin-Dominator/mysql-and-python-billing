@@ -8,7 +8,7 @@ jobs:
   building:
     strategy:
       matrix:
-        os: [macos-latest, windows-latest]
+        os: [windows-latest] # Used to be mac and windows, but there's no use for mac
     runs-on: ${{ matrix.os }}
     # Runs when the commit message contains "[Release]" Otherwise it doesn't run
     if: "contains(github.event.head_commit.message, '[Release]')"
@@ -48,7 +48,7 @@ jobs:
           name: Release ${{ github.ref }}
           draft: true
           files: |
-            ./dist/main-macos-x86_64.zip
+            #./dist/main-macos-x86_64.zip
             ./dist/main-windows-x86_64.zip
             ./README.md
         env:
