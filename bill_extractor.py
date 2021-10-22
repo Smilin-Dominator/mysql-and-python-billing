@@ -15,20 +15,18 @@ class bill(object):
     def customer(self) -> str:
         # **Customer: <span style="color:green">Barney Stinson</span>**<br>
         name = self.lines[6]
-        name = name[:-13]
-        return name[38:]
+        return name[38:-13]
 
     def grand_total(self) -> str:
         # **Grand Total: <span style='color:yellow'>Rs. 12200</span>**<br>
         grand_total = " ".join([e for e in self.lines if e.startswith('**Grand Total:')])
-        return grand_total.strip("**Grand Total: <span style='color:yellow'>").strip("</span>**<br>")[3:]
+        return grand_total[42:-13]
 
     def transferred(self) -> bool or None:
         # **Transferred Cash: <span style="color:magenta">False</span>**<br>
         t_line = self.lines[-1]
         if self.lines[-1].startswith("**Transferred"):
-            t_line = t_line[48:]
-            t_line = t_line[:-13]
+            t_line = t_line[48:-13]
             if t_line == "True":
                 return True
             else:
