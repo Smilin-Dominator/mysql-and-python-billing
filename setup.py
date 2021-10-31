@@ -9,10 +9,8 @@ def main():
     print("[bold green]Welcome to my Program! Setting Up Config File")
     commands().write_conifguration_file()
     with console.status("[bold green]Initializing..", spinner='dots12') as _:
-        _ if subprocess.run("pip3 install -r requirements.txt", stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL, shell=True).returncode == 0 else error(msg="While Installing Pip Packages")
+        _ if subprocess.run("python -m pip install -r requirements.txt", stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL, shell=True).returncode == 0 else error(msg="While Installing Pip Packages")
         console.log("Environment Setup Complete")
-        time.sleep(3)
-        subprocess.call("touch log.txt", shell=True, stdout=subprocess.DEVNULL)
         time.sleep(3)
         console.log("Created Log.txt")
         time.sleep(3)
