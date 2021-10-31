@@ -110,7 +110,7 @@ def startup() -> None:
     main(messageOfTheSecond, mycursor, mydb)
 
 
-def read_config(mycursor):
+def read_config(mycursor, count):
     """
 
     Read Config
@@ -127,7 +127,7 @@ def read_config(mycursor):
             if sum(1 for _ in open('./credentials/options.yml')) < 5:
                 commands().write_conifguration_file()
             config = yaml.load(open('./credentials/options.yml', 'r'), yaml.FullLoader)
-            if config["check_for_updates"]:
+            if config["check_for_updates"] and count == 0:
                 init3()
             # Fourth Phase - Checks Integrity Of Credentials
             if config['check_file_integrity']:
@@ -171,10 +171,13 @@ def main(messageOfTheSecond, mycursor, mydb):
 
     """
 
-    key = 2
+    # Count keeps track of how many times the menu is run
+    count = 0
+
+    key = '2'
     while key != '1':
         # Gets the values for these from the read config function above
-        (transactions, vat, discount) = read_config(mycursor)
+        (transactions, vat, discount) = read_config(mycursor, count)
         randomNumGen = random.randint(1, len(messageOfTheSecond))  # RNG, unscripted order
         print(
             f"\n[white on grey54]Random Line from HUMBLE.:[/white on grey54] [white on magenta]"
@@ -227,6 +230,7 @@ def main(messageOfTheSecond, mycursor, mydb):
             elif key == '7' and transactions:
                 bank_transfer.interface(mycursor, mydb)
                 input("(enter to continue..)")
+            count += 1
             os.system('cls')
         except ValueError:
             raise errors.valueErrors("Entered A Non Integer During The Main Prompt")
