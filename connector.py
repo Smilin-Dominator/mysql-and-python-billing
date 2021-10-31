@@ -189,7 +189,7 @@ def bill_write(ar: list, transfer: bool, vat: bool, discount: bool):
 
 
 def kill_this():
-    killPass = str(getpass.getpass("[*] Enter Password: "))
+    killPass = input("Master Password", override="red", password=True)
     pass_read = open('./credentials/passwd.txt', 'r')
     check_pass_file = pass_read.read().split(',')
     salt1 = check_pass_file[0]

@@ -2,7 +2,6 @@ import logging
 import hashlib
 import sys
 import os
-import getpass
 import base64
 import random
 import string
