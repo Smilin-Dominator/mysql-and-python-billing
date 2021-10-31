@@ -74,17 +74,17 @@ def info(msg: str, override: str = None) -> None:
         print(f"[?] {msg}")
 
 
-def input(prompt: str, override: str = None, default=None) -> str:
+def input(prompt: str, override: str = None, default=None, password=False) -> str:
     if default is None:
         if override is not None:
-            return Prompt.ask(f"[{override}]{prompt}[/{override}]")
+            return Prompt.ask(f"[{override}]{prompt}[/{override}]", password=password)
         else:
-            return Prompt.ask(f"{prompt}")
+            return Prompt.ask(f"{prompt}", password=password)
     else:
         if override is not None:
-            return Prompt.ask(f"[{override}]{prompt}[/{override}]", default=default)
+            return Prompt.ask(f"[{override}]{prompt}[/{override}]", default=default, password=password)
         else:
-            return Prompt.ask(f"{prompt}", default=default)
+            return Prompt.ask(f"{prompt}", default=default, password=password)
 
 
 # ------------------------------------------#
