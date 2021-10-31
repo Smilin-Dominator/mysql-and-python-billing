@@ -198,34 +198,35 @@ class commands:
         while True:
             print(self.configuration_file_status(dictionary))
             choice = input(f"What Would You Like To Update?", override="yellow")
-            if choice == "99":
-                yaml.dump(dictionary, open("credentials/options.yml", "w"))
-                break
-            elif choice == "1":
-                if dictionary["check_for_updates"]:
-                    dictionary["check_for_updates"] = False
-                else:
-                    dictionary["check_for_updates"] = True
-            elif choice == "2":
-                if dictionary["check_file_integrity"]:
-                    dictionary["check_file_integrity"] = False
-                else:
-                    dictionary["check_file_integrity"] = True
-            elif choice == "3":
-                if dictionary["transactions"]:
-                    dictionary["transactions"] = False
-                else:
-                    dictionary["transactions"] = True
-            elif choice == "4":
-                if dictionary["vat"]:
-                    dictionary["vat"] = False
-                else:
-                    dictionary["vat"] = True
-            elif choice == "5":
-                if dictionary["discount"]:
-                    dictionary["discount"] = False
-                else:
-                    dictionary["discount"] = True
+            match choice:
+                case "99":
+                    yaml.dump(dictionary, open("credentials/options.yml", "w"))
+                    break
+                case "1":
+                    if dictionary["check_for_updates"]:
+                        dictionary["check_for_updates"] = False
+                    else:
+                        dictionary["check_for_updates"] = True
+                case "2":
+                    if dictionary["check_file_integrity"]:
+                        dictionary["check_file_integrity"] = False
+                    else:
+                        dictionary["check_file_integrity"] = True
+                case "3":
+                    if dictionary["transactions"]:
+                        dictionary["transactions"] = False
+                    else:
+                        dictionary["transactions"] = True
+                case "4":
+                    if dictionary["vat"]:
+                        dictionary["vat"] = False
+                    else:
+                        dictionary["vat"] = True
+                case "5":
+                    if dictionary["discount"]:
+                        dictionary["discount"] = False
+                    else:
+                        dictionary["discount"] = True
             for i in range(10):
                 sys.stdout.write(CURSOR_UP_ONE)
                 sys.stdout.write(ERASE_LINE)
