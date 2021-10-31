@@ -190,7 +190,7 @@ def main(messageOfTheSecond, mycursor, mydb):
         print(
             f"\n\n[red]1 - Exit\n[/red][green]2 - Make A Bill\n[/green]"
             f"[yellow]3 - Create Master Bill & Sales Reports[/yellow]\n[cyan]4 - SQL Client\n[/cyan]"
-            f"[black]5 - Verifier[/black]\n[magenta]6 - Configure Options\n[/magenta]"
+            f"[blue]5 - Verifier[/blue]\n[magenta]6 - Configure Options\n[/magenta]"
             f"{tra}"
         )
         date = time.strftime('%c')
