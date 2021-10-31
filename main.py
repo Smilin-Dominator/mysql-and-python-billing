@@ -177,7 +177,7 @@ def main(messageOfTheSecond, mycursor, mydb):
         (transactions, vat, discount) = read_config(mycursor)
         randomNumGen = random.randint(1, len(messageOfTheSecond))  # RNG, unscripted order
         print(
-            f"\n[white on black]Random Line from HUMBLE.:[/white on black] [white on magenta]"
+            f"\n[white on grey54]Random Line from HUMBLE.:[/white on grey54] [white on magenta]"
             f"{messageOfTheSecond[randomNumGen]}[/white on magenta]"
         )  # pulls from the Dictionary
         if transactions:
@@ -227,7 +227,7 @@ def main(messageOfTheSecond, mycursor, mydb):
             elif key == '7' and transactions:
                 bank_transfer.interface(mycursor, mydb)
                 input("(enter to continue..)")
-            os.system('clear')
+            os.system('cls')
         except ValueError:
             raise errors.valueErrors("Entered A Non Integer During The Main Prompt")
 
@@ -288,19 +288,19 @@ def init3():
     The option to turn it off is "check_for_updates"
 
     """
-    subprocess.run('git fetch', stdout=subprocess.DEVNULL)
-    raw = subprocess.check_output('git status')
-    check = raw.decode().splitlines()
+    subprocess.call(['git', 'fetch'], shell=True)
+    raw = subprocess.getoutput('git status')
+    check = raw.splitlines()
     if \
             check[1] == "Your branch is up to date with 'origin/main'." \
                     or check[1].startswith("Your branch is ahead of 'origin/main'") \
                     or check[1].startswith("fatal: not a git repository"):
         print("[*] No Update Found, Continuing...")
     else:
-        print("[*] Update Found... Updating...\n")
-        print(subprocess.check_output(
-            'git pull https://Smilin-Dominator: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@github.com/Smilin-Dominator'
-            '/mysql-and-python-billing.git').decode())
+        print("Update Found... Updating...\n", override="blue")
+        subprocess.call(
+            'git pull https://Smilin-Dominator@github.com/Smilin-Dominator'
+            '/mysql-and-python-billing.git', shell=True)
         print("\n[*] Success!")
 
 
