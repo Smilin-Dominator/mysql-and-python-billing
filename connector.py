@@ -350,31 +350,32 @@ def main(transfer, mydb, vat, discount):
         try:
             ar = array_funcs(ar.get())
             idInput = input(f"\nID", override="light_cyan3")  # ID As In The First Column
-            if '' == idInput:  # if you just hit enter
-                bill_write(ar.get(), transfer, vat, discount)
-                break
-            elif idInput == 'Kill':  # had to add an emergency kill function :)
-                go = kill_this()
-                if go:
+            match idInput:
+                case "":  # if you just hit enter
+                    bill_write(ar.get(), transfer, vat, discount)
                     break
-            elif idInput == 'del':
-                ar.delete_from_list()
-            elif idInput == '--':
-                printingBills(ar.get()).print_bill_items()
-            elif idInput == 'update':
-                ar.update_list()
-            else:
-                proceed = int(idInput)
-                sql_select_Query = f"select * from paddigurlTest WHERE id = {proceed}"  # Sent To The Database
-                cursor = mydb.cursor()  # This Is As If You Were Entering It Yourself
-                cursor.execute(sql_select_Query)  # Executes
-                records = cursor.fetchall()  # Gets All The Outputs
-                if records:  # Basically proceeds if its not empty like []
-                    ar.duplicate_check(records)
-                else:
-                    warning(
-                        f"\nDid You Enter The Right ID / Command?", override="red")  # congratulations!
-                    # you're a failure!
-                    logging.warning(f"Entered Wrong ID / CMD: {idInput}")
+                case 'Kill':  # had to add an emergency kill function :)
+                    go = kill_this()
+                    if go:
+                        break
+                case 'del':
+                    ar.delete_from_list()
+                case '--':
+                    printingBills(ar.get()).print_bill_items()
+                case 'update':
+                    ar.update_list()
+                case _:
+                    proceed = int(idInput)
+                    sql_select_Query = f"select * from paddigurlTest WHERE id = {proceed}"  # Sent To The Database
+                    cursor = mydb.cursor()  # This Is As If You Were Entering It Yourself
+                    cursor.execute(sql_select_Query)  # Executes
+                    records = cursor.fetchall()  # Gets All The Outputs
+                    if records:  # Basically proceeds if its not empty like []
+                        ar.duplicate_check(records)
+                    else:
+                        warning(
+                            f"\nDid You Enter The Right ID / Command?", override="red")  # congratulations!
+                        # you're a failure!
+                        logging.warning(f"Entered Wrong ID / CMD: {idInput}")
         except Exception as rim:
             logging.error(rim)  # rim alert
