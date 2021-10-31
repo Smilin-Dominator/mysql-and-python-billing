@@ -3,11 +3,14 @@ import os
 import time
 import glob
 from pathlib import Path
+from configuration import print, input, console
+from rich.table import Table
 
 
 def input_screen():
-    print("Welcome To The Master Bill Creator!\n")
-    key = input("Today or All?\n\nT for Today\nAnything Else for All\n\n: ")
+    print("Welcome To The Master Bill Creator!\n", override="cyan")
+    key = input("[plum1]Today or All?[/plum1]\n\n[khaki1]T for Today[/khaki1]\n[light_goldenrod2]"
+                "Anything Else for All[/light_goldenrod2]\n\n")
     return key
 
 
@@ -17,12 +20,13 @@ master_bill_header = "{:^50}"
 
 class master_bill(object):
 
-    def __init__(self, var_path=None, bill=None, main_ar=None):
+    def __init__(self, var_path: str =None, bill=None, main_ar=None):
         self.var_path = var_path
         self.bill = bill
         self.main_ar = main_ar
+        self.day = self.var_path[8:].replace("_", " ")
 
-    def bill_write(self):
+    def bill_write(self) -> None:
         master_bill_path = os.path.join(self.var_path + '/master_bill.txt')
         bill_prep = my_format.format("Name", "Grand Total (Rs.)")
         master_bill_file = open(master_bill_path, 'w+')
@@ -34,20 +38,28 @@ class master_bill(object):
         master_bill_file.write(f'\n\nDate: {str(time.strftime("%d/%m/%Y"))}')
         master_bill_file.write(f"\nTime: {str(time.strftime('%I.%M %p'))}")
         master_bill_file.write(f'\n\n{bill_prep}')
-        print(bill_prep)
+
+        tab = Table(title=f"Master Bill Of {self.day}")
+        tab.add_column("Name")
+        tab.add_column("Grand Total (Rs.)")
+
         total = 0
-        for i in range(len(self.main_ar)):
-            printable = my_format.format(self.main_ar[i][0], self.main_ar[i][1])
-            print(printable)
+        for _, data in enumerate(self.main_ar):
+            printable = my_format.format(data[0], data[1])
+            tab.add_row(data[0], data[1])
             master_bill_file.write(f"\n{printable}")
-            price_to_add = float(self.main_ar[i][1])
+            price_to_add = float(data[1])
             total = total + price_to_add
-        print("\n")
+
         master_bill_file.write("\n\n")
         master_bill_file.write(my_format.format("Total For The Day", total))
         master_bill_file.flush()
         master_bill_file.close()
-        return my_format.format("Total For The Day", total)
+
+        tab.add_row("\n", "\n")
+        tab.add_row("Total For The Day", str(total))
+
+        console.print(tab)
 
     def bill_collect(self):
         temp_path = os.path.join(self.var_path + '/' + self.bill)
@@ -123,7 +135,7 @@ def main():
             if bill.startswith("[BILL]"):
                 to_write = master_bill(var_path=var_path, bill=bill).bill_collect()
                 main_ar.append(to_write)
-        print(master_bill(var_path=var_path, main_ar=main_ar).bill_write())
+        master_bill(var_path=var_path, main_ar=main_ar).bill_write()
         sales_reports(multiverse)
     else:
         for directory in multiverse:
@@ -133,7 +145,7 @@ def main():
                 if bill.startswith("[BILL]"):
                     to_write = master_bill(var_path=var_path, bill=bill).bill_collect()
                     main_ar.append(to_write)
-            print(master_bill(var_path=var_path, main_ar=main_ar).bill_write())
+            master_bill(var_path=var_path, main_ar=main_ar).bill_write()
             print("\n")
             main_ar = []
         sales_reports(multiverse)

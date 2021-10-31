@@ -2,11 +2,10 @@ import logging
 import hashlib
 import sys
 import os
-import getpass
 import base64
 import random
 import string
-from configuration import variables, warning, info
+from configuration import variables, warning, info, input
 
 logging.basicConfig(filename='log.txt', format=variables.log_format, datefmt='[%Y-%m-%d] [%H:%M:%S]',
                     level=logging.DEBUG)
@@ -78,7 +77,7 @@ def init5_security(mycursor, conf: bool):
         critical = integrityCheck(check_log='./log.txt', mycursor=mycursor).pass_check()
         if not critical:
             warning("No Password Set.. Creating File..")
-            pas_enter = getpass.getpass("[red]Enter Password:[/red] ")
+            pas_enter = input(prompt="Enter A Password", override="red", password=True)
             pas = open('./credentials/passwd.txt', 'w+')
             salt1 = ''.join(random.choices(string.ascii_letters + string.hexdigits, k=95))
             salt2 = ''.join(random.choices(string.digits + string.octdigits, k=95))

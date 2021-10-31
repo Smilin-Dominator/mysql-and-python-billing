@@ -22,7 +22,6 @@ def startup():
     # logs are the go-to place
 
 
-myFormat = "{:<25}{:<15}{:<15}{:<15}"  # format for the .format() :)
 fileHeaderFormat = "{:^70}"  # headers
 varTime = time.strftime("%d_of_%B")
 
@@ -32,10 +31,8 @@ varTime = time.strftime("%d_of_%B")
 
 class printingBills(object):
 
-    def __init__(self, ar: list[tuple[str, int, int]] = None, new_format: str = None, file=None):
+    def __init__(self, ar: list[tuple[str, int, int]] = None, file = None):
         self.ar = ar
-        self.form = new_format
-        self.formPrep = self.form.format('Name', 'Price (Rs.)', 'Quantity', 'Total (Rs.)')
         self.file = file
 
     def print_bill_items(self) -> None:
@@ -82,7 +79,7 @@ def bill_write(ar: list, transfer: bool, vat: bool, discount: bool):
     filePath = os.path.join(f'./bills/{varTime}', fileName)  # adds it into the bills DIR
     fileOpen = open(filePath, 'w+')  # Opens the bill file for writing
 
-    print_the_values = printingBills(ar, myFormat)
+    print_the_values = printingBills(ar)
     print_the_values.print_bill_items()
 
     fileOpen.write(f"{fileHeaderFormat.format(70 * '-')}")
@@ -92,10 +89,10 @@ def bill_write(ar: list, transfer: bool, vat: bool, discount: bool):
     fileOpen.write(f'\n**Time: <span style="color:red">{str(fileTime.replace("_", " "))}</span>**<br>')  # uses the variable set earlier
     fileOpen.write(f'\n**Customer: <span style="color:green">{customerName.replace("_", " ")}</span>**<br>\n')
 
-    write_the_values = printingBills(ar, myFormat, fileOpen)
+    write_the_values = printingBills(ar, fileOpen)
     write_the_values.write_bill_items()
 
-    var_tot = printingBills(ar, myFormat).print_total()
+    var_tot = printingBills(ar).print_total()
     print(f"Subtotal: Rs. {var_tot}", override='red')
     fileOpen.write(f'\n\n**Subtotal: <span style="color:orange">Rs. {str(var_tot)}</span>**<br>')
     logging.info(f'Subtotal: Rs. {var_tot}')  # Three simultaneous actions here lol
@@ -192,7 +189,7 @@ def bill_write(ar: list, transfer: bool, vat: bool, discount: bool):
 
 
 def kill_this():
-    killPass = str(getpass.getpass("[*] Enter Password: "))
+    killPass = input("Master Password", override="red", password=True)
     pass_read = open('./credentials/passwd.txt', 'r')
     check_pass_file = pass_read.read().split(',')
     salt1 = check_pass_file[0]
@@ -225,18 +222,18 @@ class array_funcs(object):
             total = int(price) * quantity
             if len(ar) > 0:
                 tempList = [list(item) for item in ar]  # converts into a list, since you cant change tuples
-                for i in range(len(tempList)):
-                    checkName = tempList[i][0]
-                    checkPrice = tempList[i][1]
-                    if checkName == name and checkPrice == price:
+                for _, item in enumerate(tempList):
+                    checkName = item[0]
+                    checkPrice = item[1]
+                    if (checkName == name) and (checkPrice == price):
                         info(f"\nDuplicate Detected, Updating Current Entry", override="teal")
-                        currentTotal = tempList[i][3]
-                        currentQuantity = tempList[i][2]
+                        currentTotal = item[3]
+                        currentQuantity = item[2]
                         newTotal = int(price) * quantity + currentTotal
                         newQuantity = int(currentQuantity) + quantity
                         try:
-                            tempList[i][3] = newTotal
-                            tempList[i][2] = newQuantity
+                            item[3] = newTotal
+                            item[2] = newQuantity
                             info(f"Success!", override="green_yellow")
                             logging.info(
                                 f"Updated: {checkName}, {checkPrice}\nSet Quantity {currentQuantity} => "
@@ -254,29 +251,29 @@ class array_funcs(object):
 
     def update_list(self):
         ar = self.ar
-        print(printingBills(ar, myFormat).print_bill_items())
+        printingBills(ar).print_bill_items()
         theLoop = True
         while theLoop:
             try:
                 updateValue = input(f"What Would You Like To Update? (Name)", override="dark_olive_green2")
                 tempList = [list(tup) for tup in ar]
-                for i in range(len(tempList)):
-                    up_name = tempList[i][0]
+                for _, item in enumerate(tempList):
+                    up_name = item[0]
                     if updateValue == up_name:
                         update_key = input(
                             f"Add Or Remove How Much? (+ amount/ - amount)", override="white"
                         )
                         update_key_check = (update_key.split(' '))
                         upQuan = int(update_key_check[1])
-                        oldQuan = tempList[i][2]
+                        oldQuan = item[2]
                         if update_key_check[0] == '+':
                             newQuan = upQuan + oldQuan
-                            newTot = newQuan * tempList[i][1]
-                            tempList[i][2] = newQuan
-                            tempList[i][3] = newTot
+                            newTot = newQuan * item[1]
+                            item[2] = newQuan
+                            item[3] = newTot
                             logging.info(
-                                f"Updated: {updateValue}, {ar[i][1]}\nSet Quantity {oldQuan} => "
-                                f"{newQuan}\nUpdated Total {tempList[i][3]} => {newTot}"
+                                f"Updated: {updateValue}, {ar[1]}\nSet Quantity {oldQuan} => "
+                                f"{newQuan}\nUpdated Total {item[3]} => {newTot}"
                             )
                             ar = [tuple(entry) for entry in tempList]
                         elif update_key_check[0] == '-':
@@ -289,16 +286,16 @@ class array_funcs(object):
                                         , override="red")
                                 confirm = input(f"Proceed? (Y/N)", override="yellow")
                                 if confirm == 'Y':
-                                    logging.warning(f"Set {updateValue}, {ar[i][1]}'s Quantity to 1")
+                                    logging.warning(f"Set {updateValue}, {item[1]}'s Quantity to 1")
                                     newQuan = 1
                                 else:
-                                    logging.warning(f"Didn't Change {updateValue}, {ar[i][1]}'s Quantity")
+                                    logging.warning(f"Didn't Change {updateValue}, {item[1]}'s Quantity")
                                     newQuan = oldQuan
-                            newTot = newQuan * tempList[i][1]
-                            tempList[i][2] = newQuan
-                            tempList[i][3] = newTot
+                            newTot = newQuan * item[1]
+                            item[2] = newQuan
+                            item[3] = newTot
                             logging.info(
-                                f"Updated: {updateValue}, {ar[i][1]}\nSet Quantity {oldQuan} => {newQuan}\n"
+                                f"Updated: {updateValue}, {item[1]}\nSet Quantity {oldQuan} => {newQuan}\n"
                                 f"Updated Total => {newTot}"
                             )
                         elif update_key_check[0] == 'exit':
@@ -313,18 +310,18 @@ class array_funcs(object):
 
     def delete_from_list(self):
         ar = self.ar
-        print(printingBills(ar, myFormat).print_bill_items())
+        printingBills(ar).print_bill_items()
         theLoop = True
         while theLoop:
             try:
                 delKey = input(f"The (Name) To Be Removed", override="red")
                 if delKey == 'abort':
-                    warning(f"[!] Aborting...", override="light_salmon3")
+                    warning(f"Aborting...", override="light_salmon3")
                     break
                 else:
-                    for i in range(len(ar)):
-                        if ar[i][0] == delKey:
-                            popTime = ar[i]
+                    for _, item in enumerate(ar):
+                        if item[0] == delKey:
+                            popTime = item
                             ar.remove(popTime)
                             break
                     info(
@@ -363,7 +360,7 @@ def main(transfer, mydb, vat, discount):
             elif idInput == 'del':
                 ar.delete_from_list()
             elif idInput == '--':
-                printingBills(ar.get(), myFormat).print_bill_items()
+                printingBills(ar.get()).print_bill_items()
             elif idInput == 'update':
                 ar.update_list()
             else:

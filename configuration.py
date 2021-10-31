@@ -74,17 +74,17 @@ def info(msg: str, override: str = None) -> None:
         print(f"[?] {msg}")
 
 
-def input(prompt: str, override: str = None, default=None) -> str:
+def input(prompt: str, override: str = None, default=None, password=False) -> str:
     if default is None:
         if override is not None:
-            return Prompt.ask(f"[{override}]{prompt}[/{override}]")
+            return Prompt.ask(f"[{override}]{prompt}[/{override}]", password=password)
         else:
-            return Prompt.ask(f"{prompt}")
+            return Prompt.ask(f"{prompt}", password=password)
     else:
         if override is not None:
-            return Prompt.ask(f"[{override}]{prompt}[/{override}]", default=default)
+            return Prompt.ask(f"[{override}]{prompt}[/{override}]", default=default, password=password)
         else:
-            return Prompt.ask(f"{prompt}", default=default)
+            return Prompt.ask(f"{prompt}", default=default, password=password)
 
 
 # ------------------------------------------#
@@ -137,27 +137,27 @@ class commands:
         if f:
             ops["check_for_updates"] = False
         else:
-            up = input("Check For Updates On Startup? (y/n)", "bold blue")
+            up = input("Check For Updates On Startup? (y/n)", "bold blue", "y")
             if up == 'y':
                 ops["check_for_updates"] = True
             else:
                 ops["check_for_updates"] = False
-        incheck = input("Check File Integrity On Startup? (y/n)", "bold blue")
+        incheck = input("Check File Integrity On Startup? (y/n)", "bold blue", "y")
         if incheck == 'y':
             ops["check_file_integrity"] = True
         else:
             ops["check_file_integrity"] = False
-        incheck = input("Transaction Mode? (y/n)", "bold blue")
+        incheck = input("Transaction Mode? (y/n)", "bold blue", "n")
         if incheck == 'y':
             ops["transactions"] = True
         else:
             ops["transactions"] = False
-        incheck = input("Add VAT To Total? (y/n)", "bold blue")
+        incheck = input("Add VAT To Total? (y/n)", "bold blue", "n")
         if incheck == 'y':
             ops["vat"] = True
         else:
             ops["vat"] = False
-        incheck = input("Enable Discount? (y/n)", "bold blue")
+        incheck = input("Enable Discount? (y/n)", "bold blue", "y")
         if incheck == 'y':
             ops["discount"] = True
         else:

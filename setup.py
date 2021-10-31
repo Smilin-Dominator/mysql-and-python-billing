@@ -9,10 +9,8 @@ def main():
     print("[bold green]Welcome to my Program! Setting Up Config File")
     commands().write_conifguration_file()
     with console.status("[bold green]Initializing..", spinner='dots12') as _:
-        _ if subprocess.run("pip3 install -r requirements.txt", stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL, shell=True).returncode == 0 else error(msg="While Installing Pip Packages")
+        _ if subprocess.run("python -m pip install -r requirements.txt", stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL, shell=True).returncode == 0 else error(msg="While Installing Pip Packages")
         console.log("Environment Setup Complete")
-        time.sleep(3)
-        subprocess.call("touch log.txt", shell=True, stdout=subprocess.DEVNULL)
         time.sleep(3)
         console.log("Created Log.txt")
         time.sleep(3)
@@ -28,7 +26,7 @@ def sql(logging, rsa):
             console.log("Creating Docker Image..")
             try:
                 user = input("Username", "bold red")
-                password = input("Password", "bold red")
+                password = input("Password", "bold red", password=True)
                 db = 'paddigurl'
                 port = 3306
                 host = '127.0.0.1'
@@ -45,7 +43,7 @@ def sql(logging, rsa):
             host = input("Host", "bold red")
             port = input(prompt="Port", override="bold red", default="3306")
             user = input("Username", "bold red")
-            password = input("Password", "bold red")
+            password = input("Password", "bold red", password=True)
             db = input("Database", "bold red")
         with console.status("[bold green]Registering Credentials..", spinner='dots11') as _:
             pubKey, privKey = rsa.newkeys(1096)

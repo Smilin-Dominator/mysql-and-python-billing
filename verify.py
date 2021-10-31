@@ -1,7 +1,7 @@
 import hashlib
 import logging
 import os
-from configuration import variables, input, info, error, warning
+from configuration import variables, input, info, error, print
 
 logging.basicConfig(filename='log.txt', format=variables.log_format, datefmt='[%Y-%m-%d] [%H:%M:%S]',
                     level=logging.DEBUG)
@@ -101,9 +101,11 @@ def verify(mycursor):
 
 
 def main(mydb, mycursor):
-    print("Welcome To The Verifier!\n\n'Nobody Will Tamper With Your Data!' \n- People Before Their Data Got Tampered\n")
-    print("This Will Verify The Hashes Of Your Bills, Not The Master Bills And Sales Reports, as they're Dynamic")
-    key = input("Verify or Hash or Quit? (v/h/q): ")
+    print("[green on white]Welcome To The Verifier![/green on white]\n\n[red]'Nobody Will Tamper With Your Data!'[/red]"
+          "[orange_red1]\n- People Before Their Data Got Tampered[/orange_red1]\n")
+    print("[honeydew2]This Will Verify The Hashes Of Your Bills, Not The Master Bills And Sales Reports"
+          ", as they're Dynamic[/honeydew2]")
+    key = input("[dark_sea_green1]Verify or Hash or Quit? (v/h/q): [/dark_sea_green1]")
     if key == 'v':
         verify(mycursor)
         input("(enter to continue...)")

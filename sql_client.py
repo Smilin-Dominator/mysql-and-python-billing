@@ -1,4 +1,3 @@
-import getpass
 import logging
 import hashlib
 from configuration import variables, print, input, info, console
@@ -11,7 +10,7 @@ logging.basicConfig(filename='log.txt', format=variables.log_format, datefmt='[%
 def auth(mydb):
     badPass = True
     while badPass:
-        passwd = getpass.getpass(f"[*] Master Password: ")
+        passwd = input("Master Password", override="red", password=True)
         pass_read = open('./credentials/passwd.txt', 'r')
         (salt1, salt2, hash_check) = pass_read.read().split(',')
         pass_check = salt1 + passwd + salt2

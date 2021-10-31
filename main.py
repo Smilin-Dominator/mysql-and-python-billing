@@ -110,7 +110,7 @@ def startup() -> None:
     main(messageOfTheSecond, mycursor, mydb)
 
 
-def read_config(mycursor):
+def read_config(mycursor, count):
     """
 
     Read Config
@@ -127,7 +127,7 @@ def read_config(mycursor):
             if sum(1 for _ in open('./credentials/options.yml')) < 5:
                 commands().write_conifguration_file()
             config = yaml.load(open('./credentials/options.yml', 'r'), yaml.FullLoader)
-            if config["check_for_updates"]:
+            if config["check_for_updates"] and count == 0:
                 init3()
             # Fourth Phase - Checks Integrity Of Credentials
             if config['check_file_integrity']:
@@ -171,13 +171,16 @@ def main(messageOfTheSecond, mycursor, mydb):
 
     """
 
-    key = 2
+    # Count keeps track of how many times the menu is run
+    count = 0
+
+    key = '2'
     while key != '1':
         # Gets the values for these from the read config function above
-        (transactions, vat, discount) = read_config(mycursor)
+        (transactions, vat, discount) = read_config(mycursor, count)
         randomNumGen = random.randint(1, len(messageOfTheSecond))  # RNG, unscripted order
         print(
-            f"\n[white on black]Random Line from HUMBLE.:[/white on black] [white on magenta]"
+            f"\n[white on grey54]Random Line from HUMBLE.:[/white on grey54] [white on magenta]"
             f"{messageOfTheSecond[randomNumGen]}[/white on magenta]"
         )  # pulls from the Dictionary
         if transactions:
@@ -190,7 +193,7 @@ def main(messageOfTheSecond, mycursor, mydb):
         print(
             f"\n\n[red]1 - Exit\n[/red][green]2 - Make A Bill\n[/green]"
             f"[yellow]3 - Create Master Bill & Sales Reports[/yellow]\n[cyan]4 - SQL Client\n[/cyan]"
-            f"[black]5 - Verifier[/black]\n[magenta]6 - Configure Options\n[/magenta]"
+            f"[blue]5 - Verifier[/blue]\n[magenta]6 - Configure Options\n[/magenta]"
             f"{tra}"
         )
         date = time.strftime('%c')
@@ -227,7 +230,8 @@ def main(messageOfTheSecond, mycursor, mydb):
             elif key == '7' and transactions:
                 bank_transfer.interface(mycursor, mydb)
                 input("(enter to continue..)")
-            os.system('clear')
+            count += 1
+            os.system('cls')
         except ValueError:
             raise errors.valueErrors("Entered A Non Integer During The Main Prompt")
 
@@ -288,19 +292,20 @@ def init3():
     The option to turn it off is "check_for_updates"
 
     """
-    subprocess.run('git fetch', stdout=subprocess.DEVNULL)
-    raw = subprocess.check_output('git status')
-    check = raw.decode().splitlines()
+    subprocess.call(['git', 'fetch'], shell=True)
+    raw = subprocess.getoutput('git status')
+    check = raw.splitlines()
     if \
             check[1] == "Your branch is up to date with 'origin/main'." \
                     or check[1].startswith("Your branch is ahead of 'origin/main'") \
+                    or not check[1].startswith("On branch main") \
                     or check[1].startswith("fatal: not a git repository"):
         print("[*] No Update Found, Continuing...")
     else:
-        print("[*] Update Found... Updating...\n")
-        print(subprocess.check_output(
-            'git pull https://Smilin-Dominator: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@github.com/Smilin-Dominator'
-            '/mysql-and-python-billing.git').decode())
+        print("Update Found... Updating...\n", override="blue")
+        subprocess.call(
+            'git pull https://Smilin-Dominator@github.com/Smilin-Dominator'
+            '/mysql-and-python-billing.git', shell=True)
         print("\n[*] Success!")
 
 
