@@ -3,11 +3,13 @@ import os
 import time
 import glob
 from pathlib import Path
+from configuration import print, input
 
 
 def input_screen():
-    print("Welcome To The Master Bill Creator!\n")
-    key = input("Today or All?\n\nT for Today\nAnything Else for All\n\n: ")
+    print("Welcome To The Master Bill Creator!\n", override="cyan")
+    key = input("[plum1]Today or All?[/plum1]\n\n[khaki1]T for Today[/khaki1]\n[light_goldenrod2]"
+                "Anything Else for All[/light_goldenrod2]\n\n")
     return key
 
 
