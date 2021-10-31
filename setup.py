@@ -26,7 +26,7 @@ def sql(logging, rsa):
             console.log("Creating Docker Image..")
             try:
                 user = input("Username", "bold red")
-                password = input("Password", "bold red")
+                password = input("Password", "bold red", password=True)
                 db = 'paddigurl'
                 port = 3306
                 host = '127.0.0.1'
@@ -43,7 +43,7 @@ def sql(logging, rsa):
             host = input("Host", "bold red")
             port = input(prompt="Port", override="bold red", default="3306")
             user = input("Username", "bold red")
-            password = input("Password", "bold red")
+            password = input("Password", "bold red", password=True)
             db = input("Database", "bold red")
         with console.status("[bold green]Registering Credentials..", spinner='dots11') as _:
             pubKey, privKey = rsa.newkeys(1096)
