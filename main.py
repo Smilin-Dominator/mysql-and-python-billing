@@ -298,6 +298,7 @@ def init3():
     if \
             check[1] == "Your branch is up to date with 'origin/main'." \
                     or check[1].startswith("Your branch is ahead of 'origin/main'") \
+                    or not check[1].startswith("On branch main") \
                     or check[1].startswith("fatal: not a git repository"):
         print("[*] No Update Found, Continuing...")
     else:
