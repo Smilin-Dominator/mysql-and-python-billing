@@ -204,32 +204,34 @@ def main(messageOfTheSecond, mycursor, mydb):
             f"[white on magenta]SmilinPython>[/white on magenta]"
         )
         try:
-            if key == '1':
-                logging.info("Exiting Gracefully;")
-                os.system("cls")
-                sys.exit(0)
-            elif key == '2':
-                logging.info("Transferring to (connector.py)")
-                import connector
-                connector.main(transactions, mydb, vat, discount)
-            elif key == '3':
-                logging.info("Transferring to (master-bill.py)")
-                import master_bill
-                master_bill.main()
-                input("(enter to continue...)")
-            elif key == '4':
-                logging.info("Transferring to (sql-client.py)")
-                import sql_client
-                sql_client.auth(mydb)
-            elif key == '5':
-                logging.info("Transferring to (verify.py)")
-                import verify
-                verify.main(mydb, mycursor)
-            elif key == '6':
-                commands().configuration_file_interface()
-            elif key == '7' and transactions:
-                bank_transfer.interface(mycursor, mydb)
-                input("(enter to continue..)")
+            match key:
+                case '1':
+                    logging.info("Exiting Gracefully;")
+                    os.system("cls")
+                    sys.exit(0)
+                case '2':
+                    logging.info("Transferring to (connector.py)")
+                    import connector
+                    connector.main(transactions, mydb, vat, discount)
+                case '3':
+                    logging.info("Transferring to (master-bill.py)")
+                    import master_bill
+                    master_bill.main()
+                    input("(enter to continue...)")
+                case '4':
+                    logging.info("Transferring to (sql-client.py)")
+                    import sql_client
+                    sql_client.auth(mydb)
+                case '5':
+                    logging.info("Transferring to (verify.py)")
+                    import verify
+                    verify.main(mydb, mycursor)
+                case '6':
+                    commands().configuration_file_interface()
+                case '7':
+                    if transactions:
+                        bank_transfer.interface(mycursor, mydb)
+                        input("(enter to continue..)")
             count += 1
             os.system('cls')
         except ValueError:
