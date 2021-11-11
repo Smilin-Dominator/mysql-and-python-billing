@@ -206,54 +206,60 @@ def kill_this():
 
 # ------------------------------------------ Array Related Functions ----------------------------------------------#
 
-class array_funcs(object):
+@dataclass
+class Doll:
 
-    @dataclass
-    class Doll:
-        ID: int
-        Name: str
-        Price: int
+    Name: str
+    Price: int
+    Quantity: int = None
+    Total: int = None
+
+    def to_tuple(self) -> tuple[str | int, ...]:
+        return tuple([self.Name, self.Price, self.Quantity, self.Total])
+
+
+class array_funcs(object):
 
     def __init__(self, ar: list[tuple[str, int, int]]):
         self.ar = ar
 
-    def duplicate_check(self, records: list[int, str, int]):
+    def duplicate_check(self, doll: Doll):
         ar = self.ar
         quantity = int(input(f"Quantity", override="yellow"))
-        for row in records:
-            name = row[1]  # gets the element from the data
-            price = row[2]  # and its in a fixed format, which is what matters
-            print(f"\nName  : {name}", override="light_steel_blue1")
-            print(f"Price : {price}", override="light_steel_blue1")
-            total = int(price) * quantity
-            if len(ar) > 0:
-                tempList = [list(item) for item in ar]  # converts into a list, since you cant change tuples
-                for _, item in enumerate(tempList):
-                    checkName = item[0]
-                    checkPrice = item[1]
-                    if (checkName == name) and (checkPrice == price):
-                        info(f"\nDuplicate Detected, Updating Current Entry", override="teal")
-                        currentTotal = item[3]
-                        currentQuantity = item[2]
-                        newTotal = int(price) * quantity + currentTotal
-                        newQuantity = int(currentQuantity) + quantity
-                        try:
-                            item[3] = newTotal
-                            item[2] = newQuantity
-                            info(f"Success!", override="green_yellow")
-                            logging.info(
-                                f"Updated: {checkName}, {checkPrice}\nSet Quantity {currentQuantity} => "
-                                f"{newQuantity}\nSet Total: {currentTotal} => {newTotal}"
-                            )
-                            ar = [tuple(entry) for entry in tempList]
-                            self.ar = ar
-                            break
-                        except Exception as e:
-                            logging.error(e)
-                else:
-                    self.ar.append((name, price, quantity, total))
+        print(f"\nName  : {doll.Name}", override="light_steel_blue1")
+        print(f"Price : {doll.Price}", override="light_steel_blue1")
+        total = int(doll.Price) * quantity
+        if len(ar) > 0:
+            tempList = [list(item) for item in ar]  # converts into a list, since you cant change tuples
+            for _, item in enumerate(tempList):
+                doll2 = Doll(item[0], item[1])
+                if (doll2.Name == doll.Name) and (doll2.Price == doll.Price):
+                    info(f"\nDuplicate Detected, Updating Current Entry", override="teal")
+                    doll2.Total = item[3]
+                    doll2.Quantity = item[2]
+                    newTotal = doll2.Price * quantity + doll2.Total
+                    newQuantity = doll2.Quantity + quantity
+                    try:
+                        newDoll = Doll(doll.Name, doll.Price, newQuantity, newTotal)
+                        info(f"Success!", override="green_yellow")
+                        logging.info(
+                            f"Updated: {newDoll.Name}, {newDoll.Price}\nSet Quantity {doll2.Quantity} => "
+                            f"{newQuantity}\nSet Total: {doll2.Total} => {newTotal}"
+                        )
+                        tempList[tempList.index(item)] = newDoll.to_tuple()
+                        ar = [tuple(entry) for entry in tempList]
+                        self.ar = ar
+                        break
+                    except Exception as e:
+                        logging.error(e)
             else:
-                self.ar.append((name, price, quantity, total))
+                doll.Quantity = quantity
+                doll.Total = doll.Price * doll.Quantity
+                self.ar.append((doll.Name, doll.Price, doll.Quantity, doll.Total))
+        else:
+            doll.Quantity = quantity
+            doll.Total = doll.Price * doll.Quantity
+            self.ar.append((doll.Name, doll.Price, doll.Quantity, doll.Total))
 
     def update_list(self):
         ar = self.ar
@@ -375,9 +381,10 @@ def main(transfer, mydb, vat, discount):
                     sql_select_Query = f"select * from paddigurlTest WHERE id = {proceed}"  # Sent To The Database
                     cursor = mydb.cursor()  # This Is As If You Were Entering It Yourself
                     cursor.execute(sql_select_Query)  # Executes
-                    records = cursor.fetchall()  # Gets All The Outputs
+                    records = cursor.fetchall()[0]  # Gets All The Outputs
                     if records:  # Basically proceeds if its not empty like []
-                        ar.duplicate_check(records)
+                        doll = Doll(records[1], records[2])
+                        ar.duplicate_check(doll)
                     else:
                         warning(
                             f"\nDid You Enter The Right ID / Command?", override="red")  # congratulations!
