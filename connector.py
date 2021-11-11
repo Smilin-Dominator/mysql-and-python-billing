@@ -1,4 +1,4 @@
-import getpass
+from dataclasses import dataclass
 import hashlib
 import logging
 import time
@@ -207,6 +207,12 @@ def kill_this():
 # ------------------------------------------ Array Related Functions ----------------------------------------------#
 
 class array_funcs(object):
+
+    @dataclass
+    class Doll:
+        ID: int
+        Name: str
+        Price: int
 
     def __init__(self, ar: list[tuple[str, int, int]]):
         self.ar = ar
