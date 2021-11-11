@@ -229,6 +229,8 @@ class array_funcs(object):
         print(f"\nName  : {doll.Name}", override="light_steel_blue1")
         print(f"Price : {doll.Price}", override="light_steel_blue1")
         total = int(doll.Price) * quantity
+        doll.Quantity = quantity
+        doll.Total = doll.Price * doll.Quantity
         if len(ar) > 0:
             tempList = [list(item) for item in ar]  # converts into a list, since you cant change tuples
             for _, item in enumerate(tempList):
@@ -253,12 +255,8 @@ class array_funcs(object):
                     except Exception as e:
                         logging.error(e)
             else:
-                doll.Quantity = quantity
-                doll.Total = doll.Price * doll.Quantity
                 self.ar.append((doll.Name, doll.Price, doll.Quantity, doll.Total))
         else:
-            doll.Quantity = quantity
-            doll.Total = doll.Price * doll.Quantity
             self.ar.append((doll.Name, doll.Price, doll.Quantity, doll.Total))
 
     def update_list(self):
