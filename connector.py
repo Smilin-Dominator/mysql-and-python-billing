@@ -223,7 +223,7 @@ class array_funcs(object):
     def __init__(self, ar: list[tuple[str, int, int]]):
         self.ar = ar
 
-    def duplicate_check(self, doll: Doll):
+    def __add__(self, doll: Doll):
         ar = self.ar
         quantity = int(input(f"Quantity", override="yellow"))
         print(f"\nName  : {doll.Name}", override="light_steel_blue1")
@@ -258,7 +258,7 @@ class array_funcs(object):
         else:
             self.ar.append((doll.Name, doll.Price, doll.Quantity, doll.Total))
 
-    def update_list(self):
+    def __update__(self):
         ar = self.ar
         printingBills(ar).print_bill_items()
         theLoop = True
@@ -314,7 +314,7 @@ class array_funcs(object):
                 logging.error(e)
                 theLoop = True
 
-    def delete_from_list(self):
+    def __delete__(self):
         ar = self.ar
         printingBills(ar).print_bill_items()
         theLoop = True
@@ -341,7 +341,7 @@ class array_funcs(object):
                 theLoop = True
         self.ar = ar
 
-    def get(self):
+    def __get__(self):
         return self.ar
 
 
@@ -354,22 +354,22 @@ def main(transfer, mydb, vat, discount):
     ar = array_funcs([])  # declared as empty, will get filled in the process
     while idInput != ' ':
         try:
-            ar = array_funcs(ar.get())
+            ar = array_funcs(ar.__get__())
             idInput = input(f"\nID", override="light_cyan3")  # ID As In The First Column
             match idInput:
                 case "":  # if you just hit enter
-                    bill_write(ar.get(), transfer, vat, discount)
+                    bill_write(ar.__get__(), transfer, vat, discount)
                     break
                 case 'Kill':  # had to add an emergency kill function :)
                     go = kill_this()
                     if go:
                         break
                 case 'del':
-                    ar.delete_from_list()
+                    ar.__delete__()
                 case '--':
-                    printingBills(ar.get()).print_bill_items()
+                    printingBills(ar.__get__()).print_bill_items()
                 case 'update':
-                    ar.update_list()
+                    ar.__update__()
                 case _:
                     proceed = int(idInput)
                     sql_select_Query = f"select * from paddigurlTest WHERE id = {proceed}"  # Sent To The Database
@@ -378,7 +378,7 @@ def main(transfer, mydb, vat, discount):
                     records = cursor.fetchall()[0]  # Gets All The Outputs
                     if records:  # Basically proceeds if its not empty like []
                         doll = Doll(records[1], records[2])
-                        ar.duplicate_check(doll)
+                        ar.__add__(doll)
                     else:
                         warning(
                             f"\nDid You Enter The Right ID / Command?", override="red")  # congratulations!
