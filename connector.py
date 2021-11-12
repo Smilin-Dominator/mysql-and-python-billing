@@ -232,7 +232,7 @@ class array_funcs(object):
         doll.Total = doll.Price * doll.Quantity
         if len(ar) > 0:
             tempList = [list(item) for item in ar]  # converts into a list, since you cant change tuples
-            for _, item in enumerate(tempList):
+            for i, item in enumerate(tempList):
                 doll2 = Doll(item[0], item[1])
                 if (doll2.Name == doll.Name) and (doll2.Price == doll.Price):
                     info(f"\nDuplicate Detected, Updating Current Entry", override="teal")
@@ -247,7 +247,7 @@ class array_funcs(object):
                             f"Updated: {newDoll.Name}, {newDoll.Price}\nSet Quantity {doll2.Quantity} => "
                             f"{newQuantity}\nSet Total: {doll2.Total} => {newTotal}"
                         )
-                        tempList[tempList.index(item)] = newDoll.to_tuple()
+                        tempList[i] = newDoll.to_tuple()
                         ar = [tuple(entry) for entry in tempList]
                         self.ar = ar
                         break
