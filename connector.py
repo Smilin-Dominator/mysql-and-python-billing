@@ -348,6 +348,7 @@ class array_funcs(object):
 # -------------------------------------------- Main Code --------------------------------------------------#
 
 def main(transfer, mydb, vat, discount):
+    cursor = mydb.cursor()
     global customerName
     customerName = startup()
     idInput = 69420666  # well, had to declare it as something -\_/-
@@ -355,6 +356,7 @@ def main(transfer, mydb, vat, discount):
     while idInput != ' ':
         try:
             ar = array_funcs(ar.__get__())
+            pb = printingBills(ar.__get__())
             idInput = input(f"\nID", override="light_cyan3")  # ID As In The First Column
             match idInput:
                 case "":  # if you just hit enter
@@ -367,15 +369,13 @@ def main(transfer, mydb, vat, discount):
                 case 'del':
                     ar.__delete__()
                 case '--':
-                    printingBills(ar.__get__()).print_bill_items()
+                    pb.print_bill_items()
                 case 'update':
                     ar.__update__()
                 case _:
                     proceed = int(idInput)
-                    sql_select_Query = f"select * from paddigurlTest WHERE id = {proceed}"  # Sent To The Database
-                    cursor = mydb.cursor()  # This Is As If You Were Entering It Yourself
-                    cursor.execute(sql_select_Query)  # Executes
-                    records = cursor.fetchall()[0]  # Gets All The Outputs
+                    cursor.execute(f"select * from paddigurlTest WHERE id = {proceed}")
+                    records = cursor.fetchall()[0]
                     if records:  # Basically proceeds if its not empty like []
                         doll = Doll(records[1], records[2])
                         ar.__add__(doll)
