@@ -228,7 +228,6 @@ class array_funcs(object):
         quantity = int(input(f"Quantity", override="yellow"))
         print(f"\nName  : {doll.Name}", override="light_steel_blue1")
         print(f"Price : {doll.Price}", override="light_steel_blue1")
-        total = int(doll.Price) * quantity
         doll.Quantity = quantity
         doll.Total = doll.Price * doll.Quantity
         if len(ar) > 0:
@@ -267,29 +266,28 @@ class array_funcs(object):
             try:
                 updateValue = input(f"What Would You Like To Update? (Name)", override="dark_olive_green2")
                 tempList = [list(tup) for tup in ar]
-                for _, item in enumerate(tempList):
-                    up_name = item[0]
-                    if updateValue == up_name:
+                for i, item in enumerate(tempList):
+                    doll = Doll(item[0], item[1], item[2], item[3])
+                    if updateValue == doll.Name:
                         update_key = input(
                             f"Add Or Remove How Much? (+ amount/ - amount)", override="white"
                         )
                         update_key_check = (update_key.split(' '))
                         upQuan = int(update_key_check[1])
-                        oldQuan = item[2]
+                        oldQ = doll.Quantity
+                        oldT = doll.Total
                         if update_key_check[0] == '+':
-                            newQuan = upQuan + oldQuan
-                            newTot = newQuan * item[1]
-                            item[2] = newQuan
-                            item[3] = newTot
+                            doll.Quantity = upQuan + doll.Quantity
+                            doll.Total = doll.Quantity * doll.Price
                             logging.info(
-                                f"Updated: {updateValue}, {ar[1]}\nSet Quantity {oldQuan} => "
-                                f"{newQuan}\nUpdated Total {item[3]} => {newTot}"
+                                f"Updated: {updateValue}, {doll.Name}\nSet Quantity {oldQ} => "
+                                f"{doll.Quantity}\nUpdated Total {oldT} => {doll.Total}"
                             )
                             ar = [tuple(entry) for entry in tempList]
                         elif update_key_check[0] == '-':
-                            newQuanCheck = oldQuan - upQuan
+                            newQuanCheck = doll.Quantity - upQuan
                             if newQuanCheck > 0:
-                                newQuan = newQuanCheck
+                                doll.Quantity = newQuanCheck
                             else:
                                 warning(f"[ The Value Is Either Negative or 0, And Will Be Set To 1 ]\n"
                                         f"[ If Your Intention Was To Delete This, Use The 'del' Command Instead ]"
@@ -297,21 +295,19 @@ class array_funcs(object):
                                 confirm = input(f"Proceed? (Y/N)", override="yellow")
                                 if confirm == 'Y':
                                     logging.warning(f"Set {updateValue}, {item[1]}'s Quantity to 1")
-                                    newQuan = 1
+                                    doll.Quantity = 1
                                 else:
                                     logging.warning(f"Didn't Change {updateValue}, {item[1]}'s Quantity")
-                                    newQuan = oldQuan
-                            newTot = newQuan * item[1]
-                            item[2] = newQuan
-                            item[3] = newTot
+                            doll.Total = doll.Quantity * doll.Price
                             logging.info(
-                                f"Updated: {updateValue}, {item[1]}\nSet Quantity {oldQuan} => {newQuan}\n"
-                                f"Updated Total => {newTot}"
+                                f"Updated: {updateValue}, {doll.Name}\nSet Quantity {oldQ} => {doll.Quantity}\n"
+                                f"Updated Total => {doll.Total}"
                             )
                         elif update_key_check[0] == 'exit':
                             break
                         info(f"Success!", override="honeydew2")
                         break
+                    tempList[i] = doll.to_tuple()
                 self.ar = [tuple(entry) for entry in tempList]
                 break
             except Exception as e:
