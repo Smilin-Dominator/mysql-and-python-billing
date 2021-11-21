@@ -27,11 +27,26 @@ varTime = time.strftime("%d_of_%B")
 
 
 # --------------------------------------- Bill Related Functions ---------------------------------------#
+@dataclass
+class Doll:
+    Name: str
+    Price: int
+    Quantity: int = None
+    Total: int = None
+    old_quantity: int = None
+    old_total: int = None
+
+    def set_old_quantity(self):
+        self.old_total = self.Total
+        self.old_quantity = self.Quantity
+
+    def to_tuple(self) -> tuple[str | int, ...]:
+        return tuple([self.Name, self.Price, self.Quantity, self.Total])
 
 
 class printingBills(object):
 
-    def __init__(self, ar: list[tuple[str, int, int]] = None, file=None):
+    def __init__(self, ar: list[Doll] = None, file=None):
         self.ar = ar
         self.file = file
 
@@ -44,8 +59,8 @@ class printingBills(object):
         table.add_column("Quantity", style="green")
         table.add_column("Total", style="red")
 
-        for i in range(len(self.ar)):
-            table.add_row(self.ar[i][0], str(self.ar[i][1]), str(self.ar[i][2]), str(self.ar[i][3]))
+        for _, doll in enumerate(self.ar):
+            table.add_row(doll.Name, str(doll.Price), str(doll.Quantity), str(doll.Total))
 
         table.add_row("", "", "", "")
         table.add_row("Subtotal", "", "", str(self.print_total()))
@@ -53,9 +68,10 @@ class printingBills(object):
         console.print(table)
 
     def write_bill_items(self) -> None:
+        tups = [a.to_tuple() for _, a in enumerate(self.ar)]
         table = MarkdownTableWriter(
             headers=["Name", "Price", "Quantity", "Total"],
-            value_matrix=self.ar
+            value_matrix=tups
         )
         self.file.write("\n")
         table.stream = self.file
@@ -63,12 +79,8 @@ class printingBills(object):
 
     def print_total(self) -> int:
         tot = 0
-        price_unchained = []  # blank array, like the earlier one
-        for i in range(len(self.ar)):
-            fin = int(self.ar[i][3])
-            price_unchained.append(fin)  # appends to the array
-        for i in range(0, len(price_unchained)):
-            tot = tot + price_unchained[i]  # paradox alert! this variable is dynamic, it remembers the past state.
+        for _, doll in enumerate(self.ar):
+            tot += doll.Total
         return tot
 
 
@@ -152,7 +164,7 @@ def bill_write(ar: list, transfer: bool, vat: bool, discount: bool):
         total = discount_module(total)
 
     if vat:
-        total = discount_module(total)
+        total = vat_module(total)
 
     print(f"Grand Total: Rs. {total}", override="green")
     logging.info(f"Grand Total: Rs. {total}")
@@ -220,87 +232,59 @@ def kill_this():
 
 # ------------------------------------------ Array Related Functions ----------------------------------------------#
 
-@dataclass
-class Doll:
-    Name: str
-    Price: int
-    Quantity: int = None
-    Total: int = None
-    old_quantity: int = None
-    old_total: int = None
-
-    def set_old_quantity(self):
-        self.old_total = self.Total
-        self.old_quantity = self.Quantity
-
-    def to_tuple(self) -> tuple[str | int, ...]:
-        return tuple([self.Name, self.Price, self.Quantity, self.Total])
-
-
 class array_funcs(object):
 
-    def __init__(self, ar: list[tuple[str, int, int]]):
+    def __init__(self, ar: list[Doll]):
         self.ar = ar
 
     def __add__(self, doll: Doll):
-        ar = self.ar
         quantity = int(input(f"Quantity", override="yellow"))
         print(f"\nName  : {doll.Name}", override="light_steel_blue1")
         print(f"Price : {doll.Price}", override="light_steel_blue1")
         doll.Quantity = quantity
         doll.Total = doll.Price * doll.Quantity
-        if len(ar) > 0:
-            tempList = [list(item) for item in ar]  # converts into a list, since you cant change tuples
-            for i, item in enumerate(tempList):
-                updatedDoll = Doll(*item)
-                if (updatedDoll.Name == doll.Name) and (updatedDoll.Price == doll.Price):
+        if len(self.ar) > 0:
+            for _, updateDoll in enumerate(self.ar):
+                if (updateDoll.Name == doll.Name) and (updateDoll.Price == doll.Price):
                     info(f"\nDuplicate Detected, Updating Current Entry", override="teal")
-                    updatedDoll.set_old_quantity()
-                    updatedDoll.Quantity = updatedDoll.Quantity + quantity
-                    updatedDoll.Total = updatedDoll.Price * updatedDoll.Quantity
+                    updateDoll.set_old_quantity()
+                    updateDoll.Quantity = updateDoll.Quantity + quantity
+                    updateDoll.Total = updateDoll.Price * updateDoll.Quantity
                     try:
                         info(f"Success!", override="green_yellow")
                         logging.info(
-                            f"Updated: {updatedDoll.Name}, {updatedDoll.Price}\nSet Quantity {updatedDoll.old_quantity} => "
-                            f"{updatedDoll.Quantity}\nSet Total: {updatedDoll.old_total} => {updatedDoll.Total}"
+                            f"Updated: {updateDoll.Name}, {updateDoll.Price}\nSet Quantity {updateDoll.old_quantity} => "
+                            f"{updateDoll.Quantity}\nSet Total: {updateDoll.old_total} => {updateDoll.Total}"
                         )
-                        tempList[i] = updatedDoll.to_tuple()
-                        ar = [tuple(entry) for entry in tempList]
-                        self.ar = ar
                         break
                     except Exception as e:
                         logging.error(e)
             else:
-                self.ar.append((doll.Name, doll.Price, doll.Quantity, doll.Total))
+                self.ar.append(doll)
         else:
-            self.ar.append((doll.Name, doll.Price, doll.Quantity, doll.Total))
+            self.ar.append(doll)
 
     def __update__(self):
-        ar = self.ar
-        printingBills(ar).print_bill_items()
+        printingBills(self.ar).print_bill_items()
         theLoop = True
         while theLoop:
             try:
                 updateValue = input(f"What Would You Like To Update? (Name)", override="dark_olive_green2")
-                tempList = [list(tup) for tup in ar]
-                for i, item in enumerate(tempList):
-                    doll = Doll(*item)
+                for _, doll in enumerate(self.ar):
                     if updateValue == doll.Name:
                         update_key = input(
                             f"Add Or Remove How Much? (+ amount/ - amount)", override="white"
                         )
                         update_key_check = (update_key.split(' '))
                         upQuan = int(update_key_check[1])
-                        oldQ = doll.Quantity
-                        oldT = doll.Total
+                        doll.set_old_quantity()
                         if update_key_check[0] == '+':
-                            doll.Quantity = upQuan + doll.Quantity
+                            doll.Quantity += upQuan
                             doll.Total = doll.Quantity * doll.Price
                             logging.info(
-                                f"Updated: {updateValue}, {doll.Name}\nSet Quantity {oldQ} => "
-                                f"{doll.Quantity}\nUpdated Total {oldT} => {doll.Total}"
+                                f"Updated: {updateValue}, {doll.Name}\nSet Quantity {doll.old_quantity} => "
+                                f"{doll.Quantity}\nUpdated Total {doll.old_total} => {doll.Total}"
                             )
-                            ar = [tuple(entry) for entry in tempList]
                         elif update_key_check[0] == '-':
                             newQuanCheck = doll.Quantity - upQuan
                             if newQuanCheck > 0:
@@ -311,29 +295,26 @@ class array_funcs(object):
                                         , override="red")
                                 confirm = input(f"Proceed? (Y/N)", override="yellow")
                                 if confirm == 'Y':
-                                    logging.warning(f"Set {updateValue}, {item[1]}'s Quantity to 1")
+                                    logging.warning(f"Set {updateValue}, {doll.Price}'s Quantity to 1")
                                     doll.Quantity = 1
                                 else:
-                                    logging.warning(f"Didn't Change {updateValue}, {item[1]}'s Quantity")
+                                    logging.warning(f"Didn't Change {updateValue}, {doll.Name}'s Quantity")
                             doll.Total = doll.Quantity * doll.Price
                             logging.info(
-                                f"Updated: {updateValue}, {doll.Name}\nSet Quantity {oldQ} => {doll.Quantity}\n"
-                                f"Updated Total => {doll.Total}"
+                                f"Updated: {updateValue}, {doll.Name}\nSet Quantity {doll.old_quantity} => {doll.Quantity}\n"
+                                f"Updated Total {doll.old_total} => {doll.Total}"
                             )
                         elif update_key_check[0] == 'exit':
                             break
                         info(f"Success!", override="honeydew2")
                         break
-                    tempList[i] = doll.to_tuple()
-                self.ar = [tuple(entry) for entry in tempList]
                 break
             except Exception as e:
                 logging.error(e)
                 theLoop = True
 
     def __delete__(self):
-        ar = self.ar
-        printingBills(ar).print_bill_items()
+        printingBills(self.ar).print_bill_items()
         theLoop = True
         while theLoop:
             try:
@@ -342,10 +323,9 @@ class array_funcs(object):
                     warning(f"Aborting...", override="light_salmon3")
                     break
                 else:
-                    for _, item in enumerate(ar):
-                        if item[0] == delKey:
-                            popTime = item
-                            ar.remove(popTime)
+                    for _, doll in enumerate(self.ar):
+                        if doll.Name == delKey:
+                            self.ar.remove(doll)
                             break
                     info(
                         f"Success! Type  '--' in the ID prompt To See The Updated Version!", override="green"
@@ -356,7 +336,6 @@ class array_funcs(object):
                 logging.error(e)
                 info(f"[ Error Occurred, Please Retry ]", override="red")
                 theLoop = True
-        self.ar = ar
 
     def __get__(self):
         return self.ar
