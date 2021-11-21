@@ -27,11 +27,26 @@ varTime = time.strftime("%d_of_%B")
 
 
 # --------------------------------------- Bill Related Functions ---------------------------------------#
+@dataclass
+class Doll:
+    Name: str
+    Price: int
+    Quantity: int = None
+    Total: int = None
+    old_quantity: int = None
+    old_total: int = None
+
+    def set_old_quantity(self):
+        self.old_total = self.Total
+        self.old_quantity = self.Quantity
+
+    def to_tuple(self) -> tuple[str | int, ...]:
+        return tuple([self.Name, self.Price, self.Quantity, self.Total])
 
 
 class printingBills(object):
 
-    def __init__(self, ar: list[tuple[str, int, int]] = None, file=None):
+    def __init__(self, ar: list[Doll] = None, file=None):
         self.ar = ar
         self.file = file
 
@@ -220,23 +235,6 @@ def kill_this():
 
 # ------------------------------------------ Array Related Functions ----------------------------------------------#
 
-@dataclass
-class Doll:
-    Name: str
-    Price: int
-    Quantity: int = None
-    Total: int = None
-    old_quantity: int = None
-    old_total: int = None
-
-    def set_old_quantity(self):
-        self.old_total = self.Total
-        self.old_quantity = self.Quantity
-
-    def to_tuple(self) -> tuple[str | int, ...]:
-        return tuple([self.Name, self.Price, self.Quantity, self.Total])
-
-
 class array_funcs(object):
 
     def __init__(self, ar: list[Doll]):
@@ -303,7 +301,7 @@ class array_funcs(object):
                                     logging.warning(f"Set {updateValue}, {doll.Price}'s Quantity to 1")
                                     doll.Quantity = 1
                                 else:
-                                    logging.warning(f"Didn't Change {updateValue}, {item[1]}'s Quantity")
+                                    logging.warning(f"Didn't Change {updateValue}, {doll.Name}'s Quantity")
                             doll.Total = doll.Quantity * doll.Price
                             logging.info(
                                 f"Updated: {updateValue}, {doll.Name}\nSet Quantity {doll.old_quantity} => {doll.Quantity}\n"
