@@ -152,7 +152,7 @@ def bill_write(ar: list, transfer: bool, vat: bool, discount: bool):
         total = discount_module(total)
 
     if vat:
-        total = discount_module(total)
+        total = vat_module(total)
 
     print(f"Grand Total: Rs. {total}", override="green")
     logging.info(f"Grand Total: Rs. {total}")
@@ -239,41 +239,35 @@ class Doll:
 
 class array_funcs(object):
 
-    def __init__(self, ar: list[tuple[str, int, int]]):
+    def __init__(self, ar: list[Doll]):
         self.ar = ar
 
     def __add__(self, doll: Doll):
-        ar = self.ar
         quantity = int(input(f"Quantity", override="yellow"))
         print(f"\nName  : {doll.Name}", override="light_steel_blue1")
         print(f"Price : {doll.Price}", override="light_steel_blue1")
         doll.Quantity = quantity
         doll.Total = doll.Price * doll.Quantity
-        if len(ar) > 0:
-            tempList = [list(item) for item in ar]  # converts into a list, since you cant change tuples
-            for i, item in enumerate(tempList):
-                updatedDoll = Doll(*item)
-                if (updatedDoll.Name == doll.Name) and (updatedDoll.Price == doll.Price):
+        if len(self.ar) > 0:
+            for _, updateDoll in enumerate(self.ar):
+                if (updateDoll.Name == doll.Name) and (updateDoll.Price == doll.Price):
                     info(f"\nDuplicate Detected, Updating Current Entry", override="teal")
-                    updatedDoll.set_old_quantity()
-                    updatedDoll.Quantity = updatedDoll.Quantity + quantity
-                    updatedDoll.Total = updatedDoll.Price * updatedDoll.Quantity
+                    updateDoll.set_old_quantity()
+                    updateDoll.Quantity = updateDoll.Quantity + quantity
+                    updateDoll.Total = updateDoll.Price * updateDoll.Quantity
                     try:
                         info(f"Success!", override="green_yellow")
                         logging.info(
-                            f"Updated: {updatedDoll.Name}, {updatedDoll.Price}\nSet Quantity {updatedDoll.old_quantity} => "
-                            f"{updatedDoll.Quantity}\nSet Total: {updatedDoll.old_total} => {updatedDoll.Total}"
+                            f"Updated: {updateDoll.Name}, {updateDoll.Price}\nSet Quantity {updateDoll.old_quantity} => "
+                            f"{updateDoll.Quantity}\nSet Total: {updateDoll.old_total} => {updateDoll.Total}"
                         )
-                        tempList[i] = updatedDoll.to_tuple()
-                        ar = [tuple(entry) for entry in tempList]
-                        self.ar = ar
                         break
                     except Exception as e:
                         logging.error(e)
             else:
-                self.ar.append((doll.Name, doll.Price, doll.Quantity, doll.Total))
+                self.ar.append(doll)
         else:
-            self.ar.append((doll.Name, doll.Price, doll.Quantity, doll.Total))
+            self.ar.append(doll)
 
     def __update__(self):
         ar = self.ar
