@@ -213,6 +213,12 @@ class Doll:
     Price: int
     Quantity: int = None
     Total: int = None
+    old_quantity: int = None
+    old_total: int = None
+
+    def set_old_quantity(self):
+        self.old_total = self.Total
+        self.old_quantity = self.Quantity
 
     def to_tuple(self) -> tuple[str | int, ...]:
         return tuple([self.Name, self.Price, self.Quantity, self.Total])
@@ -236,15 +242,14 @@ class array_funcs(object):
                 updatedDoll = Doll(*item)
                 if (updatedDoll.Name == doll.Name) and (updatedDoll.Price == doll.Price):
                     info(f"\nDuplicate Detected, Updating Current Entry", override="teal")
-                    oldquan = updatedDoll.Quantity
-                    oldtot = updatedDoll.Total
+                    updatedDoll.set_old_quantity()
                     updatedDoll.Quantity = updatedDoll.Quantity + quantity
                     updatedDoll.Price = updatedDoll.Price * updatedDoll.Quantity
                     try:
                         info(f"Success!", override="green_yellow")
                         logging.info(
-                            f"Updated: {updatedDoll.Name}, {updatedDoll.Price}\nSet Quantity {oldquan} => "
-                            f"{updatedDoll.Quantity}\nSet Total: {oldtot} => {updatedDoll.Total}"
+                            f"Updated: {updatedDoll.Name}, {updatedDoll.Price}\nSet Quantity {updatedDoll.old_quantity} => "
+                            f"{updatedDoll.Quantity}\nSet Total: {updatedDoll.old_total} => {updatedDoll.Total}"
                         )
                         tempList[i] = updatedDoll.to_tuple()
                         ar = [tuple(entry) for entry in tempList]
@@ -266,7 +271,7 @@ class array_funcs(object):
                 updateValue = input(f"What Would You Like To Update? (Name)", override="dark_olive_green2")
                 tempList = [list(tup) for tup in ar]
                 for i, item in enumerate(tempList):
-                    doll = Doll(item[0], item[1], item[2], item[3])
+                    doll = Doll(*item)
                     if updateValue == doll.Name:
                         update_key = input(
                             f"Add Or Remove How Much? (+ amount/ - amount)", override="white"
