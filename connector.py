@@ -80,7 +80,7 @@ class printingBills(object):
     def print_total(self) -> int:
         tot = 0
         for _, doll in enumerate(self.ar):
-            tot += doll.Price
+            tot += doll.Total
         return tot
 
 
