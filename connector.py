@@ -31,7 +31,7 @@ varTime = time.strftime("%d_of_%B")
 
 class printingBills(object):
 
-    def __init__(self, ar: list[tuple[str, int, int]] = None, file = None):
+    def __init__(self, ar: list[tuple[str, int, int]] = None, file=None):
         self.ar = ar
         self.file = file
 
@@ -73,6 +73,55 @@ class printingBills(object):
 
 
 def bill_write(ar: list, transfer: bool, vat: bool, discount: bool):
+
+    def discount_module(subtotal):
+        """
+            If discount is true, it'll show the discount interface
+            This also loops until the balance is greater than or equal to 0
+            If it's false, it sets the Discount Total to the First Total
+            :param subtotal: The Subtotal
+            :return: subtotal minus the discount
+        """
+        loop = False
+        while not loop:
+            discount = float(input(f"Discount (%)", override="yellow"))
+            if discount >= 0:
+                total_with_discount = subtotal * (discount / 100)
+                diff = subtotal - total_with_discount
+                if diff >= 0:
+                    rounded_total = round(diff, 2)
+                    print(f"Discount Amount: Rs. {round(total_with_discount, 2)}", override='green')
+                    print(f"Subtotal w/ Discount: Rs. {round(rounded_total, 2)}", override='teal')
+                    fileOpen.write(f"\n**Discount: <span style='color:orange'>{discount}%</span>**<br>")
+                    fileOpen.write(
+                        f"\n**Discount Amount: Rs. <span style='color:red'>{round(total_with_discount, 2)}</span>**<br>")
+                    fileOpen.write(
+                        f"\n**Subtotal w/ Discount: Rs. <span style='color:magenta'>{round(rounded_total, 2)}</span>**<br>")
+                    logging.info(f"Discount: {discount}%")
+                    logging.info(f"Discount Amount: Rs. {round(total_with_discount, 2)}")
+                    logging.info(f"Subtotal w/ Discount: Rs. {round(rounded_total, 2)}")
+                    return rounded_total
+                else:
+                    warning("[ Try Again, The Discount Sum is Negative ]", override="red")
+                    logging.warning("Entered Incorrect Discount %")
+                    loop = False
+            else:
+                warning("[ Try Again, Its Either 0 or An Integer ]", override="red")
+                logging.warning("Entered Incorrect Discount %")
+                loop = False
+
+    def vat_module(subtotal):
+        """
+        Adds 15% VAT
+        :param subtotal: The Subtotal
+        :return: Subtotal + Vat
+        """
+        vatAmount = subtotal * (15 / 100)
+        print(f"Tax: Rs. {vatAmount}", override='magenta')
+        fileOpen.write(f"\n**Tax : Rs. <span style='color:cyan'>{vatAmount}</span>**<br>")
+        subtotal += vatAmount
+        return subtotal
+
     fileTime = str(time.strftime('%I.%M_%p'))  # eg: 07.10 PM
     customerNameFormat = customerName.replace(' ', '_')
     fileName = f"[BILL]-{customerNameFormat}-{fileTime}.md"  # format of the filename
@@ -85,65 +134,29 @@ def bill_write(ar: list, transfer: bool, vat: bool, discount: bool):
     fileOpen.write(f"{fileHeaderFormat.format(70 * '-')}")
     fileOpen.write(f"\n{fileHeaderFormat.format('Paddigurl Dolls')}")
     fileOpen.write(f"\n{fileHeaderFormat.format(70 * '-')}")
-    fileOpen.write(f'\n\n**Date: <span style="color:blue">{str(time.strftime("%d/%m/%Y"))}</span>**<br>')  # eg: 02/05/2021
-    fileOpen.write(f'\n**Time: <span style="color:red">{str(fileTime.replace("_", " "))}</span>**<br>')  # uses the variable set earlier
+    fileOpen.write(
+        f'\n\n**Date: <span style="color:blue">{str(time.strftime("%d/%m/%Y"))}</span>**<br>')  # eg: 02/05/2021
+    fileOpen.write(
+        f'\n**Time: <span style="color:red">{str(fileTime.replace("_", " "))}</span>**<br>')  # uses the variable set earlier
     fileOpen.write(f'\n**Customer: <span style="color:green">{customerName.replace("_", " ")}</span>**<br>\n')
 
     write_the_values = printingBills(ar, fileOpen)
     write_the_values.write_bill_items()
 
-    var_tot = printingBills(ar).print_total()
-    print(f"Subtotal: Rs. {var_tot}", override='red')
-    fileOpen.write(f'\n\n**Subtotal: <span style="color:orange">Rs. {str(var_tot)}</span>**<br>')
-    logging.info(f'Subtotal: Rs. {var_tot}')  # Three simultaneous actions here lol
+    total = printingBills(ar).print_total()
+    print(f"Subtotal: Rs. {total}", override='red')
+    fileOpen.write(f'\n\n**Subtotal: <span style="color:orange">Rs. {str(total)}</span>**<br>')
+    logging.info(f'Subtotal: Rs. {total}')  # Three simultaneous actions here lol
 
-    """
-    If discount is true, it'll show the discount interface
-    This also loops until the balance is greater than or equal to 0
-    If it's false, it sets the Discount Total to the First Total
-    
-    And then there's VAT. If you enable vat, it'll calculate 15% of the Discounted Total and add it
-    to the total.
-    """
-    discountTotal = var_tot
     if discount:
-        passOff = False
-        while not passOff:
-            discountInput = float(input(f"Discount (%)", override="yellow"))
-            if discountInput >= 0:
-                discountAmount = var_tot * (discountInput / 100)
-                discountSum = var_tot - discountAmount
-                if discountSum >= 0:
-                    discountTotal = round(discountSum, 2)
-                    print(f"Discount Amount: Rs. {round(discountAmount, 2)}", override='green')
-                    print(f"Subtotal w/ Discount: Rs. {round(discountTotal, 2)}", override='teal')
-                    fileOpen.write(f"\n**Discount: <span style='color:orange'>{discountInput}%</span>**<br>")
-                    fileOpen.write(f"\n**Discount Amount: Rs. <span style='color:red'>{round(discountAmount, 2)}</span>**<br>")
-                    fileOpen.write(f"\n**Subtotal w/ Discount: Rs. <span style='color:magenta'>{round(discountTotal, 2)}</span>**<br>")
-                    logging.info(f"Discount: {discountInput}%")
-                    logging.info(f"Discount Amount: Rs. {round(discountAmount, 2)}")
-                    logging.info(f"Subtotal w/ Discount: Rs. {round(discountTotal, 2)}")
-                    passOff = True
-                else:
-                    warning("[ Try Again, The Discount Sum is Negative ]", override="red")
-                    logging.warning("Entered Incorrect Discount %")
-                    passOff = False
-            else:
-                warning("[ Try Again, Its Either 0 or An Integer ]", override="red")
-                logging.warning("Entered Incorrect Discount %")
-                passOff = False
+        total = discount_module(total)
 
     if vat:
-        vatAmount = discountTotal * (15 / 100)
-        print(f"Tax: Rs. {vatAmount}", override='magenta')
-        fileOpen.write(f"\n**Tax : Rs. <span style='color:cyan'>{vatAmount}</span>**<br>")
-        finalTotal = discountTotal + vatAmount
-    else:
-        finalTotal = discountTotal
+        total = discount_module(total)
 
-    print(f"Grand Total: Rs. {finalTotal}", override="green")
-    logging.info(f"Grand Total: Rs. {finalTotal}")
-    fileOpen.write(f"\n**Grand Total: <span style='color:yellow'>Rs. {finalTotal}</span>**<br>")
+    print(f"Grand Total: Rs. {total}", override="green")
+    logging.info(f"Grand Total: Rs. {total}")
+    fileOpen.write(f"\n**Grand Total: <span style='color:yellow'>Rs. {total}</span>**<br>")
     passOff = False
 
     """
@@ -155,9 +168,10 @@ def bill_write(ar: list, transfer: bool, vat: bool, discount: bool):
     if not transfer:
         while not passOff:
             cashGiven = int(input(f'Cash Given (Rs.)', override="green"))
-            bal = int(cashGiven - finalTotal)
+            bal = int(cashGiven - total)
             if bal < 0:  # loops if its a negative number!
-                warning("Negative Value, Something's Off, Retry", override="red")  # something's **really** off (why doesnt MD work?)
+                warning("Negative Value, Something's Off, Retry",
+                        override="red")  # something's **really** off (why doesnt MD work?)
                 logging.warning('Negative Balance')
                 passOff = False
             elif bal == 0:
@@ -208,7 +222,6 @@ def kill_this():
 
 @dataclass
 class Doll:
-
     Name: str
     Price: int
     Quantity: int = None
