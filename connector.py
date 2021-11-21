@@ -270,31 +270,25 @@ class array_funcs(object):
             self.ar.append(doll)
 
     def __update__(self):
-        ar = self.ar
-        printingBills(ar).print_bill_items()
         theLoop = True
         while theLoop:
             try:
                 updateValue = input(f"What Would You Like To Update? (Name)", override="dark_olive_green2")
-                tempList = [list(tup) for tup in ar]
-                for i, item in enumerate(tempList):
-                    doll = Doll(*item)
+                for _, doll in enumerate(self.ar):
                     if updateValue == doll.Name:
                         update_key = input(
                             f"Add Or Remove How Much? (+ amount/ - amount)", override="white"
                         )
                         update_key_check = (update_key.split(' '))
                         upQuan = int(update_key_check[1])
-                        oldQ = doll.Quantity
-                        oldT = doll.Total
+                        doll.set_old_quantity()
                         if update_key_check[0] == '+':
                             doll.Quantity = upQuan + doll.Quantity
                             doll.Total = doll.Quantity * doll.Price
                             logging.info(
-                                f"Updated: {updateValue}, {doll.Name}\nSet Quantity {oldQ} => "
-                                f"{doll.Quantity}\nUpdated Total {oldT} => {doll.Total}"
+                                f"Updated: {updateValue}, {doll.Name}\nSet Quantity {doll.old_quantity} => "
+                                f"{doll.Quantity}\nUpdated Total {doll.old_total} => {doll.Total}"
                             )
-                            ar = [tuple(entry) for entry in tempList]
                         elif update_key_check[0] == '-':
                             newQuanCheck = doll.Quantity - upQuan
                             if newQuanCheck > 0:
@@ -311,15 +305,13 @@ class array_funcs(object):
                                     logging.warning(f"Didn't Change {updateValue}, {item[1]}'s Quantity")
                             doll.Total = doll.Quantity * doll.Price
                             logging.info(
-                                f"Updated: {updateValue}, {doll.Name}\nSet Quantity {oldQ} => {doll.Quantity}\n"
-                                f"Updated Total => {doll.Total}"
+                                f"Updated: {updateValue}, {doll.Name}\nSet Quantity {doll.old_quantity} => {doll.Quantity}\n"
+                                f"Updated Total {doll.old_total} => {doll.Total}"
                             )
                         elif update_key_check[0] == 'exit':
                             break
                         info(f"Success!", override="honeydew2")
                         break
-                    tempList[i] = doll.to_tuple()
-                self.ar = [tuple(entry) for entry in tempList]
                 break
             except Exception as e:
                 logging.error(e)
