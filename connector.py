@@ -375,13 +375,14 @@ def main(transfer, mydb, vat, discount):
                 case _:
                     proceed = int(idInput)
                     cursor.execute(f"select * from paddigurlTest WHERE id = {proceed}")
-                    records = cursor.fetchall()[0]
-                    if records:  # Basically proceeds if its not empty like []
+                    try:
+                        records = cursor.fetchall()[0]
                         doll = Doll(records[1], records[2])
+                        print(doll)
                         ar.__add__(doll)
-                    else:
+                    except IndexError:
                         warning(
-                            f"\nDid You Enter The Right ID / Command?", override="red")  # congratulations!
+                            f"Did You Enter The Right ID / Command?", override="red")  # congratulations!
                         # you're a failure!
                         logging.warning(f"Entered Wrong ID / CMD: {idInput}")
         except Exception as rim:
