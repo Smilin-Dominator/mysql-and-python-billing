@@ -59,8 +59,8 @@ class printingBills(object):
         table.add_column("Quantity", style="green")
         table.add_column("Total", style="red")
 
-        for i in range(len(self.ar)):
-            table.add_row(self.ar[i][0], str(self.ar[i][1]), str(self.ar[i][2]), str(self.ar[i][3]))
+        for _, doll in enumerate(self.ar):
+            table.add_row(doll.Name, str(doll.Price), str(doll.Quantity), str(doll.Total))
 
         table.add_row("", "", "", "")
         table.add_row("Subtotal", "", "", str(self.print_total()))
@@ -68,9 +68,10 @@ class printingBills(object):
         console.print(table)
 
     def write_bill_items(self) -> None:
+        tups = [a.to_tuple() for _, a in enumerate(self.ar)]
         table = MarkdownTableWriter(
             headers=["Name", "Price", "Quantity", "Total"],
-            value_matrix=self.ar
+            value_matrix=tups
         )
         self.file.write("\n")
         table.stream = self.file
@@ -78,12 +79,8 @@ class printingBills(object):
 
     def print_total(self) -> int:
         tot = 0
-        price_unchained = []  # blank array, like the earlier one
-        for i in range(len(self.ar)):
-            fin = int(self.ar[i][3])
-            price_unchained.append(fin)  # appends to the array
-        for i in range(0, len(price_unchained)):
-            tot = tot + price_unchained[i]  # paradox alert! this variable is dynamic, it remembers the past state.
+        for _, doll in enumerate(self.ar):
+            tot += doll.Price
         return tot
 
 
