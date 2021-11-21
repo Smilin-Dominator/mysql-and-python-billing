@@ -233,21 +233,20 @@ class array_funcs(object):
         if len(ar) > 0:
             tempList = [list(item) for item in ar]  # converts into a list, since you cant change tuples
             for i, item in enumerate(tempList):
-                doll2 = Doll(item[0], item[1])
-                if (doll2.Name == doll.Name) and (doll2.Price == doll.Price):
+                updatedDoll = Doll(*item)
+                if (updatedDoll.Name == doll.Name) and (updatedDoll.Price == doll.Price):
                     info(f"\nDuplicate Detected, Updating Current Entry", override="teal")
-                    doll2.Total = item[3]
-                    doll2.Quantity = item[2]
-                    newTotal = doll2.Price * quantity + doll2.Total
-                    newQuantity = doll2.Quantity + quantity
+                    oldquan = updatedDoll.Quantity
+                    oldtot = updatedDoll.Total
+                    updatedDoll.Quantity = updatedDoll.Quantity + quantity
+                    updatedDoll.Price = updatedDoll.Price * updatedDoll.Quantity
                     try:
-                        newDoll = Doll(doll.Name, doll.Price, newQuantity, newTotal)
                         info(f"Success!", override="green_yellow")
                         logging.info(
-                            f"Updated: {newDoll.Name}, {newDoll.Price}\nSet Quantity {doll2.Quantity} => "
-                            f"{newQuantity}\nSet Total: {doll2.Total} => {newTotal}"
+                            f"Updated: {updatedDoll.Name}, {updatedDoll.Price}\nSet Quantity {oldquan} => "
+                            f"{updatedDoll.Quantity}\nSet Total: {oldtot} => {updatedDoll.Total}"
                         )
-                        tempList[i] = newDoll.to_tuple()
+                        tempList[i] = updatedDoll.to_tuple()
                         ar = [tuple(entry) for entry in tempList]
                         self.ar = ar
                         break
