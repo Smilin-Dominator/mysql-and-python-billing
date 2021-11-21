@@ -244,7 +244,7 @@ class array_funcs(object):
                     info(f"\nDuplicate Detected, Updating Current Entry", override="teal")
                     updatedDoll.set_old_quantity()
                     updatedDoll.Quantity = updatedDoll.Quantity + quantity
-                    updatedDoll.Price = updatedDoll.Price * updatedDoll.Quantity
+                    updatedDoll.Total = updatedDoll.Price * updatedDoll.Quantity
                     try:
                         info(f"Success!", override="green_yellow")
                         logging.info(
@@ -382,7 +382,6 @@ def main(transfer, mydb, vat, discount):
                     try:
                         records = cursor.fetchall()[0]
                         doll = Doll(records[1], records[2])
-                        print(doll)
                         ar.__add__(doll)
                     except IndexError:
                         warning(
