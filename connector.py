@@ -1,4 +1,4 @@
-import getpass
+from dataclasses import dataclass
 import hashlib
 import logging
 import time
@@ -27,11 +27,26 @@ varTime = time.strftime("%d_of_%B")
 
 
 # --------------------------------------- Bill Related Functions ---------------------------------------#
+@dataclass
+class Doll:
+    Name: str
+    Price: int
+    Quantity: int = None
+    Total: int = None
+    old_quantity: int = None
+    old_total: int = None
+
+    def set_old_quantity(self):
+        self.old_total = self.Total
+        self.old_quantity = self.Quantity
+
+    def to_tuple(self) -> tuple[str | int, ...]:
+        return tuple([self.Name, self.Price, self.Quantity, self.Total])
 
 
 class printingBills(object):
 
-    def __init__(self, ar: list[tuple[str, int, int]] = None, file = None):
+    def __init__(self, ar: list[Doll] = None, file=None):
         self.ar = ar
         self.file = file
 
@@ -44,8 +59,8 @@ class printingBills(object):
         table.add_column("Quantity", style="green")
         table.add_column("Total", style="red")
 
-        for i in range(len(self.ar)):
-            table.add_row(self.ar[i][0], str(self.ar[i][1]), str(self.ar[i][2]), str(self.ar[i][3]))
+        for _, doll in enumerate(self.ar):
+            table.add_row(doll.Name, str(doll.Price), str(doll.Quantity), str(doll.Total))
 
         table.add_row("", "", "", "")
         table.add_row("Subtotal", "", "", str(self.print_total()))
@@ -53,9 +68,10 @@ class printingBills(object):
         console.print(table)
 
     def write_bill_items(self) -> None:
+        tups = [a.to_tuple() for _, a in enumerate(self.ar)]
         table = MarkdownTableWriter(
             headers=["Name", "Price", "Quantity", "Total"],
-            value_matrix=self.ar
+            value_matrix=tups
         )
         self.file.write("\n")
         table.stream = self.file
@@ -63,16 +79,61 @@ class printingBills(object):
 
     def print_total(self) -> int:
         tot = 0
-        price_unchained = []  # blank array, like the earlier one
-        for i in range(len(self.ar)):
-            fin = int(self.ar[i][3])
-            price_unchained.append(fin)  # appends to the array
-        for i in range(0, len(price_unchained)):
-            tot = tot + price_unchained[i]  # paradox alert! this variable is dynamic, it remembers the past state.
+        for _, doll in enumerate(self.ar):
+            tot += doll.Total
         return tot
 
 
 def bill_write(ar: list, transfer: bool, vat: bool, discount: bool):
+
+    def discount_module(subtotal):
+        """
+            If discount is true, it'll show the discount interface
+            This also loops until the balance is greater than or equal to 0
+            If it's false, it sets the Discount Total to the First Total
+            :param subtotal: The Subtotal
+            :return: subtotal minus the discount
+        """
+        loop = False
+        while not loop:
+            discount = float(input(f"Discount (%)", override="yellow"))
+            if discount >= 0:
+                total_with_discount = subtotal * (discount / 100)
+                diff = subtotal - total_with_discount
+                if diff >= 0:
+                    rounded_total = round(diff, 2)
+                    print(f"Discount Amount: Rs. {round(total_with_discount, 2)}", override='green')
+                    print(f"Subtotal w/ Discount: Rs. {round(rounded_total, 2)}", override='teal')
+                    fileOpen.write(f"\n**Discount: <span style='color:orange'>{discount}%</span>**<br>")
+                    fileOpen.write(
+                        f"\n**Discount Amount: Rs. <span style='color:red'>{round(total_with_discount, 2)}</span>**<br>")
+                    fileOpen.write(
+                        f"\n**Subtotal w/ Discount: Rs. <span style='color:magenta'>{round(rounded_total, 2)}</span>**<br>")
+                    logging.info(f"Discount: {discount}%")
+                    logging.info(f"Discount Amount: Rs. {round(total_with_discount, 2)}")
+                    logging.info(f"Subtotal w/ Discount: Rs. {round(rounded_total, 2)}")
+                    return rounded_total
+                else:
+                    warning("[ Try Again, The Discount Sum is Negative ]", override="red")
+                    logging.warning("Entered Incorrect Discount %")
+                    loop = False
+            else:
+                warning("[ Try Again, Its Either 0 or An Integer ]", override="red")
+                logging.warning("Entered Incorrect Discount %")
+                loop = False
+
+    def vat_module(subtotal):
+        """
+        Adds 15% VAT
+        :param subtotal: The Subtotal
+        :return: Subtotal + Vat
+        """
+        vatAmount = subtotal * (15 / 100)
+        print(f"Tax: Rs. {vatAmount}", override='magenta')
+        fileOpen.write(f"\n**Tax : Rs. <span style='color:cyan'>{vatAmount}</span>**<br>")
+        subtotal += vatAmount
+        return subtotal
+
     fileTime = str(time.strftime('%I.%M_%p'))  # eg: 07.10 PM
     customerNameFormat = customerName.replace(' ', '_')
     fileName = f"[BILL]-{customerNameFormat}-{fileTime}.md"  # format of the filename
@@ -85,65 +146,29 @@ def bill_write(ar: list, transfer: bool, vat: bool, discount: bool):
     fileOpen.write(f"{fileHeaderFormat.format(70 * '-')}")
     fileOpen.write(f"\n{fileHeaderFormat.format('Paddigurl Dolls')}")
     fileOpen.write(f"\n{fileHeaderFormat.format(70 * '-')}")
-    fileOpen.write(f'\n\n**Date: <span style="color:blue">{str(time.strftime("%d/%m/%Y"))}</span>**<br>')  # eg: 02/05/2021
-    fileOpen.write(f'\n**Time: <span style="color:red">{str(fileTime.replace("_", " "))}</span>**<br>')  # uses the variable set earlier
+    fileOpen.write(
+        f'\n\n**Date: <span style="color:blue">{str(time.strftime("%d/%m/%Y"))}</span>**<br>')  # eg: 02/05/2021
+    fileOpen.write(
+        f'\n**Time: <span style="color:red">{str(fileTime.replace("_", " "))}</span>**<br>')  # uses the variable set earlier
     fileOpen.write(f'\n**Customer: <span style="color:green">{customerName.replace("_", " ")}</span>**<br>\n')
 
     write_the_values = printingBills(ar, fileOpen)
     write_the_values.write_bill_items()
 
-    var_tot = printingBills(ar).print_total()
-    print(f"Subtotal: Rs. {var_tot}", override='red')
-    fileOpen.write(f'\n\n**Subtotal: <span style="color:orange">Rs. {str(var_tot)}</span>**<br>')
-    logging.info(f'Subtotal: Rs. {var_tot}')  # Three simultaneous actions here lol
+    total = printingBills(ar).print_total()
+    print(f"Subtotal: Rs. {total}", override='red')
+    fileOpen.write(f'\n\n**Subtotal: <span style="color:orange">Rs. {str(total)}</span>**<br>')
+    logging.info(f'Subtotal: Rs. {total}')  # Three simultaneous actions here lol
 
-    """
-    If discount is true, it'll show the discount interface
-    This also loops until the balance is greater than or equal to 0
-    If it's false, it sets the Discount Total to the First Total
-    
-    And then there's VAT. If you enable vat, it'll calculate 15% of the Discounted Total and add it
-    to the total.
-    """
-    discountTotal = var_tot
     if discount:
-        passOff = False
-        while not passOff:
-            discountInput = float(input(f"Discount (%)", override="yellow"))
-            if discountInput >= 0:
-                discountAmount = var_tot * (discountInput / 100)
-                discountSum = var_tot - discountAmount
-                if discountSum >= 0:
-                    discountTotal = round(discountSum, 2)
-                    print(f"Discount Amount: Rs. {round(discountAmount, 2)}", override='green')
-                    print(f"Subtotal w/ Discount: Rs. {round(discountTotal, 2)}", override='teal')
-                    fileOpen.write(f"\n**Discount: <span style='color:orange'>{discountInput}%</span>**<br>")
-                    fileOpen.write(f"\n**Discount Amount: Rs. <span style='color:red'>{round(discountAmount, 2)}</span>**<br>")
-                    fileOpen.write(f"\n**Subtotal w/ Discount: Rs. <span style='color:magenta'>{round(discountTotal, 2)}</span>**<br>")
-                    logging.info(f"Discount: {discountInput}%")
-                    logging.info(f"Discount Amount: Rs. {round(discountAmount, 2)}")
-                    logging.info(f"Subtotal w/ Discount: Rs. {round(discountTotal, 2)}")
-                    passOff = True
-                else:
-                    warning("[ Try Again, The Discount Sum is Negative ]", override="red")
-                    logging.warning("Entered Incorrect Discount %")
-                    passOff = False
-            else:
-                warning("[ Try Again, Its Either 0 or An Integer ]", override="red")
-                logging.warning("Entered Incorrect Discount %")
-                passOff = False
+        total = discount_module(total)
 
     if vat:
-        vatAmount = discountTotal * (15 / 100)
-        print(f"Tax: Rs. {vatAmount}", override='magenta')
-        fileOpen.write(f"\n**Tax : Rs. <span style='color:cyan'>{vatAmount}</span>**<br>")
-        finalTotal = discountTotal + vatAmount
-    else:
-        finalTotal = discountTotal
+        total = vat_module(total)
 
-    print(f"Grand Total: Rs. {finalTotal}", override="green")
-    logging.info(f"Grand Total: Rs. {finalTotal}")
-    fileOpen.write(f"\n**Grand Total: <span style='color:yellow'>Rs. {finalTotal}</span>**<br>")
+    print(f"Grand Total: Rs. {total}", override="green")
+    logging.info(f"Grand Total: Rs. {total}")
+    fileOpen.write(f"\n**Grand Total: <span style='color:yellow'>Rs. {total}</span>**<br>")
     passOff = False
 
     """
@@ -155,9 +180,10 @@ def bill_write(ar: list, transfer: bool, vat: bool, discount: bool):
     if not transfer:
         while not passOff:
             cashGiven = int(input(f'Cash Given (Rs.)', override="green"))
-            bal = int(cashGiven - finalTotal)
+            bal = int(cashGiven - total)
             if bal < 0:  # loops if its a negative number!
-                warning("Negative Value, Something's Off, Retry", override="red")  # something's **really** off (why doesnt MD work?)
+                warning("Negative Value, Something's Off, Retry",
+                        override="red")  # something's **really** off (why doesnt MD work?)
                 logging.warning('Negative Balance')
                 passOff = False
             elif bal == 0:
@@ -208,109 +234,87 @@ def kill_this():
 
 class array_funcs(object):
 
-    def __init__(self, ar: list[tuple[str, int, int]]):
+    def __init__(self, ar: list[Doll]):
         self.ar = ar
 
-    def duplicate_check(self, records: list[int, str, int]):
-        ar = self.ar
+    def __add__(self, doll: Doll):
         quantity = int(input(f"Quantity", override="yellow"))
-        for row in records:
-            name = row[1]  # gets the element from the data
-            price = row[2]  # and its in a fixed format, which is what matters
-            print(f"\nName  : {name}", override="light_steel_blue1")
-            print(f"Price : {price}", override="light_steel_blue1")
-            total = int(price) * quantity
-            if len(ar) > 0:
-                tempList = [list(item) for item in ar]  # converts into a list, since you cant change tuples
-                for _, item in enumerate(tempList):
-                    checkName = item[0]
-                    checkPrice = item[1]
-                    if (checkName == name) and (checkPrice == price):
-                        info(f"\nDuplicate Detected, Updating Current Entry", override="teal")
-                        currentTotal = item[3]
-                        currentQuantity = item[2]
-                        newTotal = int(price) * quantity + currentTotal
-                        newQuantity = int(currentQuantity) + quantity
-                        try:
-                            item[3] = newTotal
-                            item[2] = newQuantity
-                            info(f"Success!", override="green_yellow")
-                            logging.info(
-                                f"Updated: {checkName}, {checkPrice}\nSet Quantity {currentQuantity} => "
-                                f"{newQuantity}\nSet Total: {currentTotal} => {newTotal}"
-                            )
-                            ar = [tuple(entry) for entry in tempList]
-                            self.ar = ar
-                            break
-                        except Exception as e:
-                            logging.error(e)
-                else:
-                    self.ar.append((name, price, quantity, total))
+        print(f"\nName  : {doll.Name}", override="light_steel_blue1")
+        print(f"Price : {doll.Price}", override="light_steel_blue1")
+        doll.Quantity = quantity
+        doll.Total = doll.Price * doll.Quantity
+        if len(self.ar) > 0:
+            for _, updateDoll in enumerate(self.ar):
+                if (updateDoll.Name == doll.Name) and (updateDoll.Price == doll.Price):
+                    info(f"\nDuplicate Detected, Updating Current Entry", override="teal")
+                    updateDoll.set_old_quantity()
+                    updateDoll.Quantity = updateDoll.Quantity + quantity
+                    updateDoll.Total = updateDoll.Price * updateDoll.Quantity
+                    try:
+                        info(f"Success!", override="green_yellow")
+                        logging.info(
+                            f"Updated: {updateDoll.Name}, {updateDoll.Price}\nSet Quantity {updateDoll.old_quantity} => "
+                            f"{updateDoll.Quantity}\nSet Total: {updateDoll.old_total} => {updateDoll.Total}"
+                        )
+                        break
+                    except Exception as e:
+                        logging.error(e)
             else:
-                self.ar.append((name, price, quantity, total))
+                self.ar.append(doll)
+        else:
+            self.ar.append(doll)
 
-    def update_list(self):
-        ar = self.ar
-        printingBills(ar).print_bill_items()
+    def __update__(self):
+        printingBills(self.ar).print_bill_items()
         theLoop = True
         while theLoop:
             try:
                 updateValue = input(f"What Would You Like To Update? (Name)", override="dark_olive_green2")
-                tempList = [list(tup) for tup in ar]
-                for _, item in enumerate(tempList):
-                    up_name = item[0]
-                    if updateValue == up_name:
+                for _, doll in enumerate(self.ar):
+                    if updateValue == doll.Name:
                         update_key = input(
                             f"Add Or Remove How Much? (+ amount/ - amount)", override="white"
                         )
                         update_key_check = (update_key.split(' '))
                         upQuan = int(update_key_check[1])
-                        oldQuan = item[2]
+                        doll.set_old_quantity()
                         if update_key_check[0] == '+':
-                            newQuan = upQuan + oldQuan
-                            newTot = newQuan * item[1]
-                            item[2] = newQuan
-                            item[3] = newTot
+                            doll.Quantity += upQuan
+                            doll.Total = doll.Quantity * doll.Price
                             logging.info(
-                                f"Updated: {updateValue}, {ar[1]}\nSet Quantity {oldQuan} => "
-                                f"{newQuan}\nUpdated Total {item[3]} => {newTot}"
+                                f"Updated: {updateValue}, {doll.Name}\nSet Quantity {doll.old_quantity} => "
+                                f"{doll.Quantity}\nUpdated Total {doll.old_total} => {doll.Total}"
                             )
-                            ar = [tuple(entry) for entry in tempList]
                         elif update_key_check[0] == '-':
-                            newQuanCheck = oldQuan - upQuan
+                            newQuanCheck = doll.Quantity - upQuan
                             if newQuanCheck > 0:
-                                newQuan = newQuanCheck
+                                doll.Quantity = newQuanCheck
                             else:
                                 warning(f"[ The Value Is Either Negative or 0, And Will Be Set To 1 ]\n"
                                         f"[ If Your Intention Was To Delete This, Use The 'del' Command Instead ]"
                                         , override="red")
                                 confirm = input(f"Proceed? (Y/N)", override="yellow")
                                 if confirm == 'Y':
-                                    logging.warning(f"Set {updateValue}, {item[1]}'s Quantity to 1")
-                                    newQuan = 1
+                                    logging.warning(f"Set {updateValue}, {doll.Price}'s Quantity to 1")
+                                    doll.Quantity = 1
                                 else:
-                                    logging.warning(f"Didn't Change {updateValue}, {item[1]}'s Quantity")
-                                    newQuan = oldQuan
-                            newTot = newQuan * item[1]
-                            item[2] = newQuan
-                            item[3] = newTot
+                                    logging.warning(f"Didn't Change {updateValue}, {doll.Name}'s Quantity")
+                            doll.Total = doll.Quantity * doll.Price
                             logging.info(
-                                f"Updated: {updateValue}, {item[1]}\nSet Quantity {oldQuan} => {newQuan}\n"
-                                f"Updated Total => {newTot}"
+                                f"Updated: {updateValue}, {doll.Name}\nSet Quantity {doll.old_quantity} => {doll.Quantity}\n"
+                                f"Updated Total {doll.old_total} => {doll.Total}"
                             )
                         elif update_key_check[0] == 'exit':
                             break
                         info(f"Success!", override="honeydew2")
                         break
-                self.ar = [tuple(entry) for entry in tempList]
                 break
             except Exception as e:
                 logging.error(e)
                 theLoop = True
 
-    def delete_from_list(self):
-        ar = self.ar
-        printingBills(ar).print_bill_items()
+    def __delete__(self):
+        printingBills(self.ar).print_bill_items()
         theLoop = True
         while theLoop:
             try:
@@ -319,10 +323,9 @@ class array_funcs(object):
                     warning(f"Aborting...", override="light_salmon3")
                     break
                 else:
-                    for _, item in enumerate(ar):
-                        if item[0] == delKey:
-                            popTime = item
-                            ar.remove(popTime)
+                    for _, doll in enumerate(self.ar):
+                        if doll.Name == delKey:
+                            self.ar.remove(doll)
                             break
                     info(
                         f"Success! Type  '--' in the ID prompt To See The Updated Version!", override="green"
@@ -333,48 +336,48 @@ class array_funcs(object):
                 logging.error(e)
                 info(f"[ Error Occurred, Please Retry ]", override="red")
                 theLoop = True
-        self.ar = ar
 
-    def get(self):
+    def __get__(self):
         return self.ar
 
 
 # -------------------------------------------- Main Code --------------------------------------------------#
 
 def main(transfer, mydb, vat, discount):
+    cursor = mydb.cursor()
     global customerName
     customerName = startup()
     idInput = 69420666  # well, had to declare it as something -\_/-
     ar = array_funcs([])  # declared as empty, will get filled in the process
     while idInput != ' ':
         try:
-            ar = array_funcs(ar.get())
+            ar = array_funcs(ar.__get__())
+            pb = printingBills(ar.__get__())
             idInput = input(f"\nID", override="light_cyan3")  # ID As In The First Column
             match idInput:
                 case "":  # if you just hit enter
-                    bill_write(ar.get(), transfer, vat, discount)
+                    bill_write(ar.__get__(), transfer, vat, discount)
                     break
                 case 'Kill':  # had to add an emergency kill function :)
                     go = kill_this()
                     if go:
                         break
                 case 'del':
-                    ar.delete_from_list()
+                    ar.__delete__()
                 case '--':
-                    printingBills(ar.get()).print_bill_items()
+                    pb.print_bill_items()
                 case 'update':
-                    ar.update_list()
+                    ar.__update__()
                 case _:
                     proceed = int(idInput)
-                    sql_select_Query = f"select * from paddigurlTest WHERE id = {proceed}"  # Sent To The Database
-                    cursor = mydb.cursor()  # This Is As If You Were Entering It Yourself
-                    cursor.execute(sql_select_Query)  # Executes
-                    records = cursor.fetchall()  # Gets All The Outputs
-                    if records:  # Basically proceeds if its not empty like []
-                        ar.duplicate_check(records)
-                    else:
+                    cursor.execute(f"select * from paddigurlTest WHERE id = {proceed}")
+                    try:
+                        records = cursor.fetchall()[0]
+                        doll = Doll(records[1], records[2])
+                        ar.__add__(doll)
+                    except IndexError:
                         warning(
-                            f"\nDid You Enter The Right ID / Command?", override="red")  # congratulations!
+                            f"Did You Enter The Right ID / Command?", override="red")  # congratulations!
                         # you're a failure!
                         logging.warning(f"Entered Wrong ID / CMD: {idInput}")
         except Exception as rim:

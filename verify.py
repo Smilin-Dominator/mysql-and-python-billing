@@ -58,16 +58,33 @@ def verify(mycursor):
     read.remove('')
     for i in range(len(read)):
         zee = read[i].split(',')
-        try:
-            hashest = hash_file(zee[0])
-            if hashest:
-                if str(hashest) == str(zee[1]):
-                    info(f"File {zee[0]} Is Safe", "green")
-                    logging.info(f"{zee[0]} Is Safe")
+        if zee[0]:
+            try:
+                hashest = hash_file(zee[0])
+                if hashest:
+                    if str(hashest) == str(zee[1]):
+                        info(f"File {zee[0]} Is Safe", "green")
+                        logging.info(f"{zee[0]} Is Safe")
+                    else:
+                        error(f"File {zee[0]} Has Been Tampered")
+                        logging.critical(f"File {zee[0]} Has Been Tampered")
+                        info(f"Recovering Data...")
+                        mycursor.execute(f"SELECT filecontents FROM paddigurlHashes WHERE `hash` = '{str(zee[1])}';")
+                        attempted_recovery = mycursor.fetchall()
+                        recovered = ''.join(attempted_recovery[0])
+                        recover_write = open(zee[0], 'w')
+                        recover_write.write(recovered)
+                        recover_write.flush()
+                        recover_write.close()
+                        logging.info("Successful Recovery...")
+                        info(f"Success...", "green")
                 else:
-                    error(f"File {zee[0]} Has Been Tampered")
-                    logging.critical(f"File {zee[0]} Has Been Tampered")
-                    info(f"Recovering Data...")
+                    error(f"File {zee[0]} Has Been Deleted....", override="red")
+                    dir_check = zee[0].split("[BILL]")
+                    if not os.path.exists(dir_check[0]):
+                        error(f"Entire Directory Deleted... Restoring..")
+                        os.mkdir(dir_check[0])
+                    logging.critical(f"File {zee[0]} Has Been Deleted")
                     mycursor.execute(f"SELECT filecontents FROM paddigurlHashes WHERE `hash` = '{str(zee[1])}';")
                     attempted_recovery = mycursor.fetchall()
                     recovered = ''.join(attempted_recovery[0])
@@ -76,28 +93,12 @@ def verify(mycursor):
                     recover_write.flush()
                     recover_write.close()
                     logging.info("Successful Recovery...")
-                    info(f"Success...", "green")
-            else:
-                error(f"File {zee[0]} Has Been Deleted....", override="red")
-                dir_check = zee[0].split("[BILL]")
-                if not os.path.exists(dir_check[0]):
-                    error(f"Entire Directory Deleted... Restoring..")
-                    os.mkdir(dir_check[0])
-                logging.critical(f"File {zee[0]} Has Been Deleted")
-                mycursor.execute(f"SELECT filecontents FROM paddigurlHashes WHERE `hash` = '{str(zee[1])}';")
-                attempted_recovery = mycursor.fetchall()
-                recovered = ''.join(attempted_recovery[0])
-                recover_write = open(zee[0], 'w')
-                recover_write.write(recovered)
-                recover_write.flush()
-                recover_write.close()
-                logging.info("Successful Recovery...")
-                info(
-                    f"[white on black][*] Attempting Recovery....\n[/white on black]"
-                    f"[green][*] Success...[/green]"
-                )
-        except Exception as e:
-            logging.error(e)
+                    info(
+                        f"[white on black][*] Attempting Recovery....\n[/white on black]"
+                        f"[green][*] Success...[/green]"
+                    )
+            except Exception as e:
+                logging.error(e)
 
 
 def main(mydb, mycursor):
