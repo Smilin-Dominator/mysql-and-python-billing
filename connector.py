@@ -270,6 +270,7 @@ class array_funcs(object):
             self.ar.append(doll)
 
     def __update__(self):
+        printingBills(self.ar).print_bill_items()
         theLoop = True
         while theLoop:
             try:
@@ -283,7 +284,7 @@ class array_funcs(object):
                         upQuan = int(update_key_check[1])
                         doll.set_old_quantity()
                         if update_key_check[0] == '+':
-                            doll.Quantity = upQuan + doll.Quantity
+                            doll.Quantity += upQuan
                             doll.Total = doll.Quantity * doll.Price
                             logging.info(
                                 f"Updated: {updateValue}, {doll.Name}\nSet Quantity {doll.old_quantity} => "
@@ -299,7 +300,7 @@ class array_funcs(object):
                                         , override="red")
                                 confirm = input(f"Proceed? (Y/N)", override="yellow")
                                 if confirm == 'Y':
-                                    logging.warning(f"Set {updateValue}, {item[1]}'s Quantity to 1")
+                                    logging.warning(f"Set {updateValue}, {doll.Price}'s Quantity to 1")
                                     doll.Quantity = 1
                                 else:
                                     logging.warning(f"Didn't Change {updateValue}, {item[1]}'s Quantity")
@@ -318,8 +319,7 @@ class array_funcs(object):
                 theLoop = True
 
     def __delete__(self):
-        ar = self.ar
-        printingBills(ar).print_bill_items()
+        printingBills(self.ar).print_bill_items()
         theLoop = True
         while theLoop:
             try:
@@ -328,10 +328,9 @@ class array_funcs(object):
                     warning(f"Aborting...", override="light_salmon3")
                     break
                 else:
-                    for _, item in enumerate(ar):
-                        if item[0] == delKey:
-                            popTime = item
-                            ar.remove(popTime)
+                    for _, doll in enumerate(self.ar):
+                        if doll.Name == delKey:
+                            self.ar.remove(doll)
                             break
                     info(
                         f"Success! Type  '--' in the ID prompt To See The Updated Version!", override="green"
@@ -342,7 +341,6 @@ class array_funcs(object):
                 logging.error(e)
                 info(f"[ Error Occurred, Please Retry ]", override="red")
                 theLoop = True
-        self.ar = ar
 
     def __get__(self):
         return self.ar
