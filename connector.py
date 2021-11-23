@@ -1,4 +1,3 @@
-from dataclasses import dataclass
 import hashlib
 import logging
 import time
@@ -6,6 +5,7 @@ import os
 from configuration import variables, input, print, info, warning, console
 from rich.table import Table
 from pytablewriter import MarkdownTableWriter
+from pydantic import BaseModel
 
 logging.basicConfig(filename='log.txt', format=variables.log_format, datefmt='[%Y-%m-%d] [%H:%M:%S]',
                     level=logging.DEBUG)
@@ -27,8 +27,7 @@ varTime = time.strftime("%d_of_%B")
 
 
 # --------------------------------------- Bill Related Functions ---------------------------------------#
-@dataclass
-class Doll:
+class Doll(BaseModel):
     Name: str
     Price: int
     Quantity: int = None
@@ -246,7 +245,7 @@ class array_funcs(object):
         if len(self.ar) > 0:
             for _, updateDoll in enumerate(self.ar):
                 if (updateDoll.Name == doll.Name) and (updateDoll.Price == doll.Price):
-                    info(f"\nDuplicate Detected, Updating Current Entry", override="teal")
+                    info(f"Duplicate Detected, Updating Current Entry", override="teal")
                     updateDoll.set_old_quantity()
                     updateDoll.Quantity = updateDoll.Quantity + quantity
                     updateDoll.Total = updateDoll.Price * updateDoll.Quantity
@@ -370,10 +369,10 @@ def main(transfer, mydb, vat, discount):
                     ar.__update__()
                 case _:
                     proceed = int(idInput)
-                    cursor.execute(f"select * from paddigurlTest WHERE id = {proceed}")
+                    cursor.execute(f"select name, price from paddigurlTest WHERE id = {proceed}")
                     try:
                         records = cursor.fetchall()[0]
-                        doll = Doll(records[1], records[2])
+                        doll = Doll(Name=records[0], Price=records[1])
                         ar.__add__(doll)
                     except IndexError:
                         warning(
