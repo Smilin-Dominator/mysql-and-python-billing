@@ -3,6 +3,7 @@ import logging
 import os
 from configuration import variables, input, info, error, print
 from json import loads, dumps
+from dataclasses import dataclass
 
 logging.basicConfig(filename='log.txt', format=variables.log_format, datefmt='[%Y-%m-%d] [%H:%M:%S]',
                     level=logging.DEBUG)
@@ -23,10 +24,17 @@ def hash_file(filepath: str):
 
 
 # ---------Hash------------#
+@dataclass
+class File:
+    filepath: str = None
+    filehash: str = None
+    filecontents: str = None
+
+
 class FileOps:
 
     def __init__(self):
-        self.file = open("credentials/hashes.json", "w+")
+        self.file = open("credentials/hashes.json", "r+")
         self.json = loads(self.file.read())
 
     def __add__(self, filename: str, filehash: str) -> None:
@@ -37,12 +45,20 @@ class FileOps:
             }
         )
 
-    def __get__(self) -> dict:
+    def __update__(self):
+        self.json = loads(self.file.read())
+
+    def __get__(self) -> list:
         return self.json['Data']
 
-    def __del__(self) -> None:
-        self.file.write(dumps(self.json))
+    def __write__(self) -> None:
+        self.file = open("credentials/hashes.json", "w+")
+        self.file.write(dumps(self.json, indent=4))
         self.file.flush()
+        self.file.close()
+
+    def __del__(self):
+        logging.info(f"Destroying Class {self.__class__}")
 
 
 def make_hash(mydb, mycursor):
@@ -54,11 +70,12 @@ def make_hash(mydb, mycursor):
         for file in ls_l:
             the_new = os.path.join(bill_path + '/' + file)
             filehash = hash_file(the_new)
-            for file, f_hash in hashfile.__get__().items():
+            for _, file in enumerate(hashfile.__get__()):
+                fil = File(*file)
                 if the_new.endswith('master_bill.txt'):
                     info("Skipping Master Bill..")
                     continue
-                if filehash == f_hash:
+                if filehash == fil.filehash:
                     info("Skipping Adding Existing Entry....")
                     break
             else:
@@ -66,9 +83,10 @@ def make_hash(mydb, mycursor):
                 query = "INSERT INTO paddigurlHashes(`filepath`, `hash`, `filecontents`) VALUES(%s, %s, %s)"
                 values = (the_new, filehash, open(the_new, 'r').read())
                 mycursor.execute(query, values)
-                info(f"Hashed {file} .. {filehash}", override="cyan")
-                logging.info(f"Hashed .. {file} .. {filehash}")
+                info(f"Hashed {the_new} .. {filehash}", override="cyan")
+                logging.info(f"Hashed .. {the_new} .. {filehash}")
         mydb.commit()
+    hashfile.__write__()
 
 
 # -------Verify------------#
