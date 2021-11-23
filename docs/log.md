@@ -37,3 +37,11 @@
 > Instead of the old boring tables, now there's an alive one, thanks again, to rich! (when you click --)<br>
 > I also changed the bill format from .txt to markdown. So now I have styled it colours and all, and of course
 > changed all the other files accordingly (was quite a pain, but worth it).</font>
+
+(23rd November)
+><font size="6">I randomly remembered that JSON (JavaScript Object Notation) Exists, and forgot that the format the
+> hashes were stored in is nothing more than in a text file, separated by commas (disappointing). I was contemplating
+> whether to use TOML (Tom's Obvious Minimal Language), but then decided that TOML is more user friendly (which
+> is not what I'm looking for, since the machine is the one that interacts with this file) than powerful. I could've
+> used YAML, but JSON looked nicer (I know, bad excuse, but hey, my program). And why not XML? Go look at an XML
+> document and then speak to me. So now the hashes are stored in a JSON File (credentials/hashes.json)</font>
