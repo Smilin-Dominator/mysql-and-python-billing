@@ -2,7 +2,7 @@ import hashlib
 import logging
 import os
 from configuration import variables, input, info, error, print
-from json import loads, dumps
+from json import loads, dumps, JSONDecodeError
 from dataclasses import dataclass
 
 logging.basicConfig(filename='log.txt', format=variables.log_format, datefmt='[%Y-%m-%d] [%H:%M:%S]',
@@ -34,8 +34,15 @@ class File:
 class FileOps:
 
     def __init__(self):
-        self.file = open("credentials/hashes.json", "r+")
-        self.json = loads(self.file.read())
+        try:
+            self.file = open("credentials/hashes.json", "r+")
+            self.json = loads(self.file.read())
+        except FileNotFoundError:
+            self.file = open("credentials/hashes.json", "w+")
+            self.json = []
+        except JSONDecodeError:
+            self.file = open("credentials/hashes.json", "w+")
+            self.json = []
 
     def __add__(self, filename: str, filehash: str) -> None:
         self.json.append(
