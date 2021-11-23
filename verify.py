@@ -38,7 +38,7 @@ class FileOps:
         self.json = loads(self.file.read())
 
     def __add__(self, filename: str, filehash: str) -> None:
-        self.json['Data'].append(
+        self.json.append(
             {
                 "Filename": filename,
                 "Hash": filehash
@@ -49,7 +49,7 @@ class FileOps:
         self.json = loads(self.file.read())
 
     def __get__(self) -> list:
-        return self.json['Data']
+        return self.json
 
     def __write__(self) -> None:
         self.file = open("credentials/hashes.json", "w+")
@@ -74,7 +74,7 @@ def make_hash(mydb, mycursor):
                 info("Skipping Master Bill..")
                 continue
             else:
-                for _, f in enumerate(hashfile.__get__()):
+                for f in hashfile.__get__():
                     fil = File(f["Filename"], f["Hash"])
                     if filehash == fil.filehash:
                         info("Skipping Adding Existing Entry....")
@@ -93,7 +93,7 @@ def make_hash(mydb, mycursor):
 # -------Verify------------#
 def verify(mycursor):
     hashfile = FileOps()
-    for _, file in enumerate(hashfile.__get__()):
+    for file in hashfile.__get__():
         fil = File(file["Filename"], file["Hash"])
         try:
             hashest = hash_file(fil.filepath)
