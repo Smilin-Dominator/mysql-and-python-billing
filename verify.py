@@ -29,38 +29,40 @@ class FileOps:
         self.file = open("credentials/hashes.json", "w+")
         self.json = loads(self.file.read())
 
-    def __add__(self, filename: str, filehash: str):
-        self.json['Data'].append({filename, filehash})
+    def __add__(self, filename: str, filehash: str) -> None:
+        self.json['Data'].append(
+            {
+                "Filename": filename,
+                "Hash": filehash
+            }
+        )
 
-    def __get__(self):
-        return self.json
+    def __get__(self) -> dict:
+        return self.json['Data']
 
-    def __del__(self):
+    def __del__(self) -> None:
         self.file.write(dumps(self.json))
         self.file.flush()
 
 
-
 def make_hash(mydb, mycursor):
-    hashwrite = open('./credentials/hashes.json', 'a')
-    read_hash = open("./credentials/hashes.json", 'r')
+    hashfile = FileOps()
     multiverse = os.listdir('bills')
-    read_the_file = read_hash.read().splitlines()
     for directory in multiverse:
         bill_path = os.path.join('./bills/', directory)
         ls_l = os.listdir(bill_path)
         for file in ls_l:
             the_new = os.path.join(bill_path + '/' + file)
             filehash = hash_file(the_new)
-            for data in read_the_file:
+            for file, f_hash in hashfile.__get__().items():
                 if the_new.endswith('master_bill.txt'):
                     info("Skipping Master Bill..")
-                    break
-                if filehash in data:
+                    continue
+                if filehash == f_hash:
                     info("Skipping Adding Existing Entry....")
                     break
             else:
-                hashwrite.write(f"\n{the_new},{filehash}")
+                hashfile.__add__(the_new, filehash)
                 query = "INSERT INTO paddigurlHashes(`filepath`, `hash`, `filecontents`) VALUES(%s, %s, %s)"
                 values = (the_new, filehash, open(the_new, 'r').read())
                 mycursor.execute(query, values)
