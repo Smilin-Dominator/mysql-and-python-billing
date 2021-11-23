@@ -70,21 +70,22 @@ def make_hash(mydb, mycursor):
         for file in ls_l:
             the_new = os.path.join(bill_path + '/' + file)
             filehash = hash_file(the_new)
-            for _, file in enumerate(hashfile.__get__()):
-                fil = File(file["Filename"], file["Hash"])
-                if the_new.endswith('master_bill.txt'):
-                    info("Skipping Master Bill..")
-                    continue
-                if filehash == fil.filehash:
-                    info("Skipping Adding Existing Entry....")
-                    break
+            if the_new.endswith('master_bill.txt'):
+                info("Skipping Master Bill..")
+                continue
             else:
-                hashfile.__add__(the_new, filehash)
-                query = "INSERT INTO paddigurlHashes(`filepath`, `hash`, `filecontents`) VALUES(%s, %s, %s)"
-                values = (the_new, filehash, open(the_new, 'r').read())
-                mycursor.execute(query, values)
-                info(f"Hashed {the_new} .. {filehash}", override="cyan")
-                logging.info(f"Hashed .. {the_new} .. {filehash}")
+                for _, f in enumerate(hashfile.__get__()):
+                    fil = File(f["Filename"], f["Hash"])
+                    if filehash == fil.filehash:
+                        info("Skipping Adding Existing Entry....")
+                        break
+                else:
+                    hashfile.__add__(the_new, filehash)
+                    query = "INSERT INTO paddigurlHashes(`filepath`, `hash`, `filecontents`) VALUES(%s, %s, %s)"
+                    values = (the_new, filehash, open(the_new, 'r').read())
+                    mycursor.execute(query, values)
+                    info(f"Hashed {the_new} .. {filehash}", override="cyan")
+                    logging.info(f"Hashed .. {the_new} .. {filehash}")
         mydb.commit()
     hashfile.__write__()
 
