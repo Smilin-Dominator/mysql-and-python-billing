@@ -24,8 +24,8 @@ def hash_file(filepath: str):
 # ---------Hash------------#
 
 def make_hash(mydb, mycursor):
-    hashwrite = open('./credentials/hashes.txt', 'a')
-    read_hash = open("./credentials/hashes.txt", 'r')
+    hashwrite = open('./credentials/hashes.json', 'a')
+    read_hash = open("./credentials/hashes.json", 'r')
     multiverse = os.listdir('bills')
     read_the_file = read_hash.read().splitlines()
     for directory in multiverse:
@@ -53,7 +53,7 @@ def make_hash(mydb, mycursor):
 
 # -------Verify------------#
 def verify(mycursor):
-    read_hash = open("./credentials/hashes.txt", 'r')
+    read_hash = open("./credentials/hashes.json", 'r')
     read = read_hash.read().splitlines()
     read.remove('')
     for i in range(len(read)):
