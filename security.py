@@ -6,9 +6,16 @@ import base64
 import random
 import string
 from configuration import variables, warning, info, input
+from pydantic import BaseModel
+from verify import FileOps
 
 logging.basicConfig(filename='log.txt', format=variables.log_format, datefmt='[%Y-%m-%d] [%H:%M:%S]',
                     level=logging.DEBUG)
+
+
+class HashFileRow(BaseModel):
+    filepath: str
+    hash: str
 
 
 class integrityCheck(object):
@@ -54,16 +61,18 @@ class integrityCheck(object):
     def hash_check(self):
         self.mycursor.execute("SELECT filepath, hash FROM paddigurlHashes;")
         grape = self.mycursor.fetchall()
-        return grape
+        out = []
+        for filepath, hash in grape:
+            out.append(HashFileRow(filepath=filepath, hash=hash))
+        return out
 
     def hash_write(self):
         warning("Hashes Have Been Tampered With, Restoring Previous Hashes...")
         logging.critical("Hashes Have Been Tampered With, Restoring Previous Hashes...")
-        write_hash = open("./credentials/hashes.json", 'w')
-        for i in range(len(self.scraped_content)):
-            write_hash.write(f"\n{self.scraped_content[i][0]},{self.scraped_content[i][1]}")
-        write_hash.flush()
-        write_hash.close()
+        write_hash = FileOps()
+        for _, data in enumerate(self.scraped_content):
+            write_hash.__add__(data.filepath, data.hash)
+        write_hash.__write__()
         logging.info("Successfully Recovered The Hashes!")
         return "Successfully Recovered The Hashes!\n"
 
