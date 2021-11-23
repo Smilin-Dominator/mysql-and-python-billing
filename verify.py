@@ -2,6 +2,7 @@ import hashlib
 import logging
 import os
 from configuration import variables, input, info, error, print
+from json import loads, dumps
 
 logging.basicConfig(filename='log.txt', format=variables.log_format, datefmt='[%Y-%m-%d] [%H:%M:%S]',
                     level=logging.DEBUG)
@@ -22,6 +23,23 @@ def hash_file(filepath: str):
 
 
 # ---------Hash------------#
+class FileOps:
+
+    def __init__(self):
+        self.file = open("credentials/hashes.json", "w+")
+        self.json = loads(self.file.read())
+
+    def __add__(self, filename: str, filehash: str):
+        self.json['Data'].append({filename, filehash})
+
+    def __get__(self):
+        return self.json
+
+    def __del__(self):
+        self.file.write(dumps(self.json))
+        self.file.flush()
+
+
 
 def make_hash(mydb, mycursor):
     hashwrite = open('./credentials/hashes.json', 'a')
