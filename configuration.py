@@ -21,30 +21,27 @@ class Singleton(type):
 class logging(object, metaclass=Singleton):
 
     def __init__(self):
-        self.logging = lg
-        self.filename = self.log_name()
-        self.logging.basicConfig(
-            format='%(asctime)s (%(filename)s): %(message)s',
-            datefmt='[%Y-%m-%d] [%H:%M:%S]',
-            level=self.logging.DEBUG,
-            handlers=[
-                self.logging.FileHandler(filename=self.filename, mode="a", delay=True)
-            ]
-        )
 
-    def log_name(self, single: bool = True) -> str:
-        if single:
-            if not path.exists("logs/"):
-                mkdir("logs/")
-            return f"logs/main.log"
-        else:
-            if path.exists("logs/") and (listdir("logs/")):
-                return f"logs/{strftime('%Y_%m_%d-%I_%M-%p')}.log"
-            elif path.exists("logs/") and not (listdir("logs/")):
-                return f"logs/main.log"
-            else:
-                mkdir("logs/")
-                return f"logs/main.log"
+        self.filename = self.log_name()
+        self.logging = lg
+        self.format = '%(asctime)s (%(filename)s): %(message)s'
+
+        self.main = self.logging.getLogger("main")
+        main_file = lg.FileHandler(filename="logs/main.log", mode="a", delay=True)
+        main_file.setFormatter(lg.Formatter(self.format))
+        self.main.addHandler(main_file)
+        self.main.setLevel(lg.DEBUG)
+
+        self.bill = self.logging.getLogger("bill")
+        side_file = lg.FileHandler(filename=self.log_name(), mode="a", delay=True)
+        side_file.setFormatter(lg.Formatter(self.format))
+        self.bill.addHandler(side_file)
+        self.bill.setLevel(lg.DEBUG)
+
+    def log_name(self) -> str:
+        if not path.exists("logs/"):
+            mkdir("logs/")
+        return f"logs/{strftime('%Y_%m_%d-%I_%M_%S-%p')}.log"
 
     def info(self, msg: Any):
         self.logging.info(msg=msg)

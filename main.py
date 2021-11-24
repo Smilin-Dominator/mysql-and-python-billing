@@ -25,7 +25,7 @@ except ModuleNotFoundError:
     setup.main()
 
 
-logging = logging()
+logging = logging().main
 
  
 def startup() -> None:

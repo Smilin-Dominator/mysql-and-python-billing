@@ -7,7 +7,7 @@ from rich.table import Table
 from pytablewriter import MarkdownTableWriter
 from pydantic import BaseModel
 
-logging = logging()
+logging = logging().bill
 BUF_SIZE = 65536
 
 
