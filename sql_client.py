@@ -1,5 +1,5 @@
 from hashlib import sha512
-from configuration import variables, print, input, info, console, logging
+from configuration import print, input, info, console, logging
 from rich.table import Table
 
 

@@ -1,4 +1,3 @@
-import logging
 from hashlib import sha256
 from os import path, listdir, mkdir
 from configuration import logging, input, info, error, print
