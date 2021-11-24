@@ -9,18 +9,19 @@ import bank_transfer
 import setup
 
 # Included Imports
-import subprocess
 import logging
-import os
-import random
-import sys
-import time
+from subprocess import getoutput, call
+from os import path, mkdir, system
+from random import randint
+from sys import exit
+from time import time, strftime
 
 # Modules Needed To Be Installed By Pip
 try:
-    import mysql.connector
+    from mysql.connector import connect
+    from mysql.connector import Error as MSError
     import rsa
-    import yaml
+    from yaml import load, FullLoader
 except ModuleNotFoundError:
     setup.main()
 
@@ -39,7 +40,7 @@ def startup() -> None:
     """
 
     # Starts timing the boot
-    initial_time = time.time()
+    initial_time = time()
 
     messageOfTheSecond = {
         # if you don't recognize this song, stop reading this and listen
@@ -69,7 +70,7 @@ def startup() -> None:
 
     try:
         # Connecting to the MariaDB Database
-        mydb = mysql.connector.connect(
+        mydb = connect(
             auth_plugin='mysql_native_password',
             host=credz[0],
             user=credz[1],
@@ -77,19 +78,19 @@ def startup() -> None:
             password=credz[3],
             database=credz[4]
         )
-    except mysql.connector.Error:
+    except MSError:
         print("[*] MySQL Database Not Connecting")
         # If the docker-compose.yml exists, the PC thinks that the server is a container.
-        if os.path.exists('docker-compose.yml'):
+        if path.exists('docker-compose.yml'):
             print("[*] (Realization) Docker Container, Attempting To Start It")
-            check = subprocess.getoutput("docker start Maria")
+            check = getoutput("docker start Maria")
             newcheck = check.splitlines()
             for line in newcheck:
                 if line.startswith("Error"):
                     raise errors.dockerError("Unable To Start Docker Container...", check)
             else:
                 print("[*] Successful!, Rerun This File...")
-                sys.exit(1)
+                exit(1)
         else:
             raise errors.mysqlConnectionError("Couldn't Connect To Database..")
 
@@ -99,12 +100,12 @@ def startup() -> None:
         if credz[5] == 'y':
             commands().sql_tables(mycursor, mydb)
     else:
-        os.system('cls')
+        system('cls')
 
     print("[white on cyan]Welcome! If Something Doesn't Seem Right, Check The Logs![/white on cyan]\n")
 
     # Logs Boot Time Taken
-    logging.info("Booting Up Took: %f Seconds" % (time.time() - initial_time))
+    logging.info("Booting Up Took: %f Seconds" % (time() - initial_time))
 
     # Final Phase - Main Program
     main(messageOfTheSecond, mycursor, mydb)
@@ -126,7 +127,7 @@ def read_config(mycursor, count):
             # Third Phase - Checks For Updates
             if sum(1 for _ in open('./credentials/options.yml')) < 5:
                 commands().write_conifguration_file()
-            config = yaml.load(open('./credentials/options.yml', 'r'), yaml.FullLoader)
+            config = load(open('./credentials/options.yml', 'r'), FullLoader)
             if config["check_for_updates"] and count == 0:
                 init3()
             # Fourth Phase - Checks Integrity Of Credentials
@@ -178,7 +179,7 @@ def main(messageOfTheSecond, mycursor, mydb):
     while key != '1':
         # Gets the values for these from the read config function above
         (transactions, vat, discount) = read_config(mycursor, count)
-        randomNumGen = random.randint(1, len(messageOfTheSecond))  # RNG, unscripted order
+        randomNumGen = randint(1, len(messageOfTheSecond))  # RNG, unscripted order
         print(
             f"\n[white on grey54]Random Line from HUMBLE.:[/white on grey54] [white on magenta]"
             f"{messageOfTheSecond[randomNumGen]}[/white on magenta]"
@@ -196,8 +197,8 @@ def main(messageOfTheSecond, mycursor, mydb):
             f"[blue]5 - Verifier[/blue]\n[magenta]6 - Configure Options\n[/magenta]"
             f"{tra}"
         )
-        date = time.strftime('%c')
-        time_prompt = time.strftime('%I:%M %p')
+        date = strftime('%c')
+        time_prompt = strftime('%I:%M %p')
         # The main prompt
         key = input(
             f"\n[white on green][{date}][/white on green]-[white on cyan][{time_prompt}][/white on cyan]\n"
@@ -207,8 +208,8 @@ def main(messageOfTheSecond, mycursor, mydb):
             match key:
                 case '1':
                     logging.info("Exiting Gracefully;")
-                    os.system("cls")
-                    sys.exit(0)
+                    system("cls")
+                    exit(0)
                 case '2':
                     logging.info("Transferring to (connector.py)")
                     import connector
@@ -233,7 +234,7 @@ def main(messageOfTheSecond, mycursor, mydb):
                         bank_transfer.interface(mycursor, mydb)
                         input("(enter to continue..)")
             count += 1
-            os.system('cls')
+            system('cls')
         except ValueError:
             raise errors.valueErrors("Entered A Non Integer During The Main Prompt")
 
@@ -255,14 +256,14 @@ def init0():
         firstTime = sum(1 for _ in open('log.txt')) == 0
     except FileNotFoundError:
         firstTime = True
-    check = os.path.exists('./credentials')
+    check = path.exists('./credentials')
     if not check:
-        os.mkdir('./credentials')
+        mkdir('./credentials')
         info('Made Directory "./Credentials"')
     if firstTime and (not f):
         setup.main()
     elif firstTime and f:
-        os.system("touch log.txt")
+        system("touch log.txt")
 
 
 def init1():
@@ -278,8 +279,8 @@ def init1():
 
     """
 
-    keycheck1 = os.path.exists('./credentials/private.pem')
-    keycheck2 = os.path.exists('./credentials/public.pem')
+    keycheck1 = path.exists('./credentials/private.pem')
+    keycheck2 = path.exists('./credentials/public.pem')
     if (not keycheck1) or (not keycheck2):
         key_security()
     return setup.sql(logging, rsa)
@@ -294,8 +295,8 @@ def init3():
     The option to turn it off is "check_for_updates"
 
     """
-    subprocess.call(['git', 'fetch'], shell=True)
-    raw = subprocess.getoutput('git status')
+    call(['git', 'fetch'], shell=True)
+    raw = getoutput('git status')
     check = raw.splitlines()
     if \
             check[1] == "Your branch is up to date with 'origin/main'." \
@@ -305,7 +306,7 @@ def init3():
         print("[*] No Update Found, Continuing...")
     else:
         print("Update Found... Updating...\n", override="blue")
-        subprocess.call(
+        call(
             'git pull https://Smilin-Dominator@github.com/Smilin-Dominator'
             '/mysql-and-python-billing.git', shell=True)
         print("\n[*] Success!")
@@ -325,21 +326,21 @@ def init5(mycursor, conf: bool):
 
     """
 
-    check = os.path.exists('bills/')
+    check = path.exists('bills/')
     varTime = time.strftime("%d_of_%B")
     varPath = f'./bills/{varTime}'
-    checkmate = os.path.exists(varPath)
-    checksales = os.path.exists('./sales_reports')
+    checkmate = path.exists(varPath)
+    checksales = path.exists('./sales_reports')
     if not check:
-        os.mkdir("bills/")  # Makes the DIR
+        mkdir("bills/")  # Makes the DIR
         logging.info("Making the Bills Directory")
         print("[*] Making Directory 'bills/'...")
     if not checkmate:
-        os.mkdir(varPath)
+        mkdir(varPath)
         logging.info(f"Making A Directory For Today's Date ({varPath})")
         print(f"[*] Making A Directory For Today..({varPath})\n")
     if not checksales:
-        os.mkdir('./sales_reports')
+        mkdir('./sales_reports')
         logging.info("Making the Sales Report Directory.")
         print("[*] Making Directory 'sales-reports/'...")
     init5_security(mycursor, conf)
