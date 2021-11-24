@@ -41,10 +41,10 @@ class logging(object, metaclass=Singleton):
             if path.exists("logs/") and (listdir("logs/")):
                 return f"logs/{strftime('%Y_%m_%d-%I_%M-%p')}.log"
             elif path.exists("logs/") and not (listdir("logs/")):
-                return f"logs/first.log"
+                return f"logs/main.log"
             else:
                 mkdir("logs/")
-                return f"logs/first.log"
+                return f"logs/main.log"
 
     def info(self, msg: Any):
         self.logging.info(msg=msg)
