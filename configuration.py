@@ -4,6 +4,8 @@ from sys import stdout
 from yaml import load, dump, FullLoader
 from typing import Any
 from time import strftime
+from rich.console import Console
+from rich.prompt import Prompt
 
 
 class Singleton(type):
@@ -26,8 +28,7 @@ class logging(object, metaclass=Singleton):
             datefmt='[%Y-%m-%d] [%H:%M:%S]',
             level=self.logging.DEBUG,
             handlers=[
-                self.logging.FileHandler(filename=self.filename, mode="a", delay=True),
-                self.logging.StreamHandler()
+                self.logging.FileHandler(filename=self.filename, mode="a", delay=True)
             ]
         )
 
@@ -67,7 +68,7 @@ def execheck():
         return False
 
 
-class variables:    # error next
+class variables:  # error next
 
     docker_compose = """# Devisha's Docker MariaDB Creation File!
 version: '3.1'
@@ -90,9 +91,6 @@ services:
 
 # ------------- Text Funcs ----------------#
 
-from rich.console import Console
-from rich.prompt import Prompt
-
 console = Console(color_system="256")
 
 
@@ -108,7 +106,7 @@ def error(msg: str, override: str = None) -> None:
         print(f"[white on red][@] {msg}[/white on red]")
     else:
         print(f"[{override}][@] {msg}[/{override}]")
-    logging.error(f"{msg}\nLocals: {locals()}")
+    logging().error(f"{msg}\nLocals: {locals()}")
 
 
 def warning(msg: str, override: str = None) -> None:
@@ -116,7 +114,7 @@ def warning(msg: str, override: str = None) -> None:
         print(f"[white on yellow][!] {msg}[/white on yellow]")
     else:
         print(f"[{override}][!] {msg}[/{override}]")
-    logging.warning(msg)
+    logging().warning(msg)
 
 
 def info(msg: str, override: str = None) -> None:
