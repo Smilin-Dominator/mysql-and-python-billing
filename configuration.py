@@ -45,25 +45,25 @@ class logging(object, metaclass=Singleton):
         return f"logs/bill-{strftime('%Y_%m_%d-%I_%M_%S-%p')}.log"
 
     def info(self, msg: Any):
-        if not self.bill:
+        if not self.bill_logger:
             self.main.info(msg=msg)
         else:
             self.bill.info(msg=msg)
 
     def warning(self, msg: Any):
-        if not self.bill:
+        if not self.bill_logger:
             self.main.warning(msg=msg)
         else:
             self.bill.warning(msg=msg)
 
     def error(self, msg: Any):
-        if not self.bill:
+        if not self.bill_logger:
             self.main.error(msg=msg)
         else:
             self.bill.error(msg=msg)
 
     def critical(self, msg: Any):
-        if not self.bill:
+        if not self.bill_logger:
             self.main.critical(msg=msg)
         else:
             self.bill.critical(msg=msg)

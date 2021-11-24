@@ -210,7 +210,7 @@ def main(messageOfTheSecond, mycursor, mydb):
                     system("cls")
                     exit(0)
                 case '2':
-                    logging.info("Transferring to (connector.py)")
+                    logging.info(f"Transferring to (connector.py) -> Log = {logging.filename}")
                     import connector
                     connector.main(transactions, mydb, vat, discount)
                 case '3':
