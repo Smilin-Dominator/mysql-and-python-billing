@@ -1,7 +1,78 @@
-import logging
-from os import listdir, system
+import logging as lg
+from os import listdir, system, path, mkdir
 from sys import stdout
 from yaml import load, dump, FullLoader
+from typing import Any
+from time import strftime
+from rich.console import Console
+from rich.prompt import Prompt
+
+
+class Singleton(type):
+    """Returns the only instance of a class"""
+    _instances = {}
+
+    def __call__(cls, *args, **kwargs):
+        if cls not in cls._instances:
+            cls._instances[cls] = super(Singleton, cls).__call__(*args, **kwargs)
+        return cls._instances[cls]
+
+
+class logging(object, metaclass=Singleton):
+
+    def __init__(self):
+
+        self.filename = self.log_name()
+        self.logging = lg
+        self.format = '%(asctime)s (%(filename)s): %(message)s'
+
+        self.main = None
+        self.bill = None
+        self.update_main_object()
+        self.update_bill_object()
+
+    def update_main_object(self):
+        self.main = self.logging.getLogger("main")
+        main_file = lg.FileHandler(filename="logs/main.log", mode="a", delay=True)
+        main_file.setFormatter(lg.Formatter(self.format))
+        self.main.addHandler(main_file)
+        self.main.setLevel(lg.DEBUG)
+
+    def update_bill_object(self):
+        self.bill = self.logging.getLogger("bill")
+        side_file = lg.FileHandler(filename=self.log_name(), mode="a", delay=True)
+        side_file.setFormatter(lg.Formatter(self.format))
+        self.bill.addHandler(side_file)
+        self.bill.setLevel(lg.DEBUG)
+
+    def log_name(self) -> str:
+        if not path.exists("logs/"):
+            mkdir("logs/")
+        return f"logs/bill-{strftime('%Y_%m_%d-%I_%M_%S-%p')}.log"
+
+    def info(self, msg: Any, bill=None):
+        if bill is None:
+            self.main.info(msg=msg)
+        else:
+            self.bill.info(msg=msg)
+
+    def warning(self, msg: Any, bill=None):
+        if bill is None:
+            self.main.warning(msg=msg)
+        else:
+            self.bill.warning(msg=msg)
+
+    def error(self, msg: Any, bill=None):
+        if bill is None:
+            self.main.error(msg=msg)
+        else:
+            self.bill.error(msg=msg)
+
+    def critical(self, msg: Any, bill=None):
+        if bill is None:
+            self.main.critical(msg=msg)
+        else:
+            self.bill.critical(msg=msg)
 
 
 def execheck():
@@ -13,9 +84,7 @@ def execheck():
         return False
 
 
-class variables:
-    log_format = '%(asctime)s (%(filename)s): %(message)s'  # this basically says that the time and date come first,
-    # error next
+class variables:  # error next
 
     docker_compose = """# Devisha's Docker MariaDB Creation File!
 version: '3.1'
@@ -38,9 +107,6 @@ services:
 
 # ------------- Text Funcs ----------------#
 
-from rich.console import Console
-from rich.prompt import Prompt
-
 console = Console(color_system="256")
 
 
@@ -56,7 +122,7 @@ def error(msg: str, override: str = None) -> None:
         print(f"[white on red][@] {msg}[/white on red]")
     else:
         print(f"[{override}][@] {msg}[/{override}]")
-    logging.error(f"{msg}\nLocals: {locals()}")
+    logging().error(f"{msg}\nLocals: {locals()}")
 
 
 def warning(msg: str, override: str = None) -> None:
@@ -64,7 +130,7 @@ def warning(msg: str, override: str = None) -> None:
         print(f"[white on yellow][!] {msg}[/white on yellow]")
     else:
         print(f"[{override}][!] {msg}[/{override}]")
-    logging.warning(msg)
+    logging().warning(msg)
 
 
 def info(msg: str, override: str = None) -> None:

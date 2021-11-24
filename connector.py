@@ -2,14 +2,12 @@ import logging
 from hashlib import sha512
 from time import strftime
 from os import path
-from configuration import variables, input, print, info, warning, console
+from configuration import logging, input, print, info, warning, console
 from rich.table import Table
 from pytablewriter import MarkdownTableWriter
 from pydantic import BaseModel
 
-logging.basicConfig(filename='log.txt', format=variables.log_format, datefmt='[%Y-%m-%d] [%H:%M:%S]',
-                    level=logging.DEBUG)
-
+logging = logging()
 BUF_SIZE = 65536
 
 
@@ -17,7 +15,7 @@ def startup():
     nameOfCustomer = input(f"Customer", override="white")  # Optional, if you're in a hurry, leave blank
     if not nameOfCustomer:  # ' ' => blank
         nameOfCustomer = '(Not Specified)'
-    logging.info(f"\nSold the following to {nameOfCustomer}")  # you'll see this often, in case any bills go missing
+    logging.info(f"\nSold the following to {nameOfCustomer}", bill=True)  # you'll see this often, in case any bills go missing
     return nameOfCustomer
     # logs are the go-to place
 
@@ -107,17 +105,17 @@ def bill_write(ar: list, transfer: bool, vat: bool, discount: bool):
                         f"\n**Discount Amount: Rs. <span style='color:red'>{round(total_with_discount, 2)}</span>**<br>")
                     fileOpen.write(
                         f"\n**Subtotal w/ Discount: Rs. <span style='color:magenta'>{round(rounded_total, 2)}</span>**<br>")
-                    logging.info(f"Discount: {discount}%")
-                    logging.info(f"Discount Amount: Rs. {round(total_with_discount, 2)}")
-                    logging.info(f"Subtotal w/ Discount: Rs. {round(rounded_total, 2)}")
+                    logging.info(f"Discount: {discount}%", bill=True)
+                    logging.info(f"Discount Amount: Rs. {round(total_with_discount, 2)}", bill=True)
+                    logging.info(f"Subtotal w/ Discount: Rs. {round(rounded_total, 2)}", bill=True)
                     return rounded_total
                 else:
                     warning("[ Try Again, The Discount Sum is Negative ]", override="red")
-                    logging.warning("Entered Incorrect Discount %")
+                    logging.warning("Entered Incorrect Discount %", bill=True)
                     loop = False
             else:
                 warning("[ Try Again, Its Either 0 or An Integer ]", override="red")
-                logging.warning("Entered Incorrect Discount %")
+                logging.warning("Entered Incorrect Discount %", bill=True)
                 loop = False
 
     def vat_module(subtotal):
@@ -156,7 +154,7 @@ def bill_write(ar: list, transfer: bool, vat: bool, discount: bool):
     total = printingBills(ar).print_total()
     print(f"Subtotal: Rs. {total}", override='red')
     fileOpen.write(f'\n\n**Subtotal: <span style="color:orange">Rs. {str(total)}</span>**<br>')
-    logging.info(f'Subtotal: Rs. {total}')  # Three simultaneous actions here lol
+    logging.info(f'Subtotal: Rs. {total}', bill=True)  # Three simultaneous actions here lol
 
     if discount:
         total = discount_module(total)
@@ -165,7 +163,7 @@ def bill_write(ar: list, transfer: bool, vat: bool, discount: bool):
         total = vat_module(total)
 
     print(f"Grand Total: Rs. {total}", override="green")
-    logging.info(f"Grand Total: Rs. {total}")
+    logging.info(f"Grand Total: Rs. {total}", bill=True)
     fileOpen.write(f"\n**Grand Total: <span style='color:yellow'>Rs. {total}</span>**<br>")
     passOff = False
 
@@ -182,20 +180,20 @@ def bill_write(ar: list, transfer: bool, vat: bool, discount: bool):
             if bal < 0:  # loops if its a negative number!
                 warning("Negative Value, Something's Off, Retry",
                         override="red")  # something's **really** off (why doesnt MD work?)
-                logging.warning('Negative Balance')
+                logging.warning('Negative Balance', bill=True)
                 passOff = False
             elif bal == 0:
-                logging.info(f'Cash Given: Rs. {cashGiven}')
+                logging.info(f'Cash Given: Rs. {cashGiven}', bill=True)
                 fileOpen.write(f'\n**Cash Given: Rs. <span style="color:orange">{cashGiven}</span>**<br>')
                 print('\nNo Balance!', override='green')
-                logging.info('No Balance')
+                logging.info('No Balance', bill=True)
                 fileOpen.write(f'\n**Balance: <span style="color:red">No Balance!</span>**<br>')
                 break  # passes if its not
             elif bal > 0:
-                logging.info(f'Cash Given: Rs. {cashGiven}')
+                logging.info(f'Cash Given: Rs. {cashGiven}', bill=True)
                 fileOpen.write(f'\n**Cash Given: Rs. <span style="color:orange">{cashGiven}</span>**<br>')
                 print(f'Balance: Rs. {bal}', override="green")
-                logging.info(f'Balance: Rs. {str(bal)}\n')
+                logging.info(f'Balance: Rs. {str(bal)}\n', bill=True)
                 fileOpen.write(f'\n**Balance: <span style="color:red">Rs. {bal}</span>**<br>')
                 break
     else:
@@ -252,11 +250,11 @@ class array_funcs(object):
                         info(f"Success!", override="green_yellow")
                         logging.info(
                             f"Updated: {updateDoll.Name}, {updateDoll.Price}\nSet Quantity {updateDoll.old_quantity} => "
-                            f"{updateDoll.Quantity}\nSet Total: {updateDoll.old_total} => {updateDoll.Total}"
+                            f"{updateDoll.Quantity}\nSet Total: {updateDoll.old_total} => {updateDoll.Total}", bill=True
                         )
                         break
                     except Exception as e:
-                        logging.error(e)
+                        logging.error(e, bill=True)
             else:
                 self.ar.append(doll)
         else:
@@ -282,7 +280,7 @@ class array_funcs(object):
                             logging.info(
                                 f"Updated: {updateValue}, {doll.Name}\nSet Quantity {doll.old_quantity} => "
                                 f"{doll.Quantity}\nUpdated Total {doll.old_total} => {doll.Total}"
-                            )
+                            , bill=True)
                         elif update_key_check[0] == '-':
                             newQuanCheck = doll.Quantity - upQuan
                             if newQuanCheck > 0:
@@ -293,7 +291,7 @@ class array_funcs(object):
                                         , override="red")
                                 confirm = input(f"Proceed? (Y/N)", override="yellow")
                                 if confirm == 'Y':
-                                    logging.warning(f"Set {updateValue}, {doll.Price}'s Quantity to 1")
+                                    logging.warning(f"Set {updateValue}, {doll.Price}'s Quantity to 1", bill=True)
                                     doll.Quantity = 1
                                 else:
                                     logging.warning(f"Didn't Change {updateValue}, {doll.Name}'s Quantity")
@@ -301,7 +299,7 @@ class array_funcs(object):
                             logging.info(
                                 f"Updated: {updateValue}, {doll.Name}\nSet Quantity {doll.old_quantity} => {doll.Quantity}\n"
                                 f"Updated Total {doll.old_total} => {doll.Total}"
-                            )
+                            , bill=True)
                         elif update_key_check[0] == 'exit':
                             break
                         info(f"Success!", override="honeydew2")
@@ -328,11 +326,11 @@ class array_funcs(object):
                     info(
                         f"Success! Type  '--' in the ID prompt To See The Updated Version!", override="green"
                     )
-                    logging.info(f"Successfully Deleted Entry {delKey}")
+                    logging.info(f"Successfully Deleted Entry {delKey}", bill=True)
                     theLoop = False
             except Exception as e:
                 logging.error(e)
-                info(f"[ Error Occurred, Please Retry ]", override="red")
+                info(f"[ Error Occurred, Please Retry ]", override="red", bill=True)
                 theLoop = True
 
     def __get__(self):
@@ -382,6 +380,6 @@ def main(transfer, mydb, vat, discount):
                         warning(
                             f"Did You Enter The Right ID / Command?", override="red")  # congratulations!
                         # you're a failure!
-                        logging.warning(f"Entered Wrong ID / CMD: {idInput}")
+                        logging.warning(f"Entered Wrong ID / CMD: {idInput}", bill=True)
         except Exception as rim:
-            logging.error(rim)  # rim alert
+            logging.error(rim, bill=True)  # rim alert
