@@ -20,11 +20,12 @@ class Singleton(type):
 
 class logging(object, metaclass=Singleton):
 
-    def __init__(self):
+    def __init__(self, bill: bool = False):
 
         self.filename = self.log_name()
         self.logging = lg
         self.format = '%(asctime)s (%(filename)s): %(message)s'
+        self.bill_logger = bill
 
         self.main = self.logging.getLogger("main")
         main_file = lg.FileHandler(filename="logs/main.log", mode="a", delay=True)
@@ -41,19 +42,31 @@ class logging(object, metaclass=Singleton):
     def log_name(self) -> str:
         if not path.exists("logs/"):
             mkdir("logs/")
-        return f"logs/{strftime('%Y_%m_%d-%I_%M_%S-%p')}.log"
+        return f"logs/bill-{strftime('%Y_%m_%d-%I_%M_%S-%p')}.log"
 
     def info(self, msg: Any):
-        self.logging.info(msg=msg)
+        if not self.bill:
+            self.main.info(msg=msg)
+        else:
+            self.bill.info(msg=msg)
 
     def warning(self, msg: Any):
-        self.logging.warning(msg=msg)
+        if not self.bill:
+            self.main.warning(msg=msg)
+        else:
+            self.bill.warning(msg=msg)
 
     def error(self, msg: Any):
-        self.logging.error(msg=msg)
+        if not self.bill:
+            self.main.error(msg=msg)
+        else:
+            self.bill.error(msg=msg)
 
     def critical(self, msg: Any):
-        self.logging.critical(msg=msg)
+        if not self.bill:
+            self.main.critical(msg=msg)
+        else:
+            self.bill.critical(msg=msg)
 
 
 def execheck():
