@@ -1,4 +1,4 @@
-import logging
+import logging as lg
 from os import listdir, system
 from sys import stdout
 from yaml import load, dump, FullLoader
@@ -14,6 +14,30 @@ class Singleton(type):
         return cls._instances[cls]
 
 
+class logging(object, metaclass=Singleton):
+
+    def __init__(self):
+        self.logging = lg
+        self.logging.basicConfig(
+            filename='log.txt',
+            format='%(asctime)s (%(filename)s): %(message)s',
+            datefmt='[%Y-%m-%d] [%H:%M:%S]',
+            level=self.logging.DEBUG
+        )
+
+    def info(self, *args: str):
+        self.logging.info(args)
+
+    def warning(self, *args: str):
+        self.logging.warning(args)
+
+    def error(self, *args: str):
+        self.logging.error(args)
+
+    def critical(self, *args: str):
+        self.logging.critical(args)
+
+
 def execheck():
     f = listdir()
     for i in range(len(f)):
@@ -23,9 +47,7 @@ def execheck():
         return False
 
 
-class variables:
-    log_format = '%(asctime)s (%(filename)s): %(message)s'  # this basically says that the time and date come first,
-    # error next
+class variables:    # error next
 
     docker_compose = """# Devisha's Docker MariaDB Creation File!
 version: '3.1'
