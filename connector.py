@@ -1,7 +1,7 @@
-import hashlib
 import logging
-import time
-import os
+from hashlib import sha512
+from time import strftime
+from os import path
 from configuration import variables, input, print, info, warning, console
 from rich.table import Table
 from pytablewriter import MarkdownTableWriter
@@ -23,7 +23,7 @@ def startup():
 
 
 fileHeaderFormat = "{:^70}"  # headers
-varTime = time.strftime("%d_of_%B")
+varTime = strftime("%d_of_%B")
 
 
 # --------------------------------------- Bill Related Functions ---------------------------------------#
@@ -84,7 +84,6 @@ class printingBills(object):
 
 
 def bill_write(ar: list, transfer: bool, vat: bool, discount: bool):
-
     def discount_module(subtotal):
         """
             If discount is true, it'll show the discount interface
@@ -133,10 +132,10 @@ def bill_write(ar: list, transfer: bool, vat: bool, discount: bool):
         subtotal += vatAmount
         return subtotal
 
-    fileTime = str(time.strftime('%I.%M_%p'))  # eg: 07.10 PM
+    fileTime = str(strftime('%I.%M_%p'))  # eg: 07.10 PM
     customerNameFormat = customerName.replace(' ', '_')
     fileName = f"[BILL]-{customerNameFormat}-{fileTime}.md"  # format of the filename
-    filePath = os.path.join(f'./bills/{varTime}', fileName)  # adds it into the bills DIR
+    filePath = path.join(f'./bills/{varTime}', fileName)  # adds it into the bills DIR
     fileOpen = open(filePath, 'w+')  # Opens the bill file for writing
 
     print_the_values = printingBills(ar)
@@ -146,7 +145,7 @@ def bill_write(ar: list, transfer: bool, vat: bool, discount: bool):
     fileOpen.write(f"\n{fileHeaderFormat.format('Paddigurl Dolls')}")
     fileOpen.write(f"\n{fileHeaderFormat.format(70 * '-')}")
     fileOpen.write(
-        f'\n\n**Date: <span style="color:blue">{str(time.strftime("%d/%m/%Y"))}</span>**<br>')  # eg: 02/05/2021
+        f'\n\n**Date: <span style="color:blue">{str(strftime("%d/%m/%Y"))}</span>**<br>')  # eg: 02/05/2021
     fileOpen.write(
         f'\n**Time: <span style="color:red">{str(fileTime.replace("_", " "))}</span>**<br>')  # uses the variable set earlier
     fileOpen.write(f'\n**Customer: <span style="color:green">{customerName.replace("_", " ")}</span>**<br>\n')
@@ -221,7 +220,7 @@ def kill_this():
     salt2 = check_pass_file[1]
     hash_check = check_pass_file[2]
     pass_check = salt1 + killPass + salt2
-    pass_hash = hashlib.sha512(pass_check.encode()).hexdigest()
+    pass_hash = sha512(pass_check.encode()).hexdigest()
     if hash_check == pass_hash:
         return True
     else:
@@ -343,7 +342,14 @@ class array_funcs(object):
 # -------------------------------------------- Main Code --------------------------------------------------#
 
 def main(transfer, mydb, vat, discount):
+
     cursor = mydb.cursor()
+
+    def get_doll(id: int):
+        cursor.execute(f"select name, price from paddigurlTest WHERE id = {id}")
+        records = cursor.fetchall()[0]
+        return Doll(Name=records[0], Price=records[1])
+
     global customerName
     customerName = startup()
     idInput = 69420666  # well, had to declare it as something -\_/-
@@ -369,10 +375,8 @@ def main(transfer, mydb, vat, discount):
                     ar.__update__()
                 case _:
                     proceed = int(idInput)
-                    cursor.execute(f"select name, price from paddigurlTest WHERE id = {proceed}")
                     try:
-                        records = cursor.fetchall()[0]
-                        doll = Doll(Name=records[0], Price=records[1])
+                        doll = get_doll(proceed)
                         ar.__add__(doll)
                     except IndexError:
                         warning(
