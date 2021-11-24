@@ -326,7 +326,7 @@ def init5(mycursor, conf: bool):
     """
 
     check = path.exists('bills/')
-    varTime = time.strftime("%d_of_%B")
+    varTime = strftime("%d_of_%B")
     varPath = f'./bills/{varTime}'
     checkmate = path.exists(varPath)
     checksales = path.exists('./sales_reports')
