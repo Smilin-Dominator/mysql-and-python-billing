@@ -1,10 +1,10 @@
 import logging
-import hashlib
-import sys
-import os
-import base64
-import random
-import string
+from hashlib import md5, sha512
+from sys import exit
+from os import path
+from base64 import b64decode
+from random import choices
+from string import ascii_letters, hexdigits, octdigits, digits
 from configuration import variables, warning, info, input
 from pydantic import BaseModel
 from verify import FileOps
@@ -34,7 +34,7 @@ class integrityCheck(object):
             try:
                 if "Systemdump--Ignore--These" in crit[i]:
                     signature = crit[i + 1]
-                    if signature == str(hashlib.md5("McDonalds_Im_Loving_It".encode()).hexdigest()):
+                    if signature == str(md5("McDonalds_Im_Loving_It".encode()).hexdigest()):
                         salt1 = crit[i + 2]
                         salt2 = crit[i + 3]
                         hashed_pw = crit[i + 4]
@@ -43,7 +43,7 @@ class integrityCheck(object):
                     else:
                         warning("Authenticity Not Recognized.. Reset log.txt and passwd.txt, Data Might've been "
                               "breached")
-                        sys.exit(66)
+                        exit(66)
             except Exception as e:
                 logging.warning(e)
         return critical
@@ -79,8 +79,8 @@ class integrityCheck(object):
 
 def init5_security(mycursor, conf: bool):
 
-    checkPass = os.path.exists('./credentials/passwd.txt')
-    checkHash = os.path.exists('./credentials/hashes.json')
+    checkPass = path.exists('./credentials/passwd.txt')
+    checkHash = path.exists('./credentials/hashes.json')
 
     if not checkPass:
         critical = integrityCheck(check_log='./log.txt', mycursor=mycursor).pass_check()
@@ -88,11 +88,11 @@ def init5_security(mycursor, conf: bool):
             warning("No Password Set.. Creating File..")
             pas_enter = input(prompt="Enter A Password", override="red", password=True)
             pas = open('./credentials/passwd.txt', 'w+')
-            salt1 = ''.join(random.choices(string.ascii_letters + string.hexdigits, k=95))
-            salt2 = ''.join(random.choices(string.digits + string.octdigits, k=95))
+            salt1 = ''.join(choices(ascii_letters + hexdigits, k=95))
+            salt2 = ''.join(choices(digits + octdigits, k=95))
             pass_write = str(salt1 + pas_enter + salt2)
-            hashpass = hashlib.sha512(pass_write.encode()).hexdigest()
-            signature = hashlib.md5("McDonalds_Im_Loving_It".encode()).hexdigest()
+            hashpass = sha512(pass_write.encode()).hexdigest()
+            signature = md5("McDonalds_Im_Loving_It".encode()).hexdigest()
             logging.info(f"Systemdump--Ignore--These\n{signature}\n{salt1}\n{salt2}\n{hashpass}")
             pas.write(f'{salt1},{salt2},{hashpass}')
             info("Success!", "green")
@@ -148,7 +148,7 @@ def key_security():
                 b = line.split('Binary_Data:')
                 pubkey = open('./credentials/public.pem', 'w+')
                 out = ''.join(b[1]).replace("b'", "").replace("'", "")
-                dec = base64.b64decode(out).decode()
+                dec = b64decode(out).decode()
                 pubkey.write(dec)
                 info("Successfully Recovered Public Key!", "green")
                 pubkey.close()
@@ -158,7 +158,7 @@ def key_security():
                 b = line.split('Binary-Data:')
                 privkey = open('./credentials/private.pem', 'w+')
                 out = ''.join(b[1]).replace("b'", "").replace("'", "")
-                dec = base64.b64decode(out).decode()
+                dec = b64decode(out).decode()
                 privkey.write(dec)
                 info("Successfully Recovered Private Key!", "green")
                 privkey.close()

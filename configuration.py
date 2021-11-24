@@ -1,11 +1,11 @@
 import logging
-import os
-import sys
-import yaml
+from os import listdir, system
+from sys import stdout
+from yaml import load, dump, FullLoader
 
 
 def execheck():
-    f = os.listdir()
+    f = listdir()
     for i in range(len(f)):
         if f[i].endswith('.exe'):
             return True
@@ -122,7 +122,7 @@ class commands:
         mydb.commit()
         print("[*] Success!")
         input("(enter to continue...)")
-        os.system('cls')
+        system('cls')
 
     def write_conifguration_file(self):
         options = open('./credentials/options.yml', 'w+')
@@ -162,7 +162,7 @@ class commands:
             ops["discount"] = True
         else:
             ops["discount"] = False
-        yaml.dump(ops, options)
+        dump(ops, options)
         options.flush()
         options.close()
 
@@ -194,13 +194,13 @@ class commands:
 
         CURSOR_UP_ONE = '\x1b[1A'
         ERASE_LINE = '\x1b[2K'
-        dictionary = yaml.load(open("credentials/options.yml", "r"), yaml.FullLoader)
+        dictionary = load(open("credentials/options.yml", "r"), FullLoader)
         while True:
             print(self.configuration_file_status(dictionary))
             choice = input(f"What Would You Like To Update?", override="yellow")
             match choice:
                 case "99":
-                    yaml.dump(dictionary, open("credentials/options.yml", "w"))
+                    dump(dictionary, open("credentials/options.yml", "w"))
                     break
                 case "1":
                     if dictionary["check_for_updates"]:
@@ -228,8 +228,8 @@ class commands:
                     else:
                         dictionary["discount"] = True
             for i in range(10):
-                sys.stdout.write(CURSOR_UP_ONE)
-                sys.stdout.write(ERASE_LINE)
+                stdout.write(CURSOR_UP_ONE)
+                stdout.write(ERASE_LINE)
 
 
 class errors(object):
@@ -242,7 +242,7 @@ class errors(object):
             self.var = self.string % (self.scenario, self.message)
             print(self.var)
             logging.error(self.var)
-            sys.exit(5)
+            exit(5)
 
     class mysqlConnectionError(Exception):
 
@@ -252,7 +252,7 @@ class errors(object):
             self.var = self.string % self.scenario
             print(self.var)
             logging.error(self.var)
-            sys.exit(5)
+            exit(5)
 
     class valueErrors(Exception):
 
@@ -263,4 +263,4 @@ class errors(object):
             print(self.var)
             logging.error(self.var)
             input("(enter to continue...)")
-            os.system('cls')
+            system('cls')

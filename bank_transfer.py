@@ -1,4 +1,4 @@
-import os
+from os import listdir
 from configuration import errors, input, warning, error, print
 from verify import hash_file
 from bill_extractor import bill
@@ -11,8 +11,8 @@ def view_bank_transactions():
     combined = []
     file_prefix = "./bills/%s/%s"
     dir_prefix = "./bills/%s"
-    for d in os.listdir("./bills/"):
-        for file in os.listdir(dir_prefix % d):
+    for d in listdir("./bills/"):
+        for file in listdir(dir_prefix % d):
             if file.endswith(".md"):
                 with open(file_prefix % (d, file), "r") as f:
                     b = bill(f)

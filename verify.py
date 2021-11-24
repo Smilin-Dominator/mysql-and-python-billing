@@ -1,6 +1,6 @@
-import hashlib
 import logging
-import os
+from hashlib import sha256
+from os import path, listdir, mkdir
 from configuration import variables, input, info, error, print
 from json import loads, dumps, JSONDecodeError
 from dataclasses import dataclass
@@ -10,15 +10,15 @@ logging.basicConfig(filename='log.txt', format=variables.log_format, datefmt='[%
 
 
 def hash_file(filepath: str):
-    sha256 = hashlib.sha256()
-    if os.path.exists(filepath):
+    sha = sha256()
+    if path.exists(filepath):
         with open(filepath, 'r') as red:
             while True:
                 check = red.read(65536)
                 if not check:
                     break
-                sha256.update(check.encode())
-            return sha256.hexdigest()
+                sha.update(check.encode())
+            return sha.hexdigest()
     else:
         return False
 
@@ -70,12 +70,12 @@ class FileOps:
 
 def make_hash(mydb, mycursor):
     hashfile = FileOps()
-    multiverse = os.listdir('bills')
+    multiverse = listdir('bills')
     for directory in multiverse:
-        bill_path = os.path.join('./bills/', directory)
-        ls_l = os.listdir(bill_path)
+        bill_path = path.join('./bills/', directory)
+        ls_l = listdir(bill_path)
         for file in ls_l:
-            the_new = os.path.join(bill_path + '/' + file)
+            the_new = path.join(bill_path + '/' + file)
             filehash = hash_file(the_new)
             if the_new.endswith('master_bill.txt'):
                 info("Skipping Master Bill..")
@@ -124,9 +124,9 @@ def verify(mycursor):
             else:
                 error(f"File {fil.filepath} Has Been Deleted....", override="red")
                 dir_check = fil.filepath.split("[BILL]")
-                if not os.path.exists(dir_check[0]):
+                if not path.exists(dir_check[0]):
                     error(f"Entire Directory Deleted... Restoring..")
-                    os.mkdir(dir_check[0])
+                    mkdir(dir_check[0])
                 logging.critical(f"File {fil.filepath} Has Been Deleted")
                 mycursor.execute(f"SELECT filecontents FROM paddigurlHashes WHERE `hash` = '{fil.filehash}';")
                 attempted_recovery = mycursor.fetchall()
