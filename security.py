@@ -1,16 +1,14 @@
-import logging
 from hashlib import md5, sha512
 from sys import exit
 from os import path
 from base64 import b64decode
 from random import choices
 from string import ascii_letters, hexdigits, octdigits, digits
-from configuration import variables, warning, info, input
+from configuration import warning, info, input, logging
 from pydantic import BaseModel
 from verify import FileOps
 
-logging.basicConfig(filename='log.txt', format=variables.log_format, datefmt='[%Y-%m-%d] [%H:%M:%S]',
-                    level=logging.DEBUG)
+logging = logging()
 
 
 class HashFileRow(BaseModel):

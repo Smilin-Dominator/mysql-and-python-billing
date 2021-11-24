@@ -1,10 +1,12 @@
-import logging
 from os import listdir, remove, path
 from time import strftime
 from glob import glob
 from pathlib import Path
-from configuration import print, input, console
+from configuration import print, input, console, logging
 from rich.table import Table
+
+
+logging = logging()
 
 
 def input_screen():

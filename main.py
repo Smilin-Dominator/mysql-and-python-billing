@@ -3,13 +3,12 @@
 # Don't even think of stealing my code!
 
 # File Imports
-from configuration import variables, commands, errors, execheck, print, info, input
+from configuration import logging, commands, errors, execheck, print, info, input
 from security import init5_security, key_security
 import bank_transfer
 import setup
 
 # Included Imports
-import logging
 from subprocess import getoutput, call
 from os import path, mkdir, system
 from random import randint
@@ -24,6 +23,9 @@ try:
     from yaml import load, FullLoader
 except ModuleNotFoundError:
     setup.main()
+
+
+logging = logging()
 
  
 def startup() -> None:
@@ -61,9 +63,6 @@ def startup() -> None:
 
     # First Boot - Checks For Log.txt
     init0()
-
-    logging.basicConfig(filename='log.txt', format=variables.log_format, datefmt='[%Y-%m-%d] [%H:%M:%S]',
-                        level=logging.DEBUG)
 
     # Second Phase - Checks For SQL Credentials
     credz = init1()

@@ -1,10 +1,9 @@
-import logging
 from hashlib import sha512
-from configuration import variables, print, input, info, console
+from configuration import variables, print, input, info, console, logging
 from rich.table import Table
 
-logging.basicConfig(filename='log.txt', format=variables.log_format, datefmt='[%Y-%m-%d] [%H:%M:%S]',
-                    level=logging.DEBUG)
+
+logging = logging()
 
 
 def auth(mydb):

@@ -1,12 +1,11 @@
 import logging
 from hashlib import sha256
 from os import path, listdir, mkdir
-from configuration import variables, input, info, error, print
+from configuration import logging, input, info, error, print
 from json import loads, dumps, JSONDecodeError
 from dataclasses import dataclass
 
-logging.basicConfig(filename='log.txt', format=variables.log_format, datefmt='[%Y-%m-%d] [%H:%M:%S]',
-                    level=logging.DEBUG)
+logging = logging()
 
 
 def hash_file(filepath: str):
