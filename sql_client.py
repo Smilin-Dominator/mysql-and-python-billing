@@ -1,5 +1,5 @@
 import logging
-import hashlib
+from hashlib import sha512
 from configuration import variables, print, input, info, console
 from rich.table import Table
 
@@ -15,7 +15,7 @@ def auth(mydb):
         pass_read = open('./credentials/passwd.txt', 'r')
         (salt1, salt2, hash_check) = pass_read.read().split(',')
         pass_check = salt1 + passwd + salt2
-        pass_hash = hashlib.sha512(pass_check.encode()).hexdigest()
+        pass_hash = sha512(pass_check.encode()).hexdigest()
         if pass_hash == hash_check:
             pass_read.close()
             main(mydb)
