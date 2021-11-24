@@ -39,7 +39,7 @@ class integrityCheck(object):
                         critical_ar = (salt1, salt2, hashed_pw)
                         critical.append(critical_ar)
                     else:
-                        warning("Authenticity Not Recognized.. Reset log.txt and passwd.txt, Data Might've been "
+                        warning("Authenticity Not Recognized.. Reset logs/main.log and passwd.txt, Data Might've been "
                               "breached")
                         exit(66)
             except Exception as e:
@@ -81,7 +81,7 @@ def init5_security(mycursor, conf: bool):
     checkHash = path.exists('./credentials/hashes.json')
 
     if not checkPass:
-        critical = integrityCheck(check_log='./log.txt', mycursor=mycursor).pass_check()
+        critical = integrityCheck(check_log='./logs/main.log', mycursor=mycursor).pass_check()
         if not critical:
             warning("No Password Set.. Creating File..")
             pas_enter = input(prompt="Enter A Password", override="red", password=True)
@@ -98,7 +98,7 @@ def init5_security(mycursor, conf: bool):
             info(integrityCheck(password_array=critical, mycursor=mycursor).pass_write(), "green")
 
     if checkPass and conf:
-        critical = integrityCheck(check_log="./log.txt", mycursor=mycursor).pass_check()
+        critical = integrityCheck(check_log="./logs/main.log", mycursor=mycursor).pass_check()
         read_pass = open('./credentials/passwd.txt', 'r')
         read_pass_re = read_pass.read()
         read_pass_tup = tuple(read_pass_re.split(','))
@@ -137,7 +137,7 @@ def init5_security(mycursor, conf: bool):
 
 
 def key_security():
-    with open('log.txt', 'r') as truth:
+    with open('logs/main.log', 'r') as truth:
         a = truth.read().splitlines()
         for line in a:
             if 'Binary_Data' in line:
