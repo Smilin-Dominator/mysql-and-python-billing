@@ -31,14 +31,17 @@ class logging(object, metaclass=Singleton):
             ]
         )
 
-    def log_name(self) -> str:
-        if path.exists("logs/") and (listdir("logs/")):
-            return f"logs/{strftime('%Y_%m_%d-%I_%M-%p')}.log"
-        elif path.exists("logs/") and not (listdir("logs/")):
-            return f"logs/first.log"
+    def log_name(self, single: bool = True) -> str:
+        if single:
+            return f"logs/main.log"
         else:
-            mkdir("logs/")
-            return f"logs/first.log"
+            if path.exists("logs/") and (listdir("logs/")):
+                return f"logs/{strftime('%Y_%m_%d-%I_%M-%p')}.log"
+            elif path.exists("logs/") and not (listdir("logs/")):
+                return f"logs/first.log"
+            else:
+                mkdir("logs/")
+                return f"logs/first.log"
 
     def info(self, msg: Any):
         self.logging.info(msg=msg)
