@@ -1,7 +1,9 @@
 import logging as lg
-from os import listdir, system
+from os import listdir, system, path, mkdir
 from sys import stdout
 from yaml import load, dump, FullLoader
+from typing import Any
+from time import strftime
 
 
 class Singleton(type):
@@ -18,24 +20,37 @@ class logging(object, metaclass=Singleton):
 
     def __init__(self):
         self.logging = lg
+        self.filename = self.log_name()
         self.logging.basicConfig(
-            filename='log.txt',
             format='%(asctime)s (%(filename)s): %(message)s',
             datefmt='[%Y-%m-%d] [%H:%M:%S]',
-            level=self.logging.DEBUG
+            level=self.logging.DEBUG,
+            handlers=[
+                self.logging.FileHandler(filename=self.filename, mode="a", delay=True),
+                self.logging.StreamHandler()
+            ]
         )
 
-    def info(self, *args: str):
-        self.logging.info(args)
+    def log_name(self) -> str:
+        if path.exists("logs/") and (listdir("logs/")):
+            return f"logs/{strftime('%Y_%m_%d-%I_%M-%p')}.log"
+        elif path.exists("logs/") and not (listdir("logs/")):
+            return f"logs/first.log"
+        else:
+            mkdir("logs/")
+            return f"logs/first.log"
 
-    def warning(self, *args: str):
-        self.logging.warning(args)
+    def info(self, msg: Any):
+        self.logging.info(msg=msg)
 
-    def error(self, *args: str):
-        self.logging.error(args)
+    def warning(self, msg: Any):
+        self.logging.warning(msg=msg)
 
-    def critical(self, *args: str):
-        self.logging.critical(args)
+    def error(self, msg: Any):
+        self.logging.error(msg=msg)
+
+    def critical(self, msg: Any):
+        self.logging.critical(msg=msg)
 
 
 def execheck():
