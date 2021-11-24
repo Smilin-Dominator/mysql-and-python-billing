@@ -35,7 +35,7 @@ class logging(object, metaclass=Singleton):
     def log_name(self, single: bool = True) -> str:
         if single:
             if not path.exists("logs/"):
-                mkdir("main.log")
+                mkdir("logs/")
             return f"logs/main.log"
         else:
             if path.exists("logs/") and (listdir("logs/")):

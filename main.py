@@ -34,7 +34,7 @@ def startup() -> None:
     Startup
 
     It basically uses all the main functions (down below and in security),
-    performs background checks such as for log.txt and credentials and ensures
+    performs background checks such as for logs/main.log and credentials and ensures
     that everything is fine when starting.
     The most important service is connecting to the SQL Database and passing
     it as a parameter to all the functions that need it.
@@ -243,16 +243,16 @@ def init0():
 
     Init0
 
-    This checks if log.txt and the credentials directory exist.
-    If its not an exe file (execheck) and log.txt is empty it launches
+    This checks if logs/main.log and the credentials directory exist.
+    If its not an exe file (execheck) and logs/main.log is empty it launches
     first time setup.
-    If its an exe file and its the first time, it'll just make log.txt
+    If its an exe file and its the first time, it'll just make logs/main.log
 
     """
 
     f = execheck()
     try:
-        firstTime = sum(1 for _ in open('log.txt')) == 0
+        firstTime = sum(1 for _ in open('./logs/main.log')) == 0
     except FileNotFoundError:
         firstTime = True
     check = path.exists('./credentials')
@@ -262,7 +262,7 @@ def init0():
     if firstTime and (not f):
         setup.main()
     elif firstTime and f:
-        system("touch log.txt")
+        system("mkdir logs/ && touch logs/main.log")
 
 
 def init1():

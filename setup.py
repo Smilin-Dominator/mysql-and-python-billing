@@ -2,7 +2,10 @@ from subprocess import run, DEVNULL, SubprocessError
 from time import sleep
 from os import path
 from base64 import b64encode
-from configuration import commands, variables, console, print, input, warning, error
+from configuration import commands, variables, console, print, input, warning, error, logging
+
+
+logging = logging()
 
 
 def main():
@@ -12,7 +15,8 @@ def main():
         _ if run("python -m pip install -r requirements.txt", stdout=DEVNULL, stderr=DEVNULL, shell=True).returncode == 0 else error(msg="While Installing Pip Packages")
         console.log("Environment Setup Complete")
         sleep(3)
-        console.log("Created Log.txt")
+        logging.info("First!")
+        console.log("Created logs/main.log")
         sleep(3)
         console.log("All Tasks Successful!")
 
