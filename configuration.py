@@ -27,12 +27,19 @@ class logging(object, metaclass=Singleton):
         self.format = '%(asctime)s (%(filename)s): %(message)s'
         self.bill_logger = bill
 
+        self.main = None
+        self.bill = None
+        self.update_main_object()
+        self.update_bill_object()
+
+    def update_main_object(self):
         self.main = self.logging.getLogger("main")
         main_file = lg.FileHandler(filename="logs/main.log", mode="a", delay=True)
         main_file.setFormatter(lg.Formatter(self.format))
         self.main.addHandler(main_file)
         self.main.setLevel(lg.DEBUG)
 
+    def update_bill_object(self):
         self.bill = self.logging.getLogger("bill")
         side_file = lg.FileHandler(filename=self.log_name(), mode="a", delay=True)
         side_file.setFormatter(lg.Formatter(self.format))
