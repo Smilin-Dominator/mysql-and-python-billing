@@ -20,12 +20,11 @@ class Singleton(type):
 
 class logging(object, metaclass=Singleton):
 
-    def __init__(self, bill: bool = False):
+    def __init__(self):
 
         self.filename = self.log_name()
         self.logging = lg
         self.format = '%(asctime)s (%(filename)s): %(message)s'
-        self.bill_logger = bill
 
         self.main = None
         self.bill = None
@@ -51,26 +50,26 @@ class logging(object, metaclass=Singleton):
             mkdir("logs/")
         return f"logs/bill-{strftime('%Y_%m_%d-%I_%M_%S-%p')}.log"
 
-    def info(self, msg: Any):
-        if not self.bill_logger:
+    def info(self, msg: Any, bill=None):
+        if bill is None:
             self.main.info(msg=msg)
         else:
             self.bill.info(msg=msg)
 
-    def warning(self, msg: Any):
-        if not self.bill_logger:
+    def warning(self, msg: Any, bill=None):
+        if bill is None:
             self.main.warning(msg=msg)
         else:
             self.bill.warning(msg=msg)
 
-    def error(self, msg: Any):
-        if not self.bill_logger:
+    def error(self, msg: Any, bill=None):
+        if bill is None:
             self.main.error(msg=msg)
         else:
             self.bill.error(msg=msg)
 
-    def critical(self, msg: Any):
-        if not self.bill_logger:
+    def critical(self, msg: Any, bill=None):
+        if bill is None:
             self.main.critical(msg=msg)
         else:
             self.bill.critical(msg=msg)
