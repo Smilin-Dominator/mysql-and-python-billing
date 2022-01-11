@@ -189,11 +189,11 @@ def configuration_file_interface():
 
     At the end, you'll see a for loop. That's part of an illusion used to print the same lines updated,
     without going further down, basically Rewriting the input.
-    CURSOR_UP_ONE and ERASE_LINE are sequences I use to show the illusion.
+    cursor_up and erase_line are sequences I use to show the illusion.
     """
 
-    CURSOR_UP_ONE = '\x1b[1A'
-    ERASE_LINE = '\x1b[2K'
+    cursor_up = '\x1b[1A'
+    erase_line = '\x1b[2K'
     dictionary = load(open("credentials/options.yml", "r"), FullLoader)
     while True:
         print(configuration_file_status(dictionary))
@@ -228,14 +228,15 @@ def configuration_file_interface():
                 else:
                     dictionary["discount"] = True
         for i in range(10):
-            stdout.write(CURSOR_UP_ONE)
-            stdout.write(ERASE_LINE)
+            stdout.write(cursor_up)
+            stdout.write(erase_line)
 
 
 # ----------------- Custom Errors ----------------------------- #
 
 class Errors(object):
-    class dockerError(Exception):
+
+    class DockerError(Exception):
 
         def __init__(self, scenario: str, message: str):
             self.scenario = scenario
@@ -246,7 +247,7 @@ class Errors(object):
             logging.error(self.var)
             exit(5)
 
-    class mysqlConnectionError(Exception):
+    class MySQLConnectionError(Exception):
 
         def __init__(self, scenario: str):
             self.scenario = scenario
@@ -256,7 +257,7 @@ class Errors(object):
             logging.error(self.var)
             exit(5)
 
-    class valueErrors(Exception):
+    class ValueErrors(Exception):
 
         def __init__(self, scenario: str):
             self.scenario = scenario
