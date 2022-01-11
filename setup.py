@@ -2,12 +2,12 @@ from subprocess import run, DEVNULL, SubprocessError
 from time import sleep
 from os import path
 from base64 import b64encode
-from configuration import commands, variables, console, print, input, warning, error
+from configuration import Variables, console, print, input, warning, error, write_conifguration_file
 
 
 def main():
     print("[bold green]Welcome to my Program! Setting Up Config File")
-    commands().write_conifguration_file()
+    write_conifguration_file()
     with console.status("[bold green]Initializing..", spinner='dots12') as _:
         _ if run("python -m pip install -r requirements.txt", stdout=DEVNULL, stderr=DEVNULL, shell=True).returncode == 0 else error(msg="While Installing Pip Packages")
         console.log("Environment Setup Complete")
@@ -32,7 +32,7 @@ def sql(logging, rsa):
                 host = '127.0.0.1'
                 with open("docker-compose.yml", 'w') as docker:
                     port = int(port)
-                    dc = variables.docker_compose % (user, password)
+                    dc = Variables.docker_compose % (user, password)
                     docker.write(dc)
                     docker.close()
                 run("docker-compose up -d", shell=True)

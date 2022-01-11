@@ -5,11 +5,11 @@ from os import path
 from base64 import b64decode
 from random import choices
 from string import ascii_letters, hexdigits, octdigits, digits
-from configuration import variables, warning, info, input
+from configuration import Variables, warning, info, input
 from pydantic import BaseModel
 from verify import FileOps
 
-logging.basicConfig(filename='log.txt', format=variables.log_format, datefmt='[%Y-%m-%d] [%H:%M:%S]',
+logging.basicConfig(filename='log.txt', format=Variables.log_format, datefmt='[%Y-%m-%d] [%H:%M:%S]',
                     level=logging.DEBUG)
 
 

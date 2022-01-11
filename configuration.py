@@ -2,6 +2,8 @@ import logging
 from os import listdir, system
 from sys import stdout
 from yaml import load, dump, FullLoader
+from rich.console import Console
+from rich.prompt import Prompt
 
 
 def execheck():
@@ -13,7 +15,7 @@ def execheck():
         return False
 
 
-class variables:
+class Variables:
     log_format = '%(asctime)s (%(filename)s): %(message)s'  # this basically says that the time and date come first,
     # error next
 
@@ -37,9 +39,6 @@ services:
 
 
 # ------------- Text Funcs ----------------#
-
-from rich.console import Console
-from rich.prompt import Prompt
 
 console = Console(color_system="256")
 
@@ -87,152 +86,155 @@ def input(prompt: str, override: str = None, default=None, password=False) -> st
             return Prompt.ask(f"{prompt}", default=default, password=password)
 
 
-# ------------------------------------------#
+# ---------- Creating The Tables in SQL ----------------- #
+def sql_tables(mycursor, mydb):
+    info("Creating Tables")
+    info("Creating 'paddigurlTest'")
+    mycursor.execute("""
+        CREATE TABLE paddigurlTest (
+            id INT AUTO_INCREMENT PRIMARY KEY,
+            name VARCHAR(256),
+            price INT
+        )
+    """)
+    print("[*] Creating 'paddigurlRemoved'")
+    mycursor.execute("""
+        CREATE TABLE paddigurlRemoved (
+            id INT AUTO_INCREMENT PRIMARY KEY,
+            name VARCHAR(256),
+            price INT
+        )
+                """)
+    print("[*] Creating 'paddigurlHashes'")
+    mycursor.execute("""
+        CREATE TABLE paddigurlHashes (
+            id INT AUTO_INCREMENT PRIMARY KEY,
+            filepath TEXT,
+            hash MEDIUMTEXT,
+            filecontents LONGTEXT
+        )
+                """)
+    mydb.commit()
+    print("[*] Success!")
+    input("(enter to continue...)")
+    system('cls')
 
 
-class commands:
+# ----------- Configuration File Options ----------------- #
 
-    def sql_tables(self, mycursor, mydb):
-        info("Creating Tables")
-        info("Creating 'paddigurlTest'")
-        mycursor.execute("""
-            CREATE TABLE paddigurlTest (
-                id INT AUTO_INCREMENT PRIMARY KEY,
-                name VARCHAR(256),
-                price INT
-            )
-        """)
-        print("[*] Creating 'paddigurlRemoved'")
-        mycursor.execute("""
-            CREATE TABLE paddigurlRemoved (
-                id INT AUTO_INCREMENT PRIMARY KEY,
-                name VARCHAR(256),
-                price INT
-            )
-                    """)
-        print("[*] Creating 'paddigurlHashes'")
-        mycursor.execute("""
-            CREATE TABLE paddigurlHashes (
-                id INT AUTO_INCREMENT PRIMARY KEY,
-                filepath TEXT,
-                hash MEDIUMTEXT,
-                filecontents LONGTEXT
-            )
-                    """)
-        mydb.commit()
-        print("[*] Success!")
-        input("(enter to continue...)")
-        system('cls')
-
-    def write_conifguration_file(self):
-        options = open('./credentials/options.yml', 'w+')
-        f = execheck()
-        ops = {
-            "check_for_updates": None,
-            "check_file_integrity": None,
-            "transactions": None,
-            "vat": None,
-            "discount": None
-        }
-        if f:
+def write_conifguration_file():
+    options = open('./credentials/options.yml', 'w+')
+    f = execheck()
+    ops = {
+        "check_for_updates": None,
+        "check_file_integrity": None,
+        "transactions": None,
+        "vat": None,
+        "discount": None
+    }
+    if f:
+        ops["check_for_updates"] = False
+    else:
+        up = input("Check For Updates On Startup? (y/n)", "bold blue", "y")
+        if up == 'y':
+            ops["check_for_updates"] = True
+        else:
             ops["check_for_updates"] = False
-        else:
-            up = input("Check For Updates On Startup? (y/n)", "bold blue", "y")
-            if up == 'y':
-                ops["check_for_updates"] = True
-            else:
-                ops["check_for_updates"] = False
-        incheck = input("Check File Integrity On Startup? (y/n)", "bold blue", "y")
-        if incheck == 'y':
-            ops["check_file_integrity"] = True
-        else:
-            ops["check_file_integrity"] = False
-        incheck = input("Transaction Mode? (y/n)", "bold blue", "n")
-        if incheck == 'y':
-            ops["transactions"] = True
-        else:
-            ops["transactions"] = False
-        incheck = input("Add VAT To Total? (y/n)", "bold blue", "n")
-        if incheck == 'y':
-            ops["vat"] = True
-        else:
-            ops["vat"] = False
-        incheck = input("Enable Discount? (y/n)", "bold blue", "y")
-        if incheck == 'y':
-            ops["discount"] = True
-        else:
-            ops["discount"] = False
-        dump(ops, options)
-        options.flush()
-        options.close()
-
-    def configuration_file_status(self, items: dict):
-        return """
-            1) Check For Updates: %s
-            2) Check File Integrity: %s
-            3) Transaction Mode: %s
-            4) VAT Enabled: %s
-            5) Discount Enabled: %s
-            ...
-            99) Done
-        """ % (items["check_for_updates"], items["check_file_integrity"], items["transactions"], items["vat"],
-               items["discount"])
-
-    def configuration_file_interface(self):
-
-        """
-        This Interface Activates Only If there are no errors
-        And You Clicked 6) on (main.py)
-
-        What makes this unique is that unlike the previous, it shows you the status of each one, and you just
-        have to toggle the options as True or False.
-
-        At the end, you'll see a for loop. That's part of an illusion used to print the same lines updated,
-        without going further down, basically Rewriting the input.
-        CURSOR_UP_ONE and ERASE_LINE are sequences I use to show the illusion.
-        """
-
-        CURSOR_UP_ONE = '\x1b[1A'
-        ERASE_LINE = '\x1b[2K'
-        dictionary = load(open("credentials/options.yml", "r"), FullLoader)
-        while True:
-            print(self.configuration_file_status(dictionary))
-            choice = input(f"What Would You Like To Update?", override="yellow")
-            match choice:
-                case "99":
-                    dump(dictionary, open("credentials/options.yml", "w"))
-                    break
-                case "1":
-                    if dictionary["check_for_updates"]:
-                        dictionary["check_for_updates"] = False
-                    else:
-                        dictionary["check_for_updates"] = True
-                case "2":
-                    if dictionary["check_file_integrity"]:
-                        dictionary["check_file_integrity"] = False
-                    else:
-                        dictionary["check_file_integrity"] = True
-                case "3":
-                    if dictionary["transactions"]:
-                        dictionary["transactions"] = False
-                    else:
-                        dictionary["transactions"] = True
-                case "4":
-                    if dictionary["vat"]:
-                        dictionary["vat"] = False
-                    else:
-                        dictionary["vat"] = True
-                case "5":
-                    if dictionary["discount"]:
-                        dictionary["discount"] = False
-                    else:
-                        dictionary["discount"] = True
-            for i in range(10):
-                stdout.write(CURSOR_UP_ONE)
-                stdout.write(ERASE_LINE)
+    incheck = input("Check File Integrity On Startup? (y/n)", "bold blue", "y")
+    if incheck == 'y':
+        ops["check_file_integrity"] = True
+    else:
+        ops["check_file_integrity"] = False
+    incheck = input("Transaction Mode? (y/n)", "bold blue", "n")
+    if incheck == 'y':
+        ops["transactions"] = True
+    else:
+        ops["transactions"] = False
+    incheck = input("Add VAT To Total? (y/n)", "bold blue", "n")
+    if incheck == 'y':
+        ops["vat"] = True
+    else:
+        ops["vat"] = False
+    incheck = input("Enable Discount? (y/n)", "bold blue", "y")
+    if incheck == 'y':
+        ops["discount"] = True
+    else:
+        ops["discount"] = False
+    dump(ops, options)
+    options.flush()
+    options.close()
 
 
-class errors(object):
+def configuration_file_status(items: dict):
+    return """
+        1) Check For Updates: %s
+        2) Check File Integrity: %s
+        3) Transaction Mode: %s
+        4) VAT Enabled: %s
+        5) Discount Enabled: %s
+        ...
+        99) Done
+    """ % (items["check_for_updates"], items["check_file_integrity"], items["transactions"], items["vat"],
+           items["discount"])
+
+
+def configuration_file_interface():
+
+    """
+    This Interface Activates Only If there are no errors
+    And You Clicked 6) on (main.py)
+
+    What makes this unique is that unlike the previous, it shows you the status of each one, and you just
+    have to toggle the options as True or False.
+
+    At the end, you'll see a for loop. That's part of an illusion used to print the same lines updated,
+    without going further down, basically Rewriting the input.
+    CURSOR_UP_ONE and ERASE_LINE are sequences I use to show the illusion.
+    """
+
+    CURSOR_UP_ONE = '\x1b[1A'
+    ERASE_LINE = '\x1b[2K'
+    dictionary = load(open("credentials/options.yml", "r"), FullLoader)
+    while True:
+        print(configuration_file_status(dictionary))
+        choice = input(f"What Would You Like To Update?", override="yellow")
+        match choice:
+            case "99":
+                dump(dictionary, open("credentials/options.yml", "w"))
+                break
+            case "1":
+                if dictionary["check_for_updates"]:
+                    dictionary["check_for_updates"] = False
+                else:
+                    dictionary["check_for_updates"] = True
+            case "2":
+                if dictionary["check_file_integrity"]:
+                    dictionary["check_file_integrity"] = False
+                else:
+                    dictionary["check_file_integrity"] = True
+            case "3":
+                if dictionary["transactions"]:
+                    dictionary["transactions"] = False
+                else:
+                    dictionary["transactions"] = True
+            case "4":
+                if dictionary["vat"]:
+                    dictionary["vat"] = False
+                else:
+                    dictionary["vat"] = True
+            case "5":
+                if dictionary["discount"]:
+                    dictionary["discount"] = False
+                else:
+                    dictionary["discount"] = True
+        for i in range(10):
+            stdout.write(CURSOR_UP_ONE)
+            stdout.write(ERASE_LINE)
+
+
+# ----------------- Custom Errors ----------------------------- #
+
+class Errors(object):
     class dockerError(Exception):
 
         def __init__(self, scenario: str, message: str):

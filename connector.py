@@ -2,12 +2,12 @@ import logging
 from hashlib import sha512
 from time import strftime
 from os import path
-from configuration import variables, input, print, info, warning, console
+from configuration import Variables, input, print, info, warning, console
 from rich.table import Table
 from pytablewriter import MarkdownTableWriter
 from pydantic import BaseModel
 
-logging.basicConfig(filename='log.txt', format=variables.log_format, datefmt='[%Y-%m-%d] [%H:%M:%S]',
+logging.basicConfig(filename='log.txt', format=Variables.log_format, datefmt='[%Y-%m-%d] [%H:%M:%S]',
                     level=logging.DEBUG)
 
 BUF_SIZE = 65536

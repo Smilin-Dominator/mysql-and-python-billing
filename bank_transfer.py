@@ -1,5 +1,5 @@
 from os import listdir
-from configuration import errors, input, warning, error, print
+from configuration import Errors, input, warning, error, print
 from verify import hash_file
 from bill_extractor import bill
 
@@ -91,4 +91,4 @@ def interface(mycursor, mydb):
         else:
             edit_bank_transactions(mycursor, mydb)
     except ValueError:
-        raise errors.valueErrors("Expected Integer")
+        raise Errors.valueErrors("Expected Integer")
