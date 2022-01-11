@@ -127,10 +127,10 @@ def verify(mycursor):
                     mkdir(dir_check[0])
                 logging.critical(f"File {fil.filepath} Has Been Deleted")
                 recover(mycursor, fil)
-            info(
-                    f"[white on black][*] Attempting Recovery....\n[/white on black]"
-                    f"[green][*] Success...[/green]"
-                )
+                info(
+                        f"[white on black][*] Attempting Recovery....\n[/white on black]"
+                        f"[green][*] Success...[/green]"
+                    )
         except Exception as e:
             logging.error(e)
 
