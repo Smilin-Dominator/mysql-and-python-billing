@@ -43,6 +43,15 @@ def recover_password(recovered: tuple[str, str, str]):
     info("Successfully Recovered Password!", "green")
 
 
+def get_hashes(cursor) -> list[HashFileRow]:
+    cursor.execute("SELECT filepath, hash FROM paddigurlHashes;")
+    results = cursor.fetchall()
+    output = []
+    for filepath, hash in results:
+        output.append(HashFileRow(filepath=filepath, filehash=hash))
+    return output
+
+
 class integrityCheck(object):
 
     def __init__(self, check_log=None, hash_array=None, password_array=None, mycursor=None):
@@ -50,14 +59,6 @@ class integrityCheck(object):
         self.scraped_content = hash_array
         self.password_array = password_array
         self.mycursor = mycursor
-
-    def hash_check(self):
-        self.mycursor.execute("SELECT filepath, hash FROM paddigurlHashes;")
-        grape = self.mycursor.fetchall()
-        out = []
-        for filepath, hash in grape:
-            out.append(HashFileRow(filepath=filepath, filehash=hash))
-        return out
 
     def hash_write(self):
         warning("Hashes Have Been Tampered With, Restoring Previous Hashes...")
@@ -104,7 +105,7 @@ def init5_security(mycursor, conf: bool):
 
     if not checkHash:
         warning("No Hash File Found...")
-        scrape = integrityCheck(mycursor=mycursor).hash_check()
+        scrape = get_hashes(mycursor)
         if not scrape:
             info("No Attempt Of Espionage...", "green")
             info("Proceeding To Make File....", "bold green")
@@ -115,7 +116,7 @@ def init5_security(mycursor, conf: bool):
             print(integrityCheck('none', scrape, 'none', mycursor).hash_write())
 
     if checkHash and conf:
-        db_rows = integrityCheck(mycursor=mycursor).hash_check()
+        db_rows = get_hashes(mycursor)
         try:
             hash_file_rows: list[dict] = loads(open('./credentials/hashes.json', 'r').read())
             for el in db_rows:
