@@ -20,7 +20,7 @@ def check_password() -> tuple or bool:
     lines = open("log.txt", "r").read().splitlines()
     output = []
     for idx, line in enumerate(lines):
-        if "Systemdump--Ignore-These" in line:
+        if "Systemdump--Ignore--These" in line:
             signature = lines[idx + 1]
             if signature == "d4ef6be5817ba1e665dacb292acb365c": # MD5 Hash of 'McDonalds_Im_Loving_It'
                 salt1 = lines[idx + 2]
