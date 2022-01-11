@@ -18,15 +18,12 @@ from sys import exit
 from time import time, strftime
 
 # Modules Needed To Be Installed By Pip
-try:
-    from mysql.connector import connect
-    from mysql.connector import Error as MSError
-    import rsa
-    from yaml import load, FullLoader
-except ModuleNotFoundError:
-    setup.main()
+from mysql.connector import connect
+from mysql.connector import Error as MSError
+import rsa
+from yaml import load, FullLoader
 
- 
+
 def startup() -> None:
     """
 
@@ -68,6 +65,7 @@ def startup() -> None:
 
     # Second Phase - Checks For SQL Credentials
     credz = init1()
+    mydb = ""
 
     try:
         # Connecting to the MariaDB Database
@@ -328,7 +326,7 @@ def init5(mycursor, conf: bool):
     """
 
     check = path.exists('bills/')
-    varTime = time.strftime("%d_of_%B")
+    varTime = strftime("%d_of_%B")
     varPath = f'./bills/{varTime}'
     checkmate = path.exists(varPath)
     checksales = path.exists('./sales_reports')
