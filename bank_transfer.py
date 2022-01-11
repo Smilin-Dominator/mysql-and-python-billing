@@ -91,4 +91,4 @@ def interface(mycursor, mydb):
         else:
             edit_bank_transactions(mycursor, mydb)
     except ValueError:
-        raise Errors.valueErrors("Expected Integer")
+        raise Errors.ValueErrors("Expected Integer")

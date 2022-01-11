@@ -88,12 +88,12 @@ def startup() -> None:
             newcheck = check.splitlines()
             for line in newcheck:
                 if line.startswith("Error"):
-                    raise Errors.dockerError("Unable To Start Docker Container...", check)
+                    raise Errors.DockerError("Unable To Start Docker Container...", check)
             else:
                 print("[*] Successful!, Rerun This File...")
                 exit(1)
         else:
-            raise Errors.mysqlConnectionError("Couldn't Connect To Database..")
+            raise Errors.MySQLConnectionError("Couldn't Connect To Database..")
 
     mycursor = mydb.cursor()
     # the 6th Option is during setup and is for Setting up tables
@@ -237,7 +237,7 @@ def main(messageOfTheSecond, mycursor, mydb):
             count += 1
             system('cls')
         except ValueError:
-            raise Errors.valueErrors("Entered A Non Integer During The Main Prompt")
+            raise Errors.ValueErrors("Entered A Non Integer During The Main Prompt")
 
 
 def init0():
