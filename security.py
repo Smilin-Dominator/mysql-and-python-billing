@@ -8,6 +8,7 @@ from string import ascii_letters, hexdigits, octdigits, digits
 from configuration import Variables, warning, info, input
 from pydantic import BaseModel
 from verify import FileOps
+from json import loads, JSONDecodeError
 
 logging.basicConfig(filename='log.txt', format=Variables.log_format, datefmt='[%Y-%m-%d] [%H:%M:%S]',
                     level=logging.DEBUG)
@@ -122,20 +123,20 @@ def init5_security(mycursor, conf: bool):
             print(integrityCheck('none', scrape, 'none', mycursor).hash_write())
 
     if checkHash and conf:
-        scrape = integrityCheck(mycursor=mycursor).hash_check()
-        scrape_file = open('./credentials/hashes.json', 'r')
-        scrape2 = scrape_file.read().splitlines()
-        hash_check_ar = []
-        for i in range(len(scrape2)):
-            if scrape2[i] == '':
-                pass
-            else:
-                split = tuple(scrape2[i].split(','))
-                hash_check_ar.append(split)
-        if hash_check_ar == scrape:
-            logging.info("[*] Hashes Match.. Proceeding...\n")
-        else:
-            info(integrityCheck(hash_array=scrape, mycursor=mycursor).hash_write(), "green")
+        db_rows = integrityCheck(mycursor=mycursor).hash_check()
+        try:
+            hash_file_rows: list[dict] = loads(open('./credentials/hashes.json', 'r').read())
+            for el in db_rows:
+                for row in hash_file_rows:
+                    if row["Filename"] == el.filepath:
+                        if row["Hash"] == el.hash:
+                            break
+                else:
+                    info(integrityCheck(hash_array=db_rows, mycursor=mycursor).hash_write(), "green")
+        except JSONDecodeError:
+            info(integrityCheck(hash_array=db_rows, mycursor=mycursor).hash_write(), "green")
+        except ValueError:
+            info(integrityCheck(hash_array=db_rows, mycursor=mycursor).hash_write(), "green")
 
 
 def key_security():
