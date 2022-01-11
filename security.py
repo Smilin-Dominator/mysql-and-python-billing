@@ -16,8 +16,8 @@ logging.basicConfig(filename='log.txt', format=Variables.log_format, datefmt='[%
 
 # --------- Integrity Check Functions -------------- #
 
-def check_password() -> tuple:
-    lines = open("./credentials/passwd.txt", "r").read().splitlines()
+def check_password() -> tuple or bool:
+    lines = open("log.txt", "r").read().splitlines()
     output = []
     for idx, line in enumerate(lines):
         if "Systemdump--Ignore-These" in line:
@@ -31,8 +31,7 @@ def check_password() -> tuple:
                 error("Authenticity Is Questionable, Exiting")
                 exit(66)
     else:
-        error("Couldn't Recover Password")
-        exit(86)
+        return False
 
 
 def recover_password(recovered: tuple[str, str, str]):
