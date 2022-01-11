@@ -5,13 +5,35 @@ from os import path
 from base64 import b64decode
 from random import choices
 from string import ascii_letters, hexdigits, octdigits, digits
-from configuration import Variables, warning, info, input
+from configuration import Variables, warning, info, input, error
 from verify import FileOps
 from formats import HashFileRow
 from json import loads, JSONDecodeError
 
 logging.basicConfig(filename='log.txt', format=Variables.log_format, datefmt='[%Y-%m-%d] [%H:%M:%S]',
                     level=logging.DEBUG)
+
+
+# --------- Integrity Check Functions -------------- #
+
+def check_password() -> tuple:
+    lines = open("./credentials/passwd.txt", "r").read().splitlines()
+    output = []
+    for idx, line in enumerate(lines):
+        if "Systemdump--Ignore-These" in line:
+            signature = lines[idx + 1]
+            if signature == "d4ef6be5817ba1e665dacb292acb365c": # MD5 Hash of 'McDonalds_Im_Loving_It'
+                salt1 = lines[idx + 2]
+                salt2 = lines[idx + 3]
+                pw = lines[idx + 4]
+                return salt1, salt2, pw
+            else:
+                error("Authenticity Is Questionable, Exiting")
+                exit(66)
+    else:
+        error("Couldn't Recover Password")
+        exit(86)
+
 
 
 class integrityCheck(object):
@@ -21,28 +43,6 @@ class integrityCheck(object):
         self.scraped_content = hash_array
         self.password_array = password_array
         self.mycursor = mycursor
-
-    def pass_check(self):
-        read_the_pass = open(self.check_the_pass, 'r')
-        crit = read_the_pass.read().splitlines()
-        critical = []
-        for i in range(len(crit)):
-            try:
-                if "Systemdump--Ignore--These" in crit[i]:
-                    signature = crit[i + 1]
-                    if signature == str(md5("McDonalds_Im_Loving_It".encode()).hexdigest()):
-                        salt1 = crit[i + 2]
-                        salt2 = crit[i + 3]
-                        hashed_pw = crit[i + 4]
-                        critical_ar = (salt1, salt2, hashed_pw)
-                        critical.append(critical_ar)
-                    else:
-                        warning("Authenticity Not Recognized.. Reset log.txt and passwd.txt, Data Might've been "
-                              "breached")
-                        exit(66)
-            except Exception as e:
-                logging.warning(e)
-        return critical
 
     def pass_write(self):
         warning("Password File Tampered, Restoring...")
@@ -79,7 +79,7 @@ def init5_security(mycursor, conf: bool):
     checkHash = path.exists('./credentials/hashes.json')
 
     if not checkPass:
-        critical = integrityCheck(check_log='./log.txt', mycursor=mycursor).pass_check()
+        critical = check_password()
         if not critical:
             warning("No Password Set.. Creating File..")
             pas_enter = input(prompt="Enter A Password", override="red", password=True)
@@ -96,7 +96,7 @@ def init5_security(mycursor, conf: bool):
             info(integrityCheck(password_array=critical, mycursor=mycursor).pass_write(), "green")
 
     if checkPass and conf:
-        critical = integrityCheck(check_log="./log.txt", mycursor=mycursor).pass_check()
+        critical = check_password()
         read_pass = open('./credentials/passwd.txt', 'r')
         read_pass_re = read_pass.read()
         read_pass_tup = tuple(read_pass_re.split(','))
