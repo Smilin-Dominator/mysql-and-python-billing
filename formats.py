@@ -2,8 +2,9 @@ from pydantic import BaseModel
 
 
 class HashFileRow(BaseModel):
-    filepath:   str
-    hash:       str
+    filepath:       str = None
+    filehash:       str = None
+    filecontents:   str = None
 
 
 class Doll(BaseModel):

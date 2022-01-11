@@ -3,7 +3,7 @@ from hashlib import sha256
 from os import path, listdir, mkdir
 from configuration import Variables, input, info, error, print
 from json import loads, dumps, JSONDecodeError
-from dataclasses import dataclass
+from formats import HashFileRow
 
 logging.basicConfig(filename='log.txt', format=Variables.log_format, datefmt='[%Y-%m-%d] [%H:%M:%S]',
                     level=logging.DEBUG)
@@ -24,12 +24,6 @@ def hash_file(filepath: str):
 
 
 # ---------Hash------------#
-@dataclass
-class File:
-    filepath: str = None
-    filehash: str = None
-    filecontents: str = None
-
 
 class FileOps:
 
@@ -82,7 +76,7 @@ def make_hash(mydb, mycursor):
                 continue
             else:
                 for f in hashfile.__get__():
-                    fil = File(f["Filename"], f["Hash"])
+                    fil = HashFileRow(filepath=f["Filename"], filehash=f["Hash"])
                     if filehash == fil.filehash:
                         info("Skipping Adding Existing Entry....")
                         break
@@ -101,7 +95,7 @@ def make_hash(mydb, mycursor):
 def verify(mycursor):
     hashfile = FileOps()
     for file in hashfile.__get__():
-        fil = File(file["Filename"], file["Hash"])
+        fil = HashFileRow(filepath=file["Filename"], filehash=file["Hash"])
         try:
             hashest = hash_file(fil.filepath)
             if hashest:

@@ -59,7 +59,7 @@ class integrityCheck(object):
         grape = self.mycursor.fetchall()
         out = []
         for filepath, hash in grape:
-            out.append(HashFileRow(filepath=filepath, hash=hash))
+            out.append(HashFileRow(filepath=filepath, filehash=hash))
         return out
 
     def hash_write(self):
@@ -67,7 +67,7 @@ class integrityCheck(object):
         logging.critical("Hashes Have Been Tampered With, Restoring Previous Hashes...")
         write_hash = FileOps()
         for _, data in enumerate(self.scraped_content):
-            write_hash.__add__(data.filepath, data.hash)
+            write_hash.__add__(data.filepath, data.filehash)
         write_hash.__write__()
         logging.info("Successfully Recovered The Hashes!")
         return "Successfully Recovered The Hashes!\n"
@@ -124,7 +124,7 @@ def init5_security(mycursor, conf: bool):
             for el in db_rows:
                 for row in hash_file_rows:
                     if row["Filename"] == el.filepath:
-                        if row["Hash"] == el.hash:
+                        if row["Hash"] == el.filehash:
                             break
                 else:
                     info(integrityCheck(hash_array=db_rows, mycursor=mycursor).hash_write(), "green")
