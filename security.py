@@ -6,17 +6,12 @@ from base64 import b64decode
 from random import choices
 from string import ascii_letters, hexdigits, octdigits, digits
 from configuration import Variables, warning, info, input
-from pydantic import BaseModel
 from verify import FileOps
+from formats import HashFileRow
 from json import loads, JSONDecodeError
 
 logging.basicConfig(filename='log.txt', format=Variables.log_format, datefmt='[%Y-%m-%d] [%H:%M:%S]',
                     level=logging.DEBUG)
-
-
-class HashFileRow(BaseModel):
-    filepath: str
-    hash: str
 
 
 class integrityCheck(object):
