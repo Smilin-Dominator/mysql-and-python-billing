@@ -92,6 +92,17 @@ def make_hash(mydb, mycursor):
 
 
 # -------Verify------------#
+def recover(mycursor, file: HashFileRow):
+    mycursor.execute(f"SELECT filecontents FROM paddigurlHashes WHERE `hash` = '{file.filehash}';")
+    attempted_recovery = mycursor.fetchall()
+    recovered = ''.join(attempted_recovery[0])
+    recover_write = open(file.filepath, 'w')
+    recover_write.write(recovered)
+    recover_write.flush()
+    recover_write.close()
+    logging.info("Successful Recovery...")
+
+
 def verify(mycursor):
     hashfile = FileOps()
     for file in hashfile.__get__():
@@ -106,14 +117,7 @@ def verify(mycursor):
                     error(f"File {fil.filepath} Has Been Tampered")
                     logging.critical(f"File {fil.filepath} Has Been Tampered")
                     info(f"Recovering Data...")
-                    mycursor.execute(f"SELECT filecontents FROM paddigurlHashes WHERE `hash` = '{fil.filehash}';")
-                    attempted_recovery = mycursor.fetchall()
-                    recovered = ''.join(attempted_recovery[0])
-                    recover_write = open(fil.filepath, 'w')
-                    recover_write.write(recovered)
-                    recover_write.flush()
-                    recover_write.close()
-                    logging.info("Successful Recovery...")
+                    recover(mycursor, fil)
                     info(f"Success...", "green")
             else:
                 error(f"File {fil.filepath} Has Been Deleted....", override="red")
@@ -122,15 +126,8 @@ def verify(mycursor):
                     error(f"Entire Directory Deleted... Restoring..")
                     mkdir(dir_check[0])
                 logging.critical(f"File {fil.filepath} Has Been Deleted")
-                mycursor.execute(f"SELECT filecontents FROM paddigurlHashes WHERE `hash` = '{fil.filehash}';")
-                attempted_recovery = mycursor.fetchall()
-                recovered = ''.join(attempted_recovery[0])
-                recover_write = open(fil.filepath, 'w')
-                recover_write.write(recovered)
-                recover_write.flush()
-                recover_write.close()
-                logging.info("Successful Recovery...")
-                info(
+                recover(mycursor, fil)
+            info(
                     f"[white on black][*] Attempting Recovery....\n[/white on black]"
                     f"[green][*] Success...[/green]"
                 )
