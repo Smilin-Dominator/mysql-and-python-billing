@@ -52,6 +52,15 @@ def get_hashes(cursor) -> list[HashFileRow]:
     return output
 
 
+def write_hashes(files: list[HashFileRow]):
+    warning("The Hashes Have Been Tampered With! Restoring the previous hashes...")
+    writer = FileOps()
+    for file in files:
+        writer.__add__(file.filepath, file.filehash)
+    writer.__write__()
+    info("Successfully Recovered The Hashes!")
+
+
 class integrityCheck(object):
 
     def __init__(self, check_log=None, hash_array=None, password_array=None, mycursor=None):
@@ -59,16 +68,6 @@ class integrityCheck(object):
         self.scraped_content = hash_array
         self.password_array = password_array
         self.mycursor = mycursor
-
-    def hash_write(self):
-        warning("Hashes Have Been Tampered With, Restoring Previous Hashes...")
-        logging.critical("Hashes Have Been Tampered With, Restoring Previous Hashes...")
-        write_hash = FileOps()
-        for _, data in enumerate(self.scraped_content):
-            write_hash.__add__(data.filepath, data.filehash)
-        write_hash.__write__()
-        logging.info("Successfully Recovered The Hashes!")
-        return "Successfully Recovered The Hashes!\n"
 
 
 def init5_security(mycursor, conf: bool):
@@ -113,7 +112,7 @@ def init5_security(mycursor, conf: bool):
             write_hi.write('\n')
             write_hi.close()
         else:
-            print(integrityCheck('none', scrape, 'none', mycursor).hash_write())
+            write_hashes(scrape)
 
     if checkHash and conf:
         db_rows = get_hashes(mycursor)
@@ -125,11 +124,11 @@ def init5_security(mycursor, conf: bool):
                         if row["Hash"] == el.filehash:
                             break
                 else:
-                    info(integrityCheck(hash_array=db_rows, mycursor=mycursor).hash_write(), "green")
+                    write_hashes(db_rows)
         except JSONDecodeError:
-            info(integrityCheck(hash_array=db_rows, mycursor=mycursor).hash_write(), "green")
+            write_hashes(db_rows)
         except ValueError:
-            info(integrityCheck(hash_array=db_rows, mycursor=mycursor).hash_write(), "green")
+            write_hashes(db_rows)
 
 
 def key_security():
