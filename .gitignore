@@ -2,7 +2,7 @@
 __pycache__
 *.txt
 log.txt
-bills
+bills/
 !requirements.txt
 !README.md
 *.pem
@@ -14,3 +14,5 @@ build
 *.spec
 *.yml
 !.github
+venv/
+sales_reports/
