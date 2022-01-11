@@ -35,6 +35,14 @@ def check_password() -> tuple:
         exit(86)
 
 
+def recover_password(recovered: tuple[str, str, str]):
+    warning("Password File has been Tampered With! Restoring...")
+    with open("./credentials/passwd.txt", "w") as fil:
+        fil.write(','.join(recovered))
+        fil.flush()
+        fil.close()
+    info("Successfully Recovered Password!", "green")
+
 
 class integrityCheck(object):
 
@@ -43,16 +51,6 @@ class integrityCheck(object):
         self.scraped_content = hash_array
         self.password_array = password_array
         self.mycursor = mycursor
-
-    def pass_write(self):
-        warning("Password File Tampered, Restoring...")
-        logging.critical("Password File Tampered, Restoring...")
-        pas = open('./credentials/passwd.txt', 'w+')
-        pas.write(f"{self.password_array[0][0]},{self.password_array[0][1]},{self.password_array[0][2]}")
-        pas.flush()
-        pas.close()
-        logging.info("Successfully Recovered Password!")
-        return "Successfully Recovered Password!"
 
     def hash_check(self):
         self.mycursor.execute("SELECT filepath, hash FROM paddigurlHashes;")
@@ -93,17 +91,17 @@ def init5_security(mycursor, conf: bool):
             pas.write(f'{salt1},{salt2},{hashpass}')
             info("Success!", "green")
         else:
-            info(integrityCheck(password_array=critical, mycursor=mycursor).pass_write(), "green")
+            recover_password(critical)
 
     if checkPass and conf:
         critical = check_password()
         read_pass = open('./credentials/passwd.txt', 'r')
         read_pass_re = read_pass.read()
         read_pass_tup = tuple(read_pass_re.split(','))
-        if read_pass_tup == (critical[0][0], critical[0][1], critical[0][2]):
+        if read_pass_tup == (critical[0], critical[1], critical[2]):
             logging.info("[*] Password Check Successful.. Proceeding..")
         else:
-            print(integrityCheck(password_array=critical, mycursor=mycursor).pass_write())
+            recover_password(critical)
 
     if not checkHash:
         warning("No Hash File Found...")
