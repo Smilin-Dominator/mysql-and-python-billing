@@ -61,14 +61,7 @@ def write_hashes(files: list[HashFileRow]):
     info("Successfully Recovered The Hashes!")
 
 
-class integrityCheck(object):
-
-    def __init__(self, check_log=None, hash_array=None, password_array=None, mycursor=None):
-        self.check_the_pass = check_log
-        self.scraped_content = hash_array
-        self.password_array = password_array
-        self.mycursor = mycursor
-
+# --------- Main Function ---------------------- #
 
 def init5_security(mycursor, conf: bool):
 
