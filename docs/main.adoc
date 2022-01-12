@@ -5,7 +5,8 @@ Hello everyone, I'm Devisha. And this is MySQL and Python Billing! (drumroll)
 == History
 I commited the foundation when I was 14; On the 28th of April, 2021 at 9.54.49 AM. The first version of the program
 has so many flaws, that I can't even explain them. Just use `git checkout (commit)` and run the program to see for
-yourself.
+yourself. But over time, I improved it, and slowly, it became the masterpiece it is today. The most important changes
+are documented in the log section of the docs.
 
 
 == Configuration Options

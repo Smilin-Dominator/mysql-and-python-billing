@@ -48,3 +48,9 @@ whether to use TOML (Tom's Obvious Minimal Language), but then decided that TOML
 is not what I'm looking for, since the machine is the one that interacts with this file) than powerful. I could've
 used YAML, but JSON looked nicer (I know, bad excuse, but hey, my program). And why not XML? Go look at an XML
 document and then speak to me. So now the hashes are stored in a JSON File (credentials/hashes.json)
+
+== 12th January 2022
+Within the span of yesterday and today, alot of things happened to the code. I merged a branch called 'code-clean' which
+I used to clean the code and look for bugs and all. And I found fixes for issues that've been there for so long, yet
+I never know existed. I also optimized the code and rewrote a few functions. At the time of writing, I transferred
+the docs from Markdown to Asciidoc and am about to merge that pull request tomorrow.
