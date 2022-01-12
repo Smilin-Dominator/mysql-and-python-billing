@@ -1,5 +1,5 @@
 from os import listdir
-from configuration import errors, input, warning, error, print
+from configuration import Errors, input, warning, error, print
 from verify import hash_file
 from bill_extractor import bill
 
@@ -19,7 +19,9 @@ def view_bank_transactions():
                     has_or_not = b.transferred()
                     name = b.customer()
                     time = b.time()
-                    if has_or_not:
+                    if has_or_not is None:
+                        pass
+                    elif has_or_not:
                         files.append(file_prefix % (d, file))
                         if name in combined:
                             name = name + " - " + time
@@ -31,8 +33,6 @@ def view_bank_transactions():
                             name = name + " - " + time
                         has_not.append(name)
                         combined.append(name)
-                    elif has_or_not is None:
-                        pass
     print(f"[green]Transferred:[/green]")
     for name in has:
         print(f"[blue]\t%s[/blue]" % name)
@@ -91,4 +91,4 @@ def interface(mycursor, mydb):
         else:
             edit_bank_transactions(mycursor, mydb)
     except ValueError:
-        raise errors.valueErrors("Expected Integer")
+        raise Errors.ValueErrors("Expected Integer")

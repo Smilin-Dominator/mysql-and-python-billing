@@ -3,7 +3,8 @@
 # Don't even think of stealing my code!
 
 # File Imports
-from configuration import variables, commands, errors, execheck, print, info, input
+from configuration import Variables, Errors, execheck, print, info, input, sql_tables, \
+    write_conifguration_file, configuration_file_interface
 from security import init5_security, key_security
 import bank_transfer
 import setup
@@ -17,15 +18,12 @@ from sys import exit
 from time import time, strftime
 
 # Modules Needed To Be Installed By Pip
-try:
-    from mysql.connector import connect
-    from mysql.connector import Error as MSError
-    import rsa
-    from yaml import load, FullLoader
-except ModuleNotFoundError:
-    setup.main()
+from mysql.connector import connect
+from mysql.connector import Error as MSError
+import rsa
+from yaml import load, FullLoader
 
- 
+
 def startup() -> None:
     """
 
@@ -62,11 +60,12 @@ def startup() -> None:
     # First Boot - Checks For Log.txt
     init0()
 
-    logging.basicConfig(filename='log.txt', format=variables.log_format, datefmt='[%Y-%m-%d] [%H:%M:%S]',
+    logging.basicConfig(filename='log.txt', format=Variables.log_format, datefmt='[%Y-%m-%d] [%H:%M:%S]',
                         level=logging.DEBUG)
 
     # Second Phase - Checks For SQL Credentials
     credz = init1()
+    mydb = ""
 
     try:
         # Connecting to the MariaDB Database
@@ -87,18 +86,18 @@ def startup() -> None:
             newcheck = check.splitlines()
             for line in newcheck:
                 if line.startswith("Error"):
-                    raise errors.dockerError("Unable To Start Docker Container...", check)
+                    raise Errors.DockerError("Unable To Start Docker Container...", check)
             else:
                 print("[*] Successful!, Rerun This File...")
                 exit(1)
         else:
-            raise errors.mysqlConnectionError("Couldn't Connect To Database..")
+            raise Errors.MySQLConnectionError("Couldn't Connect To Database..")
 
     mycursor = mydb.cursor()
     # the 6th Option is during setup and is for Setting up tables
     if len(credz) == 6:
         if credz[5] == 'y':
-            commands().sql_tables(mycursor, mydb)
+            sql_tables(mycursor, mydb)
     else:
         system('cls')
 
@@ -126,7 +125,7 @@ def read_config(mycursor, count):
         try:
             # Third Phase - Checks For Updates
             if sum(1 for _ in open('./credentials/options.yml')) < 5:
-                commands().write_conifguration_file()
+                write_conifguration_file()
             config = load(open('./credentials/options.yml', 'r'), FullLoader)
             if config["check_for_updates"] and count == 0:
                 init3()
@@ -152,12 +151,12 @@ def read_config(mycursor, count):
             # This triggers if its a first time setup or if the file is deleted
             logging.warning(e)
             print("[!] Config File Not Found!\n[*] Generating...")
-            commands().write_conifguration_file()
+            write_conifguration_file()
         except KeyError as e:
             # This triggers is there's a missing value, field, etc..
             logging.error(e)
             print("[!] Not Enough Arguments!\n[*] Regenerating...")
-            commands().write_conifguration_file()
+            write_conifguration_file()
     return [transactions, vat, discount]
 
 
@@ -228,7 +227,7 @@ def main(messageOfTheSecond, mycursor, mydb):
                     import verify
                     verify.main(mydb, mycursor)
                 case '6':
-                    commands().configuration_file_interface()
+                    configuration_file_interface()
                 case '7':
                     if transactions:
                         bank_transfer.interface(mycursor, mydb)
@@ -236,7 +235,7 @@ def main(messageOfTheSecond, mycursor, mydb):
             count += 1
             system('cls')
         except ValueError:
-            raise errors.valueErrors("Entered A Non Integer During The Main Prompt")
+            raise Errors.ValueErrors("Entered A Non Integer During The Main Prompt")
 
 
 def init0():
@@ -327,7 +326,7 @@ def init5(mycursor, conf: bool):
     """
 
     check = path.exists('bills/')
-    varTime = time.strftime("%d_of_%B")
+    varTime = strftime("%d_of_%B")
     varPath = f'./bills/{varTime}'
     checkmate = path.exists(varPath)
     checksales = path.exists('./sales_reports')

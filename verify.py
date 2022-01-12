@@ -1,11 +1,11 @@
 import logging
 from hashlib import sha256
 from os import path, listdir, mkdir
-from configuration import variables, input, info, error, print
+from configuration import Variables, input, info, error, print
 from json import loads, dumps, JSONDecodeError
-from dataclasses import dataclass
+from formats import HashFileRow
 
-logging.basicConfig(filename='log.txt', format=variables.log_format, datefmt='[%Y-%m-%d] [%H:%M:%S]',
+logging.basicConfig(filename='log.txt', format=Variables.log_format, datefmt='[%Y-%m-%d] [%H:%M:%S]',
                     level=logging.DEBUG)
 
 
@@ -24,12 +24,6 @@ def hash_file(filepath: str):
 
 
 # ---------Hash------------#
-@dataclass
-class File:
-    filepath: str = None
-    filehash: str = None
-    filecontents: str = None
-
 
 class FileOps:
 
@@ -82,7 +76,7 @@ def make_hash(mydb, mycursor):
                 continue
             else:
                 for f in hashfile.__get__():
-                    fil = File(f["Filename"], f["Hash"])
+                    fil = HashFileRow(filepath=f["Filename"], filehash=f["Hash"])
                     if filehash == fil.filehash:
                         info("Skipping Adding Existing Entry....")
                         break
@@ -98,10 +92,21 @@ def make_hash(mydb, mycursor):
 
 
 # -------Verify------------#
+def recover(mycursor, file: HashFileRow):
+    mycursor.execute(f"SELECT filecontents FROM paddigurlHashes WHERE `hash` = '{file.filehash}';")
+    attempted_recovery = mycursor.fetchall()
+    recovered = ''.join(attempted_recovery[0])
+    recover_write = open(file.filepath, 'w')
+    recover_write.write(recovered)
+    recover_write.flush()
+    recover_write.close()
+    logging.info("Successful Recovery...")
+
+
 def verify(mycursor):
     hashfile = FileOps()
     for file in hashfile.__get__():
-        fil = File(file["Filename"], file["Hash"])
+        fil = HashFileRow(filepath=file["Filename"], filehash=file["Hash"])
         try:
             hashest = hash_file(fil.filepath)
             if hashest:
@@ -112,14 +117,7 @@ def verify(mycursor):
                     error(f"File {fil.filepath} Has Been Tampered")
                     logging.critical(f"File {fil.filepath} Has Been Tampered")
                     info(f"Recovering Data...")
-                    mycursor.execute(f"SELECT filecontents FROM paddigurlHashes WHERE `hash` = '{fil.filehash}';")
-                    attempted_recovery = mycursor.fetchall()
-                    recovered = ''.join(attempted_recovery[0])
-                    recover_write = open(fil.filepath, 'w')
-                    recover_write.write(recovered)
-                    recover_write.flush()
-                    recover_write.close()
-                    logging.info("Successful Recovery...")
+                    recover(mycursor, fil)
                     info(f"Success...", "green")
             else:
                 error(f"File {fil.filepath} Has Been Deleted....", override="red")
@@ -128,18 +126,11 @@ def verify(mycursor):
                     error(f"Entire Directory Deleted... Restoring..")
                     mkdir(dir_check[0])
                 logging.critical(f"File {fil.filepath} Has Been Deleted")
-                mycursor.execute(f"SELECT filecontents FROM paddigurlHashes WHERE `hash` = '{fil.filehash}';")
-                attempted_recovery = mycursor.fetchall()
-                recovered = ''.join(attempted_recovery[0])
-                recover_write = open(fil.filepath, 'w')
-                recover_write.write(recovered)
-                recover_write.flush()
-                recover_write.close()
-                logging.info("Successful Recovery...")
+                recover(mycursor, fil)
                 info(
-                    f"[white on black][*] Attempting Recovery....\n[/white on black]"
-                    f"[green][*] Success...[/green]"
-                )
+                        f"[white on black][*] Attempting Recovery....\n[/white on black]"
+                        f"[green][*] Success...[/green]"
+                    )
         except Exception as e:
             logging.error(e)
 

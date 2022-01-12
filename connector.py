@@ -1,13 +1,15 @@
 import logging
 from hashlib import sha512
-from time import strftime
 from os import path
-from configuration import variables, input, print, info, warning, console
-from rich.table import Table
-from pytablewriter import MarkdownTableWriter
-from pydantic import BaseModel
+from time import strftime
 
-logging.basicConfig(filename='log.txt', format=variables.log_format, datefmt='[%Y-%m-%d] [%H:%M:%S]',
+from pytablewriter import MarkdownTableWriter
+from rich.table import Table
+
+from configuration import Variables, input, print, info, warning, console
+from formats import Doll
+
+logging.basicConfig(filename='log.txt', format=Variables.log_format, datefmt='[%Y-%m-%d] [%H:%M:%S]',
                     level=logging.DEBUG)
 
 BUF_SIZE = 65536
@@ -27,21 +29,6 @@ varTime = strftime("%d_of_%B")
 
 
 # --------------------------------------- Bill Related Functions ---------------------------------------#
-class Doll(BaseModel):
-    Name: str
-    Price: int
-    Quantity: int = None
-    Total: int = None
-    old_quantity: int = None
-    old_total: int = None
-
-    def set_old_quantity(self):
-        self.old_total = self.Total
-        self.old_quantity = self.Quantity
-
-    def to_tuple(self) -> tuple[str | int, ...]:
-        return tuple([self.Name, self.Price, self.Quantity, self.Total])
-
 
 class printingBills(object):
 

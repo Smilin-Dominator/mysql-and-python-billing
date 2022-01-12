@@ -2,19 +2,17 @@ from subprocess import run, DEVNULL, SubprocessError
 from time import sleep
 from os import path
 from base64 import b64encode
-from configuration import commands, variables, console, print, input, warning, error
+from security import create_new_passsword
+from configuration import Variables, console, print, input, warning, error, write_conifguration_file
 
 
 def main():
-    print("[bold green]Welcome to my Program! Setting Up Config File")
-    commands().write_conifguration_file()
-    with console.status("[bold green]Initializing..", spinner='dots12') as _:
-        _ if run("python -m pip install -r requirements.txt", stdout=DEVNULL, stderr=DEVNULL, shell=True).returncode == 0 else error(msg="While Installing Pip Packages")
-        console.log("Environment Setup Complete")
-        sleep(3)
-        console.log("Created Log.txt")
-        sleep(3)
-        console.log("All Tasks Successful!")
+    print("[bold green]Welcome to 'mysql_and_python_billing'; Written In Python by the One and Only Devisha "
+          "Padmaperuma![/bold green]")
+    print("\nSetting Up The Configuration File", override="tan")
+    write_conifguration_file()
+    print("\nCreating The New Password", override="tan")
+    create_new_passsword()
 
 
 def sql(logging, rsa):
@@ -32,7 +30,7 @@ def sql(logging, rsa):
                 host = '127.0.0.1'
                 with open("docker-compose.yml", 'w') as docker:
                     port = int(port)
-                    dc = variables.docker_compose % (user, password)
+                    dc = Variables.docker_compose % (user, password)
                     docker.write(dc)
                     docker.close()
                 run("docker-compose up -d", shell=True)
@@ -46,31 +44,35 @@ def sql(logging, rsa):
             password = input("Password", "bold red", password=True)
             db = input("Database", "bold red")
         with console.status("[bold green]Registering Credentials..", spinner='dots11') as _:
-            pubKey, privKey = rsa.newkeys(1096)
-            sleep(2)
-            console.log("Generated Keys....")
-            with open('./credentials/public.pem', 'w') as pop:
-                pubStr = pubKey.save_pkcs1()
-                pop.write(pubStr.decode('utf-8'))
-                encoded = b64encode(pubStr)
-                logging.info(f"Binary_Data:{encoded}")
-                pop.close()
-            sleep(2)
-            console.log("Wrote Public Key..")
-            with open('./credentials/private.pem', 'w') as pop:
-                privStr = privKey.save_pkcs1()
-                pop.write(privStr.decode('utf-8'))
-                encoded = b64encode(privStr)
-                logging.info(f"Binary-Data:{encoded}")
-                pop.close()
-            sleep(2)
-            console.log("Wrote Private Key..")
-            logging.info("Wrote RSA Keys")
+            if (not path.exists("./credentials/public.pem")) and (not path.exists("./credentials/private.pem")):
+                pubKey, privKey = rsa.newkeys(1096)
+                sleep(2)
+                console.log("Generated Keys....")
+                with open('./credentials/public.pem', 'w') as pop:
+                    pubStr = pubKey.save_pkcs1()
+                    pop.write(pubStr.decode('utf-8'))
+                    encoded = b64encode(pubStr)
+                    logging.info(f"Binary_Data:{encoded}")
+                    pop.close()
+                sleep(2)
+                console.log("Wrote Public Key..")
+                with open('./credentials/private.pem', 'w') as pop:
+                    privStr = privKey.save_pkcs1()
+                    pop.write(privStr.decode('utf-8'))
+                    encoded = b64encode(privStr)
+                    logging.info(f"Binary-Data:{encoded}")
+                    pop.close()
+                sleep(2)
+                console.log("Wrote Private Key..")
+                logging.info("Wrote RSA Keys")
+            else:
+                pubKey = rsa.PublicKey.load_pkcs1(open("./credentials/public.pem", 'rb').read())
+                console.log("Not Generating Keys As They Already Exist!")
             st = f"{host},{user},{port},{password},{db}".encode()
             with open('./credentials/mysql.txt', 'wb+') as mcdonalds:
                 var = rsa.encrypt(st, pubKey)
                 mcdonalds.write(var)
-            sleep(2)
+            sleep(1)
             console.log("Successfully Encrypted Credentials")
         if create_container == 'n':
             conf = input("Create Tables? (y/n)", "blue")

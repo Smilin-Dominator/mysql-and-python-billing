@@ -5,77 +5,77 @@ from os import path
 from base64 import b64decode
 from random import choices
 from string import ascii_letters, hexdigits, octdigits, digits
-from configuration import variables, warning, info, input
-from pydantic import BaseModel
+from configuration import Variables, warning, info, input, error
 from verify import FileOps
+from formats import HashFileRow
+from json import loads, JSONDecodeError
 
-logging.basicConfig(filename='log.txt', format=variables.log_format, datefmt='[%Y-%m-%d] [%H:%M:%S]',
+logging.basicConfig(filename='log.txt', format=Variables.log_format, datefmt='[%Y-%m-%d] [%H:%M:%S]',
                     level=logging.DEBUG)
 
 
-class HashFileRow(BaseModel):
-    filepath: str
-    hash: str
+# --------- Integrity Check Functions -------------- #
+
+def create_new_passsword() -> None:
+    pas_enter = input(prompt="Enter A Password", override="red", password=True)
+    pas = open('./credentials/passwd.txt', 'w+')
+    salt1 = ''.join(choices(ascii_letters + hexdigits, k=95))
+    salt2 = ''.join(choices(digits + octdigits, k=95))
+    pass_write = str(salt1 + pas_enter + salt2)
+    hashpass = sha512(pass_write.encode()).hexdigest()
+    signature = md5("McDonalds_Im_Loving_It".encode()).hexdigest()
+    enc = "\n".join([signature, salt1, salt2, hashpass])
+    logging.info(f"Systemdump--Ignore--These\n{enc}")
+    pas.write(','.join([salt1, salt2, hashpass]))
+    info("Success!", "green")
 
 
-class integrityCheck(object):
+def check_password() -> tuple or bool:
+    lines = open("log.txt", "r").read().splitlines()
+    output = []
+    for idx, line in enumerate(lines):
+        if "Systemdump--Ignore--These" in line:
+            signature = lines[idx + 1]
+            if signature == "d4ef6be5817ba1e665dacb292acb365c": # MD5 Hash of 'McDonalds_Im_Loving_It'
+                salt1 = lines[idx + 2]
+                salt2 = lines[idx + 3]
+                pw = lines[idx + 4]
+                return salt1, salt2, pw
+            else:
+                error("Authenticity Is Questionable, Exiting")
+                exit(66)
+    else:
+        return False
 
-    def __init__(self, check_log=None, hash_array=None, password_array=None, mycursor=None):
-        self.check_the_pass = check_log
-        self.scraped_content = hash_array
-        self.password_array = password_array
-        self.mycursor = mycursor
 
-    def pass_check(self):
-        read_the_pass = open(self.check_the_pass, 'r')
-        crit = read_the_pass.read().splitlines()
-        critical = []
-        for i in range(len(crit)):
-            try:
-                if "Systemdump--Ignore--These" in crit[i]:
-                    signature = crit[i + 1]
-                    if signature == str(md5("McDonalds_Im_Loving_It".encode()).hexdigest()):
-                        salt1 = crit[i + 2]
-                        salt2 = crit[i + 3]
-                        hashed_pw = crit[i + 4]
-                        critical_ar = (salt1, salt2, hashed_pw)
-                        critical.append(critical_ar)
-                    else:
-                        warning("Authenticity Not Recognized.. Reset log.txt and passwd.txt, Data Might've been "
-                              "breached")
-                        exit(66)
-            except Exception as e:
-                logging.warning(e)
-        return critical
+def recover_password(recovered: tuple[str, str, str]):
+    warning("Password File has been Tampered With! Restoring...")
+    with open("./credentials/passwd.txt", "w") as fil:
+        fil.write(','.join(recovered))
+        fil.flush()
+        fil.close()
+    info("Successfully Recovered Password!", "green")
 
-    def pass_write(self):
-        warning("Password File Tampered, Restoring...")
-        logging.critical("Password File Tampered, Restoring...")
-        pas = open('./credentials/passwd.txt', 'w+')
-        pas.write(f"{self.password_array[0][0]},{self.password_array[0][1]},{self.password_array[0][2]}")
-        pas.flush()
-        pas.close()
-        logging.info("Successfully Recovered Password!")
-        return "Successfully Recovered Password!"
 
-    def hash_check(self):
-        self.mycursor.execute("SELECT filepath, hash FROM paddigurlHashes;")
-        grape = self.mycursor.fetchall()
-        out = []
-        for filepath, hash in grape:
-            out.append(HashFileRow(filepath=filepath, hash=hash))
-        return out
+def get_hashes(cursor) -> list[HashFileRow]:
+    cursor.execute("SELECT filepath, hash FROM paddigurlHashes;")
+    results = cursor.fetchall()
+    output = []
+    for filepath, hash in results:
+        output.append(HashFileRow(filepath=filepath, filehash=hash))
+    return output
 
-    def hash_write(self):
-        warning("Hashes Have Been Tampered With, Restoring Previous Hashes...")
-        logging.critical("Hashes Have Been Tampered With, Restoring Previous Hashes...")
-        write_hash = FileOps()
-        for _, data in enumerate(self.scraped_content):
-            write_hash.__add__(data.filepath, data.hash)
-        write_hash.__write__()
-        logging.info("Successfully Recovered The Hashes!")
-        return "Successfully Recovered The Hashes!\n"
 
+def write_hashes(files: list[HashFileRow]):
+    warning("The Hashes Have Been Tampered With! Restoring the previous hashes...")
+    writer = FileOps()
+    for file in files:
+        writer.__add__(file.filepath, file.filehash)
+    writer.__write__()
+    info("Successfully Recovered The Hashes!")
+
+
+# --------- Main Function ---------------------- #
 
 def init5_security(mycursor, conf: bool):
 
@@ -83,35 +83,26 @@ def init5_security(mycursor, conf: bool):
     checkHash = path.exists('./credentials/hashes.json')
 
     if not checkPass:
-        critical = integrityCheck(check_log='./log.txt', mycursor=mycursor).pass_check()
+        critical = check_password()
         if not critical:
             warning("No Password Set.. Creating File..")
-            pas_enter = input(prompt="Enter A Password", override="red", password=True)
-            pas = open('./credentials/passwd.txt', 'w+')
-            salt1 = ''.join(choices(ascii_letters + hexdigits, k=95))
-            salt2 = ''.join(choices(digits + octdigits, k=95))
-            pass_write = str(salt1 + pas_enter + salt2)
-            hashpass = sha512(pass_write.encode()).hexdigest()
-            signature = md5("McDonalds_Im_Loving_It".encode()).hexdigest()
-            logging.info(f"Systemdump--Ignore--These\n{signature}\n{salt1}\n{salt2}\n{hashpass}")
-            pas.write(f'{salt1},{salt2},{hashpass}')
-            info("Success!", "green")
+            create_new_passsword()
         else:
-            info(integrityCheck(password_array=critical, mycursor=mycursor).pass_write(), "green")
+            recover_password(critical)
 
     if checkPass and conf:
-        critical = integrityCheck(check_log="./log.txt", mycursor=mycursor).pass_check()
+        critical = check_password()
         read_pass = open('./credentials/passwd.txt', 'r')
         read_pass_re = read_pass.read()
         read_pass_tup = tuple(read_pass_re.split(','))
-        if read_pass_tup == (critical[0][0], critical[0][1], critical[0][2]):
+        if read_pass_tup == (critical[0], critical[1], critical[2]):
             logging.info("[*] Password Check Successful.. Proceeding..")
         else:
-            print(integrityCheck(password_array=critical, mycursor=mycursor).pass_write())
+            recover_password(critical)
 
     if not checkHash:
         warning("No Hash File Found...")
-        scrape = integrityCheck(mycursor=mycursor).hash_check()
+        scrape = get_hashes(mycursor)
         if not scrape:
             info("No Attempt Of Espionage...", "green")
             info("Proceeding To Make File....", "bold green")
@@ -119,23 +110,23 @@ def init5_security(mycursor, conf: bool):
             write_hi.write('\n')
             write_hi.close()
         else:
-            print(integrityCheck('none', scrape, 'none', mycursor).hash_write())
+            write_hashes(scrape)
 
     if checkHash and conf:
-        scrape = integrityCheck(mycursor=mycursor).hash_check()
-        scrape_file = open('./credentials/hashes.json', 'r')
-        scrape2 = scrape_file.read().splitlines()
-        hash_check_ar = []
-        for i in range(len(scrape2)):
-            if scrape2[i] == '':
-                pass
-            else:
-                split = tuple(scrape2[i].split(','))
-                hash_check_ar.append(split)
-        if hash_check_ar == scrape:
-            logging.info("[*] Hashes Match.. Proceeding...\n")
-        else:
-            info(integrityCheck(hash_array=scrape, mycursor=mycursor).hash_write(), "green")
+        db_rows = get_hashes(mycursor)
+        try:
+            hash_file_rows: list[dict] = loads(open('./credentials/hashes.json', 'r').read())
+            for el in db_rows:
+                for row in hash_file_rows:
+                    if row["Filename"] == el.filepath:
+                        if row["Hash"] == el.filehash:
+                            break
+                else:
+                    write_hashes(db_rows)
+        except JSONDecodeError:
+            write_hashes(db_rows)
+        except ValueError:
+            write_hashes(db_rows)
 
 
 def key_security():
