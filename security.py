@@ -79,8 +79,9 @@ def init5_security(mycursor, conf: bool):
             pass_write = str(salt1 + pas_enter + salt2)
             hashpass = sha512(pass_write.encode()).hexdigest()
             signature = md5("McDonalds_Im_Loving_It".encode()).hexdigest()
-            logging.info(f"Systemdump--Ignore--These\n{signature}\n{salt1}\n{salt2}\n{hashpass}")
-            pas.write(f'{salt1},{salt2},{hashpass}')
+            enc = "\n".join([signature, salt1, salt2, hashpass])
+            logging.info(f"Systemdump--Ignore--These\n{enc}")
+            pas.write(','.join([salt1, salt2, hashpass]))
             info("Success!", "green")
         else:
             recover_password(critical)
