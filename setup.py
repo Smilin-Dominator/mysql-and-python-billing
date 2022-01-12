@@ -7,8 +7,11 @@ from configuration import Variables, console, print, input, warning, error, writ
 
 
 def main():
-    print("[bold green]Welcome to my Program! Setting Up Config File")
+    print("[bold green]Welcome to 'mysql_and_python_billing'; Written In Python by the One and Only Devisha "
+          "Padmaperuma![/bold green]")
+    print("\nSetting Up The Configuration File", override="tan")
     write_conifguration_file()
+    print("\nCreating The New Password", override="tan")
     create_new_passsword()
     with console.status("[bold green]Initializing..", spinner='dots12') as _:
         console.log("Created Log.txt")
