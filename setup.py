@@ -2,18 +2,19 @@ from subprocess import run, DEVNULL, SubprocessError
 from time import sleep
 from os import path
 from base64 import b64encode
+from security import create_new_passsword
 from configuration import Variables, console, print, input, warning, error, write_conifguration_file
 
 
 def main():
     print("[bold green]Welcome to my Program! Setting Up Config File")
     write_conifguration_file()
+    create_new_passsword()
     with console.status("[bold green]Initializing..", spinner='dots12') as _:
-        _ if run("python -m pip install -r requirements.txt", stdout=DEVNULL, stderr=DEVNULL, shell=True).returncode == 0 else error(msg="While Installing Pip Packages")
-        console.log("Environment Setup Complete")
-        sleep(3)
         console.log("Created Log.txt")
-        sleep(3)
+        sleep(1)
+        console.log("Created New Password")
+        sleep(1)
         console.log("All Tasks Successful!")
 
 
