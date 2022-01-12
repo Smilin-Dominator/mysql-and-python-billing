@@ -13,12 +13,6 @@ def main():
     write_conifguration_file()
     print("\nCreating The New Password", override="tan")
     create_new_passsword()
-    with console.status("[bold green]Initializing..", spinner='dots12') as _:
-        console.log("Created Log.txt")
-        sleep(1)
-        console.log("Created New Password")
-        sleep(1)
-        console.log("All Tasks Successful!")
 
 
 def sql(logging, rsa):
