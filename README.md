@@ -2,7 +2,8 @@
 [![Publish](https://github.com/Smilin-Dominator/mysql-and-python-billing/actions/workflows/release.yml/badge.svg)](https://github.com/Smilin-Dominator/mysql-and-python-billing/actions/workflows/release.yml)
 [![Syntax Highlighting](https://github.com/Smilin-Dominator/mysql-and-python-billing/actions/workflows/main.yml/badge.svg)](https://github.com/Smilin-Dominator/mysql-and-python-billing/actions/workflows/main.yml)
 
-# How To Use It?
+You may generate the docs by running the ruby script included in the 'docs/' folder.
+
 ***DELETE THIS FILE WHEN YOU'VE READ IT, ANYONE OTHER UNTRUSTED PARTY WHO READS THIS IS A THREAT***
 ### Prerequisites
 - Running From Source
@@ -15,13 +16,4 @@
     - You can either open Powershell and Type `./main.exe` or just click the Icon And It Should Setup Everything</font>
 - Notes Common To Both
     - If you have a MySQL / MariaDB Server instance, don't create a docker container, but if you don't install [docker-compose](https://docs.docker.com/compose/install/) and then run the program.
-
-# Index
-- [Log](./docs/log.md)
-- Function Lists
-  - [main.py](./docs/functions/main.md)
-  - [connector.py](./docs/functions/connector.md)
-  - [verify.py](./docs/functions/verify.md)
-  - [sql-client.py](./docs/functions/sql-client.md)
-- Options For [config.yaml](./docs/functions/configuration_options.md)
-- [Scenarios and Combating Them](./docs/scenarios.md)
+    
