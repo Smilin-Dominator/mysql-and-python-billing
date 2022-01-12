@@ -16,6 +16,20 @@ logging.basicConfig(filename='log.txt', format=Variables.log_format, datefmt='[%
 
 # --------- Integrity Check Functions -------------- #
 
+def create_new_passsword() -> None:
+    pas_enter = input(prompt="Enter A Password", override="red", password=True)
+    pas = open('./credentials/passwd.txt', 'w+')
+    salt1 = ''.join(choices(ascii_letters + hexdigits, k=95))
+    salt2 = ''.join(choices(digits + octdigits, k=95))
+    pass_write = str(salt1 + pas_enter + salt2)
+    hashpass = sha512(pass_write.encode()).hexdigest()
+    signature = md5("McDonalds_Im_Loving_It".encode()).hexdigest()
+    enc = "\n".join([signature, salt1, salt2, hashpass])
+    logging.info(f"Systemdump--Ignore--These\n{enc}")
+    pas.write(','.join([salt1, salt2, hashpass]))
+    info("Success!", "green")
+
+
 def check_password() -> tuple or bool:
     lines = open("log.txt", "r").read().splitlines()
     output = []
@@ -72,17 +86,7 @@ def init5_security(mycursor, conf: bool):
         critical = check_password()
         if not critical:
             warning("No Password Set.. Creating File..")
-            pas_enter = input(prompt="Enter A Password", override="red", password=True)
-            pas = open('./credentials/passwd.txt', 'w+')
-            salt1 = ''.join(choices(ascii_letters + hexdigits, k=95))
-            salt2 = ''.join(choices(digits + octdigits, k=95))
-            pass_write = str(salt1 + pas_enter + salt2)
-            hashpass = sha512(pass_write.encode()).hexdigest()
-            signature = md5("McDonalds_Im_Loving_It".encode()).hexdigest()
-            enc = "\n".join([signature, salt1, salt2, hashpass])
-            logging.info(f"Systemdump--Ignore--These\n{enc}")
-            pas.write(','.join([salt1, salt2, hashpass]))
-            info("Success!", "green")
+            create_new_passsword()
         else:
             recover_password(critical)
 
