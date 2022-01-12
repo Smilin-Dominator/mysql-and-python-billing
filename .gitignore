@@ -16,3 +16,4 @@ build
 !.github
 venv/
 sales_reports/
+docs/*.html
